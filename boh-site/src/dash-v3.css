@@ -1142,4 +1142,19 @@
   .boh-axis { padding-bottom: 1.5rem; }
   .cycle-sum { margin-top: 1.5rem; }
   .foot { padding: 1.25rem 0 1.75rem; }
+
+  /*
+    对比表只有四列，不该套用「篮子构成表」的 58rem 最小宽度，
+    否则手机上是 928px 宽被裁，必须横向拖很远。
+    收紧列距与字号，让四列正好放得下。
+  */
+  .pl-table { min-width: 0; font-size: 0.72rem; }
+  .pl-table th { padding: 0 0.3rem 0.45rem 0; line-height: 1.25; }
+  .pl-table td { padding: 0.65rem 0.3rem 0.65rem 0; }
+  .pl-table .n { padding-right: 0.5rem; }
+  .pl-table .n:last-child { padding-right: 0; }
+  .pl-table th:first-child,
+  .pl-table td:first-child { width: 31%; }
+  .pl-name { gap: 0.3rem; }
+  .pl-name .ic { width: 16px; height: 16px; }
 }
