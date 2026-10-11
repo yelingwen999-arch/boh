@@ -29,7 +29,11 @@ const cls = v => (v == null ? 'flat' : v > 0 ? 'up' : v < 0 ? 'down' : 'flat');
 function drawLogChart(svg, dates, series, opts = {}) {
   const W = svg.clientWidth || 1000;
   const H = svg.clientHeight || 340;
-  const M = { t: 22, r: 78, b: 26, l: 56 };
+  // 窄屏收紧边距，否则绘图区只剩一小条，横轴标签会互相压住
+  const narrow = W < 560;
+  const M = narrow
+    ? { t: 20, r: 52, b: 24, l: 38 }
+    : { t: 22, r: 78, b: 26, l: 56 };
   const PW = W - M.l - M.r;
   const PH = H - M.t - M.b;
   const n = dates.length;
@@ -99,8 +103,10 @@ function drawLogChart(svg, dates, series, opts = {}) {
   lt.textContent = opts.endFormat ? opts.endFormat(lastS) : lastS.toFixed(1);
   svg.appendChild(lt);
 
-  // 横轴
-  const picks = [0, Math.floor(n / 3), Math.floor((2 * n) / 3), n - 1];
+  // 横轴：窄屏只标首尾两个，否则标签会互相压住
+  const picks = narrow
+    ? [0, n - 1]
+    : [0, Math.floor(n / 3), Math.floor((2 * n) / 3), n - 1];
   picks.forEach((i, k) => {
     const t = svgEl('text', {
       class: 'axis', x: X(i), y: M.t + PH + 18,

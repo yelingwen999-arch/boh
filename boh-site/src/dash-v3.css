@@ -1029,7 +1029,18 @@
 
 @media (max-width: 680px) {
   :root { --pad: 1.1rem; }
-  .head-nav, .lang, .brand-sub { display: none; }
+  /* 手机：隐藏语言按钮与副标；导航保留，否则到不了平台史页 */
+  .lang, .brand-sub { display: none; }
+  .head-in { gap: 0.5rem; height: 4.4rem; }
+  .head-nav {
+    display: flex;
+    margin-left: auto;
+    gap: 0.85rem;
+  }
+  .head-nav a { font-size: 0.82rem; }
+  .brand-mark { width: 2.6rem; height: 2.6rem; }
+  .brand-name { font-size: 1.1rem; letter-spacing: 0.1em; }
+  .themebtn { font-size: 0.66rem; padding: 0.15rem 0.4rem; }
   .hero { padding: 3rem 0 2rem; }
   .reasons { grid-template-columns: 1fr; }
   .reason + .reason { padding-left: 0; border-left: 0; border-top: 1px solid var(--rule-2); }
@@ -1056,7 +1067,11 @@
   .boh-seg-part + .boh-seg-part { border-left: 0; border-top: 1px solid var(--panel); }
   .boh-seg-pct { font-size: 0.85rem; }
   .boh-seg-months { font-size: 0.74rem; }
-  #chart { height: 230px; }
-  #pl-chart { height: 250px; }
+  /* 手机上图更高一些，否则 SVG 等比缩放会把文字压得极小 */
+  #chart { height: 300px; }
+  #pl-chart { height: 320px; }
   .chart-readout { flex-wrap: wrap; gap: 0.5rem 1.1rem; }
+  .hero-chart { padding: 0.6rem 0.7rem 0.3rem; }
+  /* 手机上图更小，刻度文字相应缩小一点 */
+  #cycle-chart .axis, #pl-chart .axis { font-size: 9.5px; }
 }

@@ -37,7 +37,11 @@ export function renderPlatformHistory(cfg) {
 
   const W = svg.clientWidth || 1000;
   const H = svg.clientHeight || 380;
-  const M = { t: 24, r: 78, b: 28, l: 64 };
+  // 窄屏收紧边距，给绘图区留出宽度
+  const narrow = W < 560;
+  const M = narrow
+    ? { t: 22, r: 56, b: 26, l: 44 }
+    : { t: 24, r: 78, b: 28, l: 64 };
   const PW = W - M.l - M.r;
   const PH = H - M.t - M.b;
   const dates = cfg.dates;
@@ -113,11 +117,16 @@ export function renderPlatformHistory(cfg) {
       class: 'axis', x: X(lastIdx) + 7, y: Y(arr[lastIdx]) + 4,
       'text-anchor': 'start', fill: SERIES_STYLE[s].color, 'font-weight': '600',
     });
-    t.textContent = `${s} ${mult >= 10 ? mult.toFixed(0) : mult.toFixed(2)}×`;
+    // 窄屏只留币种代号，倍数由下方对比表给出
+    t.textContent = narrow
+      ? s
+      : `${s} ${mult >= 10 ? mult.toFixed(0) : mult.toFixed(2)}×`;
     svg.appendChild(t);
   }
 
-  const picks = [0, Math.floor(n / 3), Math.floor((2 * n) / 3), n - 1];
+  const picks = narrow
+    ? [0, n - 1]
+    : [0, Math.floor(n / 3), Math.floor((2 * n) / 3), n - 1];
   picks.forEach((i, k) => {
     const t = svgEl('text', {
       class: 'axis', x: X(i), y: M.t + PH + 18,
