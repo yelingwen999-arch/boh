@@ -13,7 +13,6 @@
 
 ```
 boh-site/                 网站源码
-├── index.html            访问根目录时进入总览
 ├── dash.html             总览页
 ├── history.html          平台史页
 ├── src/                  样式与脚本
@@ -27,6 +26,7 @@ boh-site/                 网站源码
 │   ├── render-logic.js   周期时间轴
 │   └── render-platform-history.js   平台币 vs BTC
 ├── public/
+│   ├── _redirects        根目录代理到 /dash.html（状态码 200）
 │   ├── data/             数据文件（构建时原样复制）
 │   └── icons/            币种官方图标
 └── scripts/              数据抓取脚本（Python）

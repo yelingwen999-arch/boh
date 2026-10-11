@@ -9,10 +9,11 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     emptyOutDir: true,
-    // 两个页面各自作为入口，静态托管时都能直接访问
+    // 两个页面各自作为入口，静态托管时都能直接访问。
+    // 根目录由 public/_redirects 代理到 /dash.html（状态码 200，
+    // 是就地渲染而非跳转），所以不需要单独的 index.html 跳转页。
     rollupOptions: {
       input: {
-        index: resolve(__dirname, 'index.html'),
         dash: resolve(__dirname, 'dash.html'),
         history: resolve(__dirname, 'history.html'),
       },
