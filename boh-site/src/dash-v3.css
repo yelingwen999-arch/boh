@@ -1,0 +1,1062 @@
+/* ==========================================================================
+   BOH — 总览页样式（v3）
+   骨架沿用上一版：行情带 → 指标卡 → 快照格 → 图表 → 表格 → 平台卡 → 手续费。
+   只换视觉：IBM Plex 字体、去光晕、去渐变文字、颜色走语义变量，支持日夜切换。
+   ========================================================================== */
+
+@import './ref.css';
+
+/* ---------- 主题变量 ------------------------------------------------------ */
+
+:root,
+[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #08090b;
+  --bg-2: #0c0e11;
+  --panel: #0c0e11;
+  --panel-2: #101318;
+  --rule: #1e2226;
+  --rule-2: #15181c;
+  --tx: #edeae4;
+  --tx-2: #9aa1a9;
+  --tx-3: #5f666e;
+  --brass: #c8a44e;
+  --jade: #5fae8b;
+  --clay: #c66a4e;
+  --hover: #ffffff06;
+  --grid-line: #ffffff0a;
+  --base-line: #ffffff18;
+  --brass-soft: #c8a44e10;
+  --clay-soft: #c66a4e0f;
+  --chip-bg: #12151a;
+}
+
+[data-theme='light'] {
+  color-scheme: light;
+  --bg: #fbfaf8;
+  --bg-2: #f4f2ee;
+  --panel: #ffffff;
+  --panel-2: #f7f5f1;
+  --rule: #d9d5cc;
+  --rule-2: #e8e5df;
+  --tx: #14161a;
+  --tx-2: #4d545c;
+  --tx-3: #82898f;
+  --brass: #8a6a1f;
+  --jade: #1f7a58;
+  --clay: #b04a2c;
+  --hover: #00000006;
+  --grid-line: #00000012;
+  --base-line: #00000022;
+  --brass-soft: #8a6a1f12;
+  --clay-soft: #b04a2c10;
+  --chip-bg: #f2efe9;
+}
+
+/* ---------- 主题切换按钮 -------------------------------------------------- */
+
+.themebtn {
+  font: inherit; font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.08em;
+  color: var(--tx-2); background: transparent;
+  border: 1px solid var(--rule); border-radius: 2px;
+  padding: 0.18rem 0.5rem; cursor: pointer;
+  transition: color .12s linear, border-color .12s linear;
+}
+.themebtn:hover { color: var(--tx); border-color: var(--tx-3); }
+.themebtn:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+
+/* ---------- 行情带（顶部滚动） -------------------------------------------- */
+
+.ticker {
+  position: relative;
+  border-bottom: 1px solid var(--rule-2);
+  background: var(--bg-2);
+  overflow: hidden;
+  height: 2.2rem;
+}
+/* 两端渐隐，避免内容硬切 */
+.ticker::after {
+  content: "";
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(90deg, var(--bg-2) 0, transparent 5%, transparent 95%, var(--bg-2) 100%);
+}
+.ticker-track {
+  display: flex;
+  gap: 2.6rem;
+  white-space: nowrap;
+  width: max-content;
+  line-height: 2.2rem;
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  color: var(--tx-2);
+  will-change: transform;
+  animation: ticker-slide 48s linear infinite;
+}
+@keyframes ticker-slide {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.ticker:hover .ticker-track { animation-play-state: paused; }
+
+.tk { display: inline-flex; align-items: center; gap: 0.42rem; }
+.tk-code { color: var(--tx); font-weight: 600; }
+.tk-price { color: var(--tx-2); }
+
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track { animation: none; }
+}
+
+/* ---------- 页眉 ---------------------------------------------------------- */
+
+.head { border-bottom: 1px solid var(--rule); background: var(--bg); }
+.head-in { display: flex; align-items: center; gap: 0.7rem; height: 5.3rem; }
+/* ---------- 品牌标记 ------------------------------------------------------ */
+
+.brand {
+  display: inline-flex; align-items: center; gap: 0.85rem;
+  text-decoration: none; color: var(--tx);
+}
+.brand-mark {
+  width: 3.4rem; height: 3.4rem;
+  flex: 0 0 auto;
+  display: block;
+}
+.brand-mark svg { display: block; width: 100%; height: 100%; }
+
+/* 米白底：黑色 K 线必须靠浅底才看得见 */
+.bm-bg { fill: #f2efe6; }
+
+/* 三根依次上升的实体 K 线（光头光脚），按上市顺序用各平台的代表色 */
+.bm-candle { stroke: none; }
+.bm-candle.c1 { fill: #d8a410; }   /* BNB 黄 */
+.bm-candle.c2 { fill: #2b2b2b; }   /* OKB 黑 */
+.bm-candle.c3 { fill: #1ba98a; }   /* HYPE 青 */
+
+.brand-text { display: flex; flex-direction: column; gap: 0.05rem; line-height: 1.08; }
+.brand-name {
+  font-family: var(--serif);
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+}
+.brand-sub {
+  font-family: var(--sans);
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  color: var(--tx-3);
+}
+
+.head-nav { margin-left: auto; display: flex; gap: 1.4rem; }
+.head-nav a { color: var(--tx-2); text-decoration: none; font-size: 0.85rem; }
+.head-nav a:hover { color: var(--tx); }
+
+.lang {
+  font-family: var(--mono); font-size: 0.72rem; color: var(--tx-3);
+  border-left: 1px solid var(--rule); padding-left: 1.1rem; margin-left: 1.1rem;
+  letter-spacing: 0.08em;
+}
+
+/* ---------- 首屏 ---------------------------------------------------------- */
+
+.hero { padding: 4.5rem 0 3rem; }
+.hero-in {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: 3.5rem;
+  align-items: start;
+}
+.eyebrow {
+  font-family: var(--mono); font-size: 0.72rem;
+  letter-spacing: 0.22em; color: var(--tx-3);
+  margin: 0 0 1.1rem;
+}
+.hero h1 {
+  margin: 0 0 1.5rem;
+  font-size: clamp(1.9rem, 4.2vw, 3rem);
+  font-weight: 600;
+  line-height: 1.28;
+  letter-spacing: -0.022em;
+}
+.lede {
+  font-size: 1.02rem; line-height: 1.9; color: var(--tx-2);
+  max-width: 33em; margin: 0 0 1.6rem;
+}
+.lede strong { color: var(--tx); font-weight: 600; }
+.hero-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.tag {
+  font-size: 0.75rem; color: var(--tx-2);
+  border: 1px solid var(--rule);
+  padding: 0.28rem 0.65rem; border-radius: 2px;
+}
+
+/* ---------- 核心指标卡 ---------------------------------------------------- */
+
+.keycard {
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  background: var(--panel);
+  padding: 1.15rem 1.35rem 1rem;
+}
+.keycard-head {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid var(--rule-2);
+}
+.keycard-title { font-size: 0.78rem; color: var(--tx-3); letter-spacing: 0.02em; }
+
+.ranges { margin-left: auto; display: flex; gap: 0.15rem; }
+.ranges button {
+  font: inherit; font-family: var(--mono); font-size: 0.72rem;
+  padding: 0.18rem 0.5rem;
+  border: 1px solid transparent; border-radius: 2px;
+  background: transparent; color: var(--tx-3); cursor: pointer;
+  transition: color .14s linear, border-color .14s linear;
+}
+.ranges button:hover { color: var(--tx-2); }
+.ranges button.is-on { color: var(--tx); border-color: var(--brass); }
+
+.keycard-body {
+  display: flex; align-items: baseline; gap: 0.55rem;
+  padding: 1.15rem 0 0.9rem;
+}
+.keynum {
+  font-family: var(--mono);
+  font-size: clamp(2.6rem, 6vw, 3.8rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--tx);
+}
+.keyunit { font-size: 0.82rem; color: var(--tx-3); }
+
+.keycard-grid {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0; border-top: 1px solid var(--rule-2);
+}
+.keycard-grid > div {
+  padding: 0.75rem 1rem 0.2rem 0;
+  display: flex; flex-direction: column; gap: 0.25rem;
+}
+.keycard-grid > div + div { padding-left: 1rem; border-left: 1px solid var(--rule-2); }
+.kg-label { font-size: 0.68rem; color: var(--tx-3); }
+.kg-value { font-size: 1.02rem; font-weight: 600; }
+
+.keycard-foot { margin: 0.9rem 0 0; font-size: 0.68rem; color: var(--tx-3); font-family: var(--mono); }
+
+/* ---------- 为什么是平台币 ------------------------------------------------ */
+
+.why { padding: 1rem 0 3.5rem; }
+.why-lead {
+  margin: 0 0 2.25rem; font-size: 1.02rem; line-height: 1.9;
+  color: var(--tx-2); max-width: 42em;
+}
+.why-lead p { margin: 0 0 1rem; }
+.why-lead p:last-child { margin-bottom: 0; }
+.why-lead strong { color: var(--tx); font-weight: 600; }
+
+.reasons {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0; border-top: 1px solid var(--rule);
+}
+.reason { padding: 1.3rem 1.4rem 1.3rem 0; display: flex; flex-direction: column; gap: 0.45rem; }
+.reason + .reason { padding-left: 1.4rem; border-left: 1px solid var(--rule-2); }
+.reason h3 { margin: 0; font-size: 0.93rem; font-weight: 600; line-height: 1.45; }
+.reason p { margin: 0; font-size: 0.83rem; color: var(--tx-2); line-height: 1.7; }
+.reason .r-evi {
+  margin-top: auto; padding-top: 0.7rem;
+  font-family: var(--mono); font-size: 0.78rem; color: var(--tx);
+  border-top: 1px solid var(--rule-2);
+}
+.reason .r-evi span { display: block; }
+.reason .r-evi .k { color: var(--tx-3); font-size: 0.68rem; }
+
+.caveat {
+  margin: 2rem 0 0; padding: 0.9rem 1.05rem;
+  font-size: 0.87rem; line-height: 1.8; color: var(--tx-2);
+  border-left: 2px solid var(--clay);
+  background: linear-gradient(90deg, var(--clay-soft), transparent 72%);
+  border-radius: 0 3px 3px 0; max-width: 52em;
+}
+.caveat strong { color: var(--tx); font-weight: 600; }
+
+/* ---------- 章节头 -------------------------------------------------------- */
+
+.sec-head {
+  display: flex; align-items: baseline; gap: 1rem;
+  margin-bottom: 1.4rem; padding-bottom: 0.7rem;
+  border-bottom: 1px solid var(--rule);
+}
+.sec-head h2 {
+  margin: 0; font-size: 0.9rem; font-weight: 600; letter-spacing: 0.02em;
+}
+.sec-note { margin-left: auto; font-size: 0.76rem; color: var(--tx-3); font-family: var(--mono); }
+
+/* ---------- 什么是 BOH ---------------------------------------------------- */
+
+.define { padding: 3rem 0 3.5rem; }
+
+.df-eyebrow {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  color: var(--tx-3);
+  margin: 0 0 1.1rem;
+}
+.df-lead {
+  margin: 0 0 2.25rem;
+  font-size: clamp(1.25rem, 2.6vw, 1.75rem);
+  line-height: 1.6;
+  letter-spacing: -0.015em;
+  color: var(--tx-2);
+  max-width: 30em;
+}
+.df-lead strong { color: var(--tx); font-weight: 600; }
+
+.df-points {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  border-top: 1px solid var(--rule);
+}
+.df-points > div {
+  padding: 1.2rem 1.6rem 0 0;
+}
+.df-points > div + div {
+  padding-left: 1.6rem;
+  border-left: 1px solid var(--rule-2);
+}
+.df-points dt {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  color: var(--brass);
+  margin-bottom: 0.5rem;
+}
+.df-points dd {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.75;
+  color: var(--tx-2);
+  max-width: 26em;
+}
+
+.df-aside {
+  margin: 2rem 0 0;
+  padding: 0.9rem 1.1rem;
+  font-size: 0.88rem;
+  line-height: 1.8;
+  color: var(--tx-2);
+  border-left: 2px solid var(--brass);
+  background: linear-gradient(90deg, var(--brass-soft), transparent 72%);
+  border-radius: 0 3px 3px 0;
+  max-width: 52em;
+}
+.df-aside strong { color: var(--tx); font-weight: 600; }
+
+/* ---------- 首屏里的 BOH 定义 --------------------------------------------- */
+
+.hero-copy .df-eyebrow {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  color: var(--tx-3);
+  margin: 0 0 1rem;
+}
+.hero-copy h1 {
+  font-size: clamp(1.55rem, 3.4vw, 2.35rem);
+  line-height: 1.35;
+  margin: 0 0 1.15rem;
+  letter-spacing: -0.02em;
+}
+.hero-copy .df-lead {
+  font-size: 1rem;
+  line-height: 1.85;
+  color: var(--tx-2);
+  margin: 0 0 1.6rem;
+  max-width: 34em;
+  letter-spacing: normal;
+}
+.hero-copy .df-lead strong { color: var(--tx); font-weight: 600; }
+
+.hero-copy .df-points {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 1.5rem;
+}
+.hero-copy .df-points > div { padding: 0.95rem 1.25rem 0 0; }
+.hero-copy .df-points > div + div { padding-left: 1.25rem; }
+.hero-copy .df-points dt { font-size: 0.7rem; margin-bottom: 0.35rem; }
+.hero-copy .df-points dd { font-size: 0.85rem; line-height: 1.7; max-width: none; }
+
+.hero-copy .df-aside {
+  margin: 0 0 1.5rem;
+  padding: 0.8rem 1rem;
+  font-size: 0.85rem;
+  line-height: 1.75;
+  max-width: 40em;
+}
+
+.hero-claim {
+  margin: 0;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--rule);
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: var(--tx-2);
+  max-width: 34em;
+}
+.hero-claim strong { color: var(--tx); font-weight: 600; }
+
+/* 首屏右栏：指标卡 + 走势图，撑起与左栏相当的高度 */
+.hero-right {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.hero-chart {
+  margin: 0;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  background: var(--panel);
+  padding: 0.75rem 0.9rem 0.4rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.hero-chart .chart-readout {
+  padding: 0 0.1rem 0.6rem;
+  gap: 1.1rem;
+  font-size: 0.72rem;
+}
+.hero-chart #chart {
+  display: block;
+  width: 100%;
+  height: 230px;
+  flex: 1 1 auto;
+}
+
+/* ---------- 论证板块（为什么是现在 / 为什么是平台币） -------------------- */
+
+.logic { padding: 1rem 0 3.5rem; }
+
+.logic-lead {
+  margin: 0 0 2.75rem;
+  font-size: 1.04rem; line-height: 1.9;
+  color: var(--tx-2); max-width: 44em;
+}
+.logic-lead p { margin: 0 0 0.9rem; }
+.logic-lead p:last-child { margin-bottom: 0; }
+.logic-lead strong { color: var(--tx); font-weight: 600; }
+
+.lnode { margin: 0 0 0.5rem; }
+.lnode-head {
+  display: flex; align-items: baseline; gap: 0.85rem;
+  margin-bottom: 0.85rem;
+}
+.lnode-idx {
+  font-family: var(--mono); font-size: 0.72rem;
+  letter-spacing: 0.16em; color: var(--brass);
+  white-space: nowrap;
+}
+.lnode-head h3 {
+  margin: 0; font-size: 1.16rem; font-weight: 600;
+  letter-spacing: -0.01em; line-height: 1.4;
+}
+.lnode-body {
+  margin: 0 0 1.5rem;
+  font-size: 0.96rem; line-height: 1.85;
+  color: var(--tx-2);
+}
+.lnode-body strong { color: var(--tx); font-weight: 600; }
+/* 单独成段的正文（如图表后面的结论）不要被上面那条限制卡住 */
+.lnode-body--wide { max-width: none; }
+
+.lfacts {
+  margin: 1.25rem 0 0;
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-top: 1px solid var(--rule);
+}
+.lfacts > div {
+  padding: 1rem 1.25rem 0 0;
+  display: flex; flex-direction: column; gap: 0.35rem;
+}
+.lfacts > div + div {
+  padding-left: 1.25rem;
+  border-left: 1px solid var(--rule-2);
+}
+.lfacts dt { font-size: 0.74rem; color: var(--tx-3); }
+.lfacts dd {
+  margin: 0;
+  font-family: var(--mono); font-size: 1.08rem; font-weight: 500;
+  letter-spacing: -0.01em; color: var(--tx);
+}
+.lfacts dd.up { color: var(--jade); }
+.lfacts dd.down { color: var(--clay); }
+.lfacts dd small {
+  display: block; margin-top: 0.2rem;
+  font-family: var(--sans); font-size: 0.7rem;
+  font-weight: 400; color: var(--tx-3); letter-spacing: 0;
+}
+
+.linfer {
+  margin: 1.75rem 0 2.75rem;
+  padding: 0.85rem 1.1rem;
+  font-size: 0.97rem; line-height: 1.8;
+  color: var(--tx-2);
+  border-left: 2px solid var(--brass);
+  background: linear-gradient(90deg, var(--brass-soft), transparent 70%);
+  border-radius: 0 3px 3px 0;
+  max-width: 50em;
+}
+.linfer strong { color: var(--tx); font-weight: 600; }
+.lfinal { margin-bottom: 2rem; }
+
+/* 周期柱状图 */
+.lfacts-block { margin: 1.5rem 0 0; }
+/* 第二层的平台币对比表 */
+.pl-table { margin-top: 1.25rem; }
+.pl-table th { padding: 0 1rem 0.6rem 0; }
+.pl-table td { padding: 0.85rem 1rem 0.85rem 0; }
+.pl-table .n { text-align: right; padding-right: 1.5rem; }
+.pl-table .n:last-child { padding-right: 0; }
+.pl-name { display: inline-flex; align-items: center; gap: 0.5rem; }
+
+
+.boh-seg {
+  position: relative;
+  display: flex !important;      /* 防止外部样式表覆盖 */
+  flex-direction: row;
+  align-items: stretch;
+  height: 6rem;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  margin-top: 0.25rem;
+}
+.boh-seg-part {
+  position: relative;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  min-width: 0;
+  color: #fff;
+  overflow: hidden;
+  flex-shrink: 0 !important;     /* 段宽由内联 flex 决定，不允许被压缩 */
+}
+.boh-seg-part.bull { background: var(--jade); }
+.boh-seg-part.bear { background: var(--clay); }
+/* 相邻段之间留一道细缝，让分段看得清 */
+.boh-seg-part + .boh-seg-part { border-left: 1px solid var(--panel); }
+
+.boh-seg-pct {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+/* 色带内的第二行：这段经历了多少个月 */
+.boh-seg-months {
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  font-weight: 400;
+  opacity: 0.88;
+  white-space: nowrap;
+}
+
+/* ---------- 时间坐标轴 ---------------------------------------------------- */
+
+/* 底部留出年月标签的高度，避免标签溢出压到下面板块的边框上 */
+.boh-axis { position: relative; padding-bottom: 2.1rem; }
+
+/* 横轴：位于色带与年月之间，右端带箭头表示时间继续 */
+.boh-rule {
+  position: relative;
+  height: 1px;
+  margin-top: 0.85rem;
+  background: var(--rule);
+  margin-right: 0.7rem;   /* 给右端箭头留位置 */
+}
+
+.boh-axis-arrow {
+  position: absolute;
+  right: -0.62rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0; height: 0;
+  border-top: 0.3rem solid transparent;
+  border-bottom: 0.3rem solid transparent;
+  border-left: 0.52rem solid var(--rule);
+}
+
+/*
+  刻度竖条：骑在横轴线上，同时向上下伸出。
+  上端指向上方的色带，下端指向下方的年月标签。
+*/
+.boh-tick {
+  position: absolute;
+  bottom: -0.42rem;      /* 从横轴往下 */
+  height: 0.95rem;       /* 向上 0.53rem、向下 0.42rem */
+  width: 1px;
+  background: var(--rule);
+  transform: translateX(-0.5px);
+}
+
+/* 年月标签：位于竖条正下方 */
+.boh-tick-label {
+  position: absolute;
+  top: 0.85rem;
+  transform: translateX(-50%);
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  line-height: 1;
+  color: var(--tx-3);
+  white-space: nowrap;
+}
+/* 两端标签贴边对齐，避免溢出被裁 */
+.boh-tick-label.is-first { transform: translateX(0); }
+.boh-tick-label.is-last { transform: translateX(-100%); }
+
+.cycle-sum {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--rule-2);
+  margin-top: 2.1rem;
+}
+.cycle-sum > div {
+  padding: 1.15rem 1.4rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.22rem;
+}
+.cycle-sum > div + div { padding-left: 1.4rem; border-left: 1px solid var(--rule-2); }
+.cs-k { font-size: 0.73rem; color: var(--tx-3); }
+.cs-v {
+  font-family: var(--mono); font-size: 1.06rem; font-weight: 500;
+  letter-spacing: -0.01em; color: var(--tx);
+}
+.cs-v em { font-family: var(--sans); font-style: normal; font-size: 0.76rem; color: var(--tx-3); }
+.cs-v.up { color: var(--jade); }
+.cs-v.down { color: var(--clay); }
+.cs-n { font-family: var(--mono); font-size: 0.68rem; color: var(--tx-3); }
+
+/* 第二层的平台币对比条（折线图下面的三条横条） */
+
+/* 币种图标（官方品牌图标，本地文件） */
+.ic {
+  display: inline-block;
+  width: 1.5rem; height: 1.5rem;
+  object-fit: contain;
+  flex: 0 0 auto;
+  vertical-align: -0.32rem;
+}
+.ic-sm { width: 1.05rem; height: 1.05rem; vertical-align: -0.18rem; }
+.ic-lg { width: 2.1rem; height: 2.1rem; vertical-align: -0.5rem; }
+.ic-okb, .ic-hype { border-radius: 3px; }
+
+/* 图例里的图标对齐 */
+.lg-note .ic { margin-right: 0.3rem; }
+.lg-item { display: inline-flex; align-items: center; gap: 0.3rem; }
+.lg-item + .lg-item { margin-left: 0.95rem; }
+.lg-line {
+  display: inline-block;
+  width: 14px; height: 2.5px;
+  border-radius: 1px;
+  margin-right: 0.1rem;
+}
+
+/* 图表说明与图例 */
+.chart-cap {
+  display: flex; align-items: baseline; gap: 1rem;
+  font-size: 0.76rem; color: var(--tx-3);
+  padding: 0 0.15rem 0.7rem;
+  border-bottom: 1px solid var(--rule-2);
+}
+.lg-note { margin-left: auto; display: flex; align-items: center; gap: 0.9rem; }
+.lg-note .sw { margin-right: 0.32rem; }
+.sw-bear { background: var(--clay); opacity: 0.55; }
+.sw-bull { background: var(--brass); opacity: 0.55; }
+.sw-basket { background: var(--tx); }
+.sw-btc { background: var(--tx-3); }
+.sw-vs { background: var(--brass); }
+
+/* 论证板块里的图线（用饱和色，保证辨识度） */
+#cycle-chart { display: block; width: 100%; height: 340px; }
+.line-btc-main { fill: none; stroke: #c9a227; stroke-width: 1.8; }
+
+/* 平台币历史图 */
+#pl-chart { display: block; width: 100%; height: 380px; }
+.pl-bnb { fill: none; stroke: #5b9bd5; stroke-width: 2; }
+.pl-okb { fill: none; stroke: #e8913a; stroke-width: 1.8; }
+.pl-hype { fill: none; stroke: #3fbf87; stroke-width: 1.8; }
+.pl-btc { fill: none; stroke: #a8a29a; stroke-width: 1.2; stroke-dasharray: 5 3; }
+
+#cycle-chart .grid, #pl-chart .grid { stroke: var(--grid-line); stroke-width: 1; }
+#cycle-chart .axis, #pl-chart .axis {
+  fill: var(--tx-3); font-family: var(--mono); font-size: 10.5px;
+}
+#pl-chart .base100 { stroke: var(--base-line); stroke-width: 1; stroke-dasharray: 3 4; }
+
+.sw-bnb { background: #5b9bd5; }
+.sw-okb { background: #e8913a; }
+.sw-hype { background: #3fbf87; }
+.sw-btcref { background: #a8a29a; }
+
+/* 净值走势图线的区分度 */
+#line-chart-basket, .line-basket-main { fill: none; stroke: #4aa8d8; stroke-width: 2; }
+.line-btc-ref { fill: none; stroke: #a8a29a; stroke-width: 1.3; }
+.line-vs-ref { fill: none; stroke: #d98a3d; stroke-width: 1.4; }
+
+/* ---------- 行情快照（卡片格） -------------------------------------------- */
+
+.snapshot { padding: 2.5rem 0 0; }
+.snap {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+  border: 1px solid var(--rule); border-radius: 3px; overflow: hidden;
+}
+.snap-cell {
+  padding: 1rem 1.15rem 1.1rem;
+  background: var(--panel);
+  display: flex; flex-direction: column; gap: 0.4rem;
+}
+.snap-cell + .snap-cell { border-left: 1px solid var(--rule-2); }
+.snap-top { display: flex; align-items: baseline; gap: 0.5rem; }
+.snap-code { font-family: var(--mono); font-weight: 600; font-size: 0.92rem; letter-spacing: 0.05em; }
+.snap-name { font-size: 0.72rem; color: var(--tx-3); }
+.snap-price { font-family: var(--mono); font-size: 1.3rem; font-weight: 500; letter-spacing: -0.02em; }
+.snap-chg { font-family: var(--mono); font-size: 0.84rem; }
+.snap-row { display: flex; gap: 0.9rem; font-size: 0.72rem; color: var(--tx-3); font-family: var(--mono); margin-top: 0.1rem; }
+
+/* ---------- 图表 ---------------------------------------------------------- */
+
+.chartsec { padding: 2.5rem 0 3rem; }
+.legend { margin-left: auto; display: flex; gap: 1.15rem; font-size: 0.75rem; color: var(--tx-2); }
+.lg::before {
+  content: ""; display: inline-block; width: 16px; height: 2px;
+  margin-right: 0.42rem; vertical-align: middle;
+}
+.lg-basket::before { background: var(--tx); height: 3px; }
+.lg-btc::before { background: var(--tx-3); }
+.lg-vs::before { background: var(--brass); }
+
+.chartbox {
+  margin: 0; border: 1px solid var(--rule); border-radius: 3px;
+  background: var(--panel); padding: 1rem 1rem 0.4rem;
+}
+.chart-readout {
+  display: flex; align-items: center; gap: 1.4rem;
+  font-size: 0.74rem; color: var(--tx-3); font-family: var(--mono);
+  padding: 0 0.2rem 0.75rem; border-bottom: 1px solid var(--rule-2);
+}
+.ro-date { color: var(--tx-2); min-width: 6.2rem; }
+.ro-item { display: inline-flex; align-items: center; gap: 0.42rem; }
+.ro-item b { color: var(--tx); font-weight: 500; }
+.sw { width: 9px; height: 9px; border-radius: 1px; display: inline-block; }
+.sw-basket { background: var(--tx); }
+.sw-btc { background: var(--tx-3); }
+.sw-vs { background: var(--brass); }
+
+#chart { display: block; width: 100%; height: 340px; }
+#chart .grid { stroke: var(--grid-line); stroke-width: 1; }
+#chart .axis { fill: var(--tx-3); font-family: var(--mono); font-size: 11px; }
+#chart .base100 { stroke: var(--base-line); stroke-width: 1; stroke-dasharray: 3 4; }
+#chart .line-basket { fill: none; stroke: var(--tx); stroke-width: 1.8; stroke-linejoin: round; }
+#chart .line-btc { fill: none; stroke: var(--tx-3); stroke-width: 1.2; }
+#chart .line-vs { fill: none; stroke: var(--brass); stroke-width: 1.3; }
+#chart .fill-basket { fill: var(--brass-soft); }
+#chart .cross { stroke: var(--base-line); stroke-width: 1; }
+.chart-x {
+  display: flex; justify-content: space-between;
+  padding: 0.3rem 0.2rem 0.5rem;
+  font-family: var(--mono); font-size: 0.68rem; color: var(--tx-3);
+}
+
+/* ---------- 篮子构成表 ---------------------------------------------------- */
+
+.holdings { padding: 2.5rem 0 3rem; }
+.tablewrap { border: 1px solid var(--rule); border-radius: 3px; overflow-x: auto; background: var(--panel); }
+.grid-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 58rem; }
+.grid-table th {
+  text-align: left; font-weight: 500; font-size: 0.72rem;
+  letter-spacing: 0.08em; color: var(--tx-3);
+  padding: 0.8rem 1rem; border-bottom: 1px solid var(--rule);
+  white-space: nowrap; background: var(--bg-2);
+}
+.grid-table td {
+  padding: 0.9rem 1rem; border-bottom: 1px solid var(--rule-2);
+  vertical-align: middle;
+}
+.grid-table tbody tr:last-child td { border-bottom: 0; }
+.grid-table tbody tr:hover { background: var(--hover); }
+.n { text-align: right; }
+
+.tok { display: flex; flex-direction: column; gap: 0.1rem; }
+.tok-line { display: inline-flex; align-items: center; gap: 0.45rem; }
+.tok-code { font-family: var(--mono); font-weight: 600; font-size: 0.94rem; }
+.tok-name { font-size: 0.72rem; color: var(--tx-3); }
+.cell-num { font-family: var(--mono); font-size: 0.89rem; }
+.cell-sub { display: block; font-size: 0.64rem; color: var(--tx-3); font-family: var(--mono); }
+.empty { color: var(--tx-3); font-family: var(--sans); font-size: 0.82rem; }
+
+/* ---------- 平台实时信息（卡片 + 指标宫格） ------------------------------ */
+
+.platforms { padding: 2.5rem 0 3rem; }
+.plat-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+.plat-card {
+  border: 1px solid var(--rule); border-radius: 3px;
+  background: var(--panel);
+  padding: 1.1rem 1.15rem 1.2rem;
+  display: flex; flex-direction: column; gap: 1rem;
+}
+.plat-head { display: flex; align-items: flex-start; gap: 0.6rem; }
+.plat-id { display: flex; flex-direction: column; gap: 0.12rem; }
+.plat-code { font-family: var(--mono); font-weight: 600; font-size: 1.04rem; letter-spacing: 0.05em; }
+.plat-name { font-size: 0.72rem; color: var(--tx-3); }
+.plat-price { margin-left: auto; text-align: right; display: flex; flex-direction: column; gap: 0.1rem; }
+.plat-price-v { font-family: var(--mono); font-size: 1.14rem; font-weight: 500; }
+.plat-price-c { font-family: var(--mono); font-size: 0.76rem; }
+
+.plat-metrics {
+  display: grid; grid-template-columns: 1fr 1fr;
+  border: 1px solid var(--rule-2); border-radius: 2px; overflow: hidden;
+  gap: 1px; background: var(--rule-2);
+}
+.plat-metric { background: var(--panel); padding: 0.5rem 0.65rem; display: flex; flex-direction: column; gap: 0.15rem; }
+.pm-k { font-size: 0.66rem; color: var(--tx-3); }
+.pm-v { font-family: var(--mono); font-size: 0.86rem; font-weight: 500; }
+.pm-v.empty { font-family: var(--sans); font-weight: 400; font-size: 0.76rem; color: var(--tx-3); }
+
+.plat-block { display: flex; flex-direction: column; gap: 0.45rem; }
+.plat-block h4 {
+  margin: 0; font-size: 0.7rem; font-weight: 500; letter-spacing: 0.1em;
+  color: var(--tx-3); padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--rule-2);
+}
+.plat-block p { margin: 0; font-size: 0.8rem; color: var(--tx-2); line-height: 1.65; }
+.plat-events { list-style: none; margin: 0; padding: 0; }
+.plat-events li {
+  display: grid; grid-template-columns: 5.2rem minmax(0, 1fr);
+  gap: 0.65rem; padding: 0.4rem 0;
+  border-bottom: 1px solid var(--rule-2);
+  font-size: 0.79rem; line-height: 1.6;
+}
+.plat-events li:last-child { border-bottom: 0; }
+.ev-date { font-family: var(--mono); font-size: 0.67rem; color: var(--tx-3); }
+.ev-body { color: var(--tx-2); }
+.ev-src { display: block; font-size: 0.63rem; color: var(--tx-3); font-family: var(--mono); margin-top: 0.12rem; }
+.plat-note {
+  font-size: 0.72rem; color: var(--tx-2); margin: 0;
+  border-left: 2px solid var(--clay); padding-left: 0.6rem; line-height: 1.65;
+}
+
+/* ---------- 手续费卡 ------------------------------------------------------ */
+
+.fees { padding: 2.5rem 0 3rem; }
+.fee-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+.fee-card {
+  border: 1px solid var(--rule); border-radius: 3px;
+  background: var(--panel);
+  padding: 1.1rem 1.15rem 1.2rem;
+  display: flex; flex-direction: column; gap: 0.65rem;
+}
+.fee-head { display: flex; align-items: baseline; gap: 0.55rem; }
+.fee-code { font-family: var(--mono); font-weight: 600; letter-spacing: 0.05em; }
+.fee-name { font-size: 0.72rem; color: var(--tx-3); }
+.fee-row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 0.35rem 0; border-bottom: 1px solid var(--rule-2); font-size: 0.82rem;
+}
+.fee-row:first-of-type { border-top: 1px solid var(--rule-2); }
+.fee-k { color: var(--tx-3); font-size: 0.75rem; }
+.fee-v { font-family: var(--mono); font-size: 0.86rem; font-weight: 500; }
+.fee-v.empty { font-family: var(--sans); font-size: 0.78rem; color: var(--tx-3); font-weight: 400; }
+.fee-note { font-size: 0.72rem; color: var(--tx-3); margin: 0; line-height: 1.65; }
+.src-note { font-size: 0.74rem; color: var(--tx-3); margin: 1rem 0 0; max-width: 52em; }
+
+/* ---------- 方法 / 风险 --------------------------------------------------- */
+
+.method { padding: 2.5rem 0 3rem; }
+.method-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--rule); }
+.method-grid article { padding: 1.3rem 1.5rem 0 0; }
+.method-grid article + article { padding-left: 1.5rem; border-left: 1px solid var(--rule-2); }
+.method-grid h3 { margin: 0 0 0.5rem; font-size: 0.95rem; font-weight: 600; }
+.method-grid p { margin: 0; font-size: 0.85rem; color: var(--tx-2); line-height: 1.75; }
+
+/* 风险与数据说明：刻意做小做淡，放在最底下，不抢视线 */
+.foot-risk {
+  margin: 0 0 0.5rem;
+  font-size: 0.7rem;
+  line-height: 1.7;
+  color: var(--tx-3);
+  max-width: 60em;
+  opacity: 0.85;
+}
+.foot-risk strong { color: var(--tx-3); font-weight: 600; }
+
+/* ---------- 页脚 ---------------------------------------------------------- */
+
+.foot { border-top: 1px solid var(--rule); background: var(--bg-2); padding: 1.6rem 0 2.25rem; }
+.foot-legal { margin: 0 0 0.6rem; font-size: 0.82rem; color: var(--tx-2); max-width: 46em; }
+.foot-legal strong { color: var(--tx); }
+.foot-meta { margin: 0; font-family: var(--mono); font-size: 0.66rem; color: var(--tx-3); opacity: 0.8; }
+
+/* ---------- 平台发展史页 ------------------------------------------------ */
+
+.hist-pagehead { padding: 3.5rem 0 2rem; }
+.hist-pagehead h1 {
+  margin: 0 0 0.9rem;
+  font-size: clamp(1.6rem, 3.4vw, 2.3rem);
+  font-weight: 600; letter-spacing: -0.02em; line-height: 1.3;
+}
+.hist-pagehead p {
+  margin: 0; color: var(--tx-2); max-width: 44em; font-size: 0.98rem;
+}
+
+.hist-sec { padding: 2.5rem 0 3rem; border-top: 1px solid var(--rule); }
+.hist-head {
+  display: flex; align-items: baseline; gap: 1rem;
+  flex-wrap: wrap; margin-bottom: 1.5rem;
+}
+.hist-code {
+  font-family: var(--mono); font-size: 1.5rem; font-weight: 600;
+  letter-spacing: 0.06em;
+}
+.hist-name { color: var(--tx-3); font-size: 0.9rem; }
+.hist-tag { margin-left: auto; font-family: var(--mono); font-size: 0.74rem; color: var(--tx-3); }
+
+.hist-sec h2,
+.unverified h2 {
+  font-size: 0.86rem; font-weight: 600; letter-spacing: 0.14em;
+  color: var(--tx-2); margin: 0 0 1rem; padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--rule-2);
+}
+
+/* 关键数据速览 */
+.facts {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0; margin: 0 0 2.5rem;
+}
+.facts > div { padding: 0 1.5rem 0 0; }
+.facts > div + div { padding-left: 1.5rem; border-left: 1px solid var(--rule-2); }
+.facts dt { font-size: 0.74rem; color: var(--tx-3); margin-bottom: 0.3rem; }
+.facts dd { margin: 0; font-size: 0.88rem; color: var(--tx); line-height: 1.6; }
+.facts dd .num { font-family: var(--mono); }
+
+/* 时间线 */
+.timeline { list-style: none; margin: 0; padding: 0; }
+.timeline li {
+  display: grid; grid-template-columns: 8.5rem minmax(0, 1fr);
+  gap: 1.5rem; padding: 0.75rem 0;
+  border-bottom: 1px solid var(--rule-2);
+}
+.timeline li:last-child { border-bottom: 0; }
+.tl-date {
+  font-family: var(--mono); font-size: 0.76rem;
+  color: var(--tx-3); padding-top: 0.18rem;
+}
+.tl-body { font-size: 0.88rem; color: var(--tx-2); line-height: 1.7; }
+.tl-body strong { color: var(--tx); font-weight: 600; }
+.tl-src {
+  display: block; font-family: var(--mono); font-size: 0.68rem;
+  color: var(--tx-3); margin-top: 0.2rem;
+}
+
+/* 提示框 */
+.note {
+  margin: 1.25rem 0 0; padding: 0.85rem 1rem;
+  font-size: 0.84rem; line-height: 1.75; color: var(--tx-2);
+  border-left: 2px solid var(--brass);
+  background: linear-gradient(90deg, var(--brass-soft), transparent 70%);
+  border-radius: 0 3px 3px 0;
+}
+.note strong { color: var(--tx); }
+.note.warn {
+  border-left-color: var(--clay);
+  background: linear-gradient(90deg, var(--clay-soft), transparent 70%);
+}
+
+/* 未能核实 */
+.unverified { padding: 2.5rem 0 3rem; border-top: 1px solid var(--rule); }
+.unverified > .wrap > p {
+  margin: 0 0 1rem; color: var(--tx-2); font-size: 0.9rem; max-width: 46em;
+}
+.unverified > .wrap > p strong { color: var(--tx); }
+.unverified ol { margin: 0; padding-left: 1.4rem; }
+.unverified li {
+  font-size: 0.85rem; color: var(--tx-2); padding: 0.35rem 0; line-height: 1.7;
+}
+.unverified li strong { color: var(--tx); }
+
+@media (max-width: 860px) {
+  .facts { grid-template-columns: 1fr; }
+  .facts > div { padding: 0 0 0.9rem; }
+  .facts > div + div {
+    padding-left: 0; border-left: 0;
+    padding-top: 0.9rem; border-top: 1px solid var(--rule-2);
+  }
+  .timeline li { grid-template-columns: 1fr; gap: 0.2rem; }
+  .hist-pagehead { padding: 2.5rem 0 1.5rem; }
+}
+
+/* ---------- 响应式 -------------------------------------------------------- */
+
+@media (max-width: 1000px) {
+  .hero-in { grid-template-columns: 1fr; gap: 2.25rem; }
+  .reasons { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .reason:nth-child(3) { padding-left: 0; border-left: 0; }
+  .boh-seg { height: 5.2rem; }
+  .boh-seg-pct { font-size: 0.72rem; }
+  .boh-seg-months { font-size: 0.6rem; }
+  .boh-tick-label { font-size: 0.58rem; }
+  .cycle-sum { grid-template-columns: 1fr; }
+  .cycle-sum > div + div {
+    padding-left: 0; border-left: 0;
+    border-top: 1px solid var(--rule-2); padding-top: 0.7rem;
+  }
+  .df-points { grid-template-columns: 1fr; }
+  .df-points > div + div {
+    padding-left: 0; border-left: 0; border-top: 1px solid var(--rule-2);
+  }
+  .snap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .snap-cell:nth-child(3) { border-left: 0; }
+  .plat-grid, .fee-grid { grid-template-columns: 1fr; }
+  .method-grid { grid-template-columns: 1fr; }
+  .method-grid article + article { padding-left: 0; border-left: 0; border-top: 1px solid var(--rule-2); }
+  #chart { height: 280px; }
+  #pl-chart { height: 300px; }
+}
+
+@media (max-width: 680px) {
+  :root { --pad: 1.1rem; }
+  .head-nav, .lang, .brand-sub { display: none; }
+  .hero { padding: 3rem 0 2rem; }
+  .reasons { grid-template-columns: 1fr; }
+  .reason + .reason { padding-left: 0; border-left: 0; border-top: 1px solid var(--rule-2); }
+  .hero-copy .df-points { grid-template-columns: 1fr; }
+  .hero-copy .df-points > div + div {
+    padding-left: 0; border-left: 0; border-top: 1px solid var(--rule-2);
+  }
+  .snap { grid-template-columns: 1fr; }
+  .snap-cell + .snap-cell { border-left: 0; border-top: 1px solid var(--rule-2); }
+  .keycard-grid { grid-template-columns: 1fr; }
+  .keycard-grid > div + div { padding-left: 0; border-left: 0; border-top: 1px solid var(--rule-2); }
+  .lfacts { grid-template-columns: 1fr; }
+  .lfacts > div + div { padding-left: 0; border-left: 0; border-top: 1px solid var(--rule-2); }
+  /* 窄屏：色带改为纵向堆叠，两个数字横排；坐标轴刻度与上面无法逐段对齐，改为隐藏 */
+  .boh-rule { display: none; }
+  .boh-seg { flex-direction: column; height: auto; }
+  .boh-seg-part {
+    flex: 0 0 auto !important;
+    height: 3.1rem;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0 0.85rem;
+  }
+  .boh-seg-part + .boh-seg-part { border-left: 0; border-top: 1px solid var(--panel); }
+  .boh-seg-pct { font-size: 0.85rem; }
+  .boh-seg-months { font-size: 0.74rem; }
+  #chart { height: 230px; }
+  #pl-chart { height: 250px; }
+  .chart-readout { flex-wrap: wrap; gap: 0.5rem 1.1rem; }
+}

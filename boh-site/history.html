@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>平台发展史 — BOH</title>
+    <meta name="description" content="BNB、OKB、HYPE 三个平台的发展时间线与关键数据。" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/dash-v3.css" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 34'%3E%3Crect width='34' height='34' rx='7' fill='%23f2efe6'/%3E%3Crect x='8.6' y='19.5' width='5' height='6.5' rx='1' fill='%23d8a410'/%3E%3Crect x='14.8' y='16' width='5' height='10' rx='1' fill='%232b2b2b'/%3E%3Crect x='21' y='12.5' width='5' height='13.5' rx='1' fill='%231ba98a'/%3E%3C/svg%3E" />
+    <script>
+      (function () {
+        try {
+          var p = localStorage.getItem('boh-theme') || 'auto';
+          var t = (p === 'light' || p === 'dark') ? p
+            : (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+          document.documentElement.setAttribute('data-theme', t);
+        } catch (e) { /* 忽略 */ }
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">跳到主要内容</a>
+
+    <!-- 行情带（与总览页完全相同） -->
+    <div class="ticker" aria-label="实时行情">
+      <div class="ticker-track" id="ticker"></div>
+    </div>
+
+    <header class="head">
+      <div class="wrap head-in">
+        <a class="brand" href="/dash.html" aria-label="BOH 平台币篮子">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 34 34" focusable="false">
+              <rect class="bm-bg" x="0" y="0" width="34" height="34" rx="7" />
+              <rect class="bm-candle c1" x="8.6" y="19.5" width="5" height="6.5" rx="1" />
+              <rect class="bm-candle c2" x="14.8" y="16" width="5" height="10" rx="1" />
+              <rect class="bm-candle c3" x="21" y="12.5" width="5" height="13.5" rx="1" />
+            </svg>
+          </span>
+          <span class="brand-text">
+            <span class="brand-name">BOH</span>
+            <span class="brand-sub">平台币篮子</span>
+          </span>
+        </a>
+        <nav class="head-nav" aria-label="主要导航">
+          <a href="/dash.html" data-nav="dash">总览</a>
+          <a href="/history.html" data-nav="history">平台史</a>
+        </nav>
+        <div class="lang" role="group" aria-label="语言">
+          <button type="button" class="is-on" aria-pressed="true">中</button>
+          <button type="button" aria-pressed="false">EN</button>
+        </div>
+        <button class="themebtn" type="button" data-theme-toggle aria-label="切换显示模式">跟随系统</button>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="hist-pagehead">
+        <div class="wrap">
+          <h1>三个平台的发展史</h1>
+          <p>
+            篮子里为什么是这三个平台，而不是别的。下面按时间列出各自的关键节点，
+            每一条都标注日期与出处。
+          </p>
+        </div>
+      </section>
+
+      <!-- ============ BNB ============ -->
+      <section class="hist-sec" id="bnb">
+        <div class="wrap">
+          <div class="hist-head">
+            <span class="hist-code">BNB</span>
+            <span class="hist-name">BNB Chain（原币安）</span>
+            <span class="hist-tag">中心化交易所 + 公链</span>
+          </div>
+
+          <dl class="facts">
+            <div>
+              <dt>成立</dt>
+              <dd>2017 年 7 月<br />创始人赵长鹏（CZ）</dd>
+            </div>
+            <div>
+              <dt>代币发行</dt>
+              <dd>2017-07 ICO<br />价格约 <span class="num">$0.15</span></dd>
+            </div>
+            <div>
+              <dt>供应与销毁</dt>
+              <dd>约 <span class="num">1.3317 亿</span> 枚，目标总量 1 亿枚；Auto-Burn 季度公式 + BEP-95 实时 Gas 销毁</dd>
+            </div>
+          </dl>
+
+          <h2>时间线</h2>
+          <ul class="timeline">
+            <li>
+              <span class="tl-date">2017-07</span>
+              <span class="tl-body">币安成立，创始人赵长鹏（CZ）。同期进行 <strong>BNB ICO</strong>，价格约 $0.15。<span class="tl-src">Binance 官方回顾 / Forbes</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2019-04-18</span>
+              <span class="tl-body">Binance Chain 主网上线，BNB 由 ERC-20 迁移至 <strong>BEP-2</strong>（主网置换约 4 月 23 日）。<span class="tl-src">CoinDesk</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2019-07</span>
+              <span class="tl-body">币安在第 8 次销毁时宣布<strong>团队放弃持有的 BNB（占总供应 40%）</strong>并加入季度销毁计划。<span class="tl-src">界面新闻</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2020-09</span>
+              <span class="tl-body"><strong>BNB Smart Chain（BSC）主网上线</strong>，BNB 同时以 BEP-20 形式在 BSC 流通。<span class="tl-src">BNB Chain 官方博客</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2021-11～12</span>
+              <span class="tl-body">BSC Bruno 升级（v1.1.5）引入 <strong>BEP-95</strong>，链上 Gas 费实时销毁。截至 2025-10 已通过 BEP-95 销毁约 27.6 万枚 BNB。<span class="tl-src">BNB Chain 公告 / ChainCatcher</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2021-12</span>
+              <span class="tl-body">币安推出 <strong>BNB Auto-Burn</strong>，取代"用利润 20% 回购销毁"，改为按价格与出块数公式每季度自动销毁。<span class="tl-src">Binance 官方公告</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2023-06-05</span>
+              <span class="tl-body">美国 SEC 对币安实体及 CZ 提起 <strong>13 项指控</strong>。<span class="tl-src">SEC 新闻稿 2023-101 / Reuters</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2023-11-21</span>
+              <span class="tl-body"><strong>CZ 认罪并辞任 CEO</strong>；币安与美国 DOJ 等达成 <strong>43 亿美元</strong>和解，CZ 个人另罚 5,000 万美元。<span class="tl-src">证券时报 / Yahoo Finance</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2024-06</span>
+              <span class="tl-body">BNB Beacon Chain（BEP2）<strong>完全停用</strong>，资产迁移至 BSC。<span class="tl-src">币安公告 / BNB Chain 迁移指引</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2025-07-10</span>
+              <span class="tl-body">第 32 次季度销毁 <span class="num">1,595,599.78</span> BNB（约 10.24 亿美元），销毁后总供应 139,289,513.94 枚。<span class="tl-src">ChainCatcher</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2025-10-13</span>
+              <span class="tl-body"><strong>BNB 创历史最高 $1,375.7</strong>。<span class="tl-src">Gate.io 日线 / BlockBeats</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2025-10-30</span>
+              <span class="tl-body">第 33 次销毁 <span class="num">1,441,281.413</span> BNB（约 12.08 亿美元），总供应 137,738,379.26 枚。<span class="tl-src">ChainCatcher</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2026-01-15</span>
+              <span class="tl-body">第 34 次销毁 <span class="num">1,371,803.77</span> BNB（约 12.77 亿美元），剩余总量 136,361,374.34 枚。<span class="tl-src">ChainCatcher</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2026-04-16</span>
+              <span class="tl-body">第 35 次销毁 156.9 万枚 BNB（约 10.2 亿美元），流通总量降至约 1.348 亿枚。<span class="tl-src">ChainCatcher</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2026-07-15</span>
+              <span class="tl-body">第 36 次销毁 <span class="num">1,615,827.795</span> BNB（约 9.32 亿美元），剩余总量约 <strong>1.3317 亿枚</strong>。<span class="tl-src">ChainCatcher</span></span>
+            </li>
+          </ul>
+
+          <p class="note">
+            <strong>为什么它在篮子里：</strong>2017 年至今，BNB 是唯一一个穿越了多轮周期、
+            每一轮都在创造新高的平台币。它背后是全网最大的交易平台，季度销毁持续压低流通量，
+            目标总量 1 亿枚。
+          </p>
+        </div>
+      </section>
+
+      <!-- ============ OKB ============ -->
+      <section class="hist-sec" id="okb">
+        <div class="wrap">
+          <div class="hist-head">
+            <span class="hist-code">OKB</span>
+            <span class="hist-name">OKX</span>
+            <span class="hist-tag">中心化交易所 + X Layer</span>
+          </div>
+
+          <dl class="facts">
+            <div>
+              <dt>成立</dt>
+              <dd>2017 年上线<br />创始人徐明星（Star Xu）；2022-01-18 由 OKEx 更名 OKX</dd>
+            </div>
+            <div>
+              <dt>代币发行</dt>
+              <dd>2018 年 3 月<br />原定总量 10 亿枚，初始 3 亿枚作<strong>用户奖励</strong>（非公开 ICO）</dd>
+            </div>
+            <div>
+              <dt>供应</dt>
+              <dd>永久固定 <span class="num">2,100 万</span> 枚<br />2025-08 合约移除增发与人工销毁功能</dd>
+            </div>
+          </dl>
+
+          <h2>时间线</h2>
+          <ul class="timeline">
+            <li>
+              <span class="tl-date">2018-03</span>
+              <span class="tl-body"><strong>OKB 发行</strong>。原定总量 10 亿枚，初始发行 3 亿枚作用户奖励：春节红包 5,000 万枚 + "预约购买手续费点卡送 OKB" 2.5 亿枚；其余含团队激励、基金会运营、早期股东购买份额。<span class="tl-src">界面新闻</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2019-05-04</span>
+              <span class="tl-body">季度回购销毁计划启动，每 3 个月按当季市场与经营情况从二级市场回购并转入黑洞地址。<span class="tl-src">ChainCatcher</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2019-05-10</span>
+              <span class="tl-body">第 1 次回购销毁 506,183.39 OKB。此后 2019 年内完成第 2–6 次。<span class="tl-src">OKX 官方销毁报告</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2020-02-10</span>
+              <span class="tl-body"><strong>一次性销毁全部 7 亿枚未发行 OKB</strong>（占最初计划 10 亿枚的 70%），总供应降至 3 亿枚。OKB 一小时内涨超 27%，次日最高 5.9 美元。<span class="tl-src">界面新闻</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2020-10-16</span>
+              <span class="tl-body"><strong>OKEx 暂停提币，创始人徐明星被中国警方带走调查。</strong>冻结约 5 周，2020-11-27 恢复提币；恢复前媒体报道其获释，OKB 一度上涨约 15%。<span class="tl-src">Forbes / The Block / ForkLog</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2020-12-29</span>
+              <span class="tl-body">公布 OKExChain 主网路线图，OKT 按 OKB 持仓比例经 Jumpstart 分发。<span class="tl-src">ForkLog</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2022-01-18</span>
+              <span class="tl-body">OKEx 更名为 <strong>OKX</strong>。<span class="tl-src">GlobeNewswire / OKX 官方说明</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2023-06-08</span>
+              <span class="tl-body">第 20 次销毁 5,497,312.77 OKB；<strong>累计销毁 64,042,314.70 枚</strong>，流通量 235,957,685.30 枚。<span class="tl-src">ChainCatcher</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2024-04-15</span>
+              <span class="tl-body"><strong>X Layer 公共主网上线</strong>（Polygon zkEVM 技术的以太坊 L2），OKB 为其唯一 Gas 及原生代币。<span class="tl-src">The Block</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2025-06-19</span>
+              <span class="tl-body">第 28 次销毁 42,437,632 OKB；<strong>累计销毁 213,743,264.15 枚</strong>。<span class="tl-src">OKX 官方销毁报告</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2025-08-05</span>
+              <span class="tl-body">X Layer 完成 PP 升级（接入 Polygon CDK，TPS 提升至 5,000、Gas 近零）。<span class="tl-src">ChainCatcher</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2025-08-13</span>
+              <span class="tl-body">OKX 公告代币经济模型优化：OKB 继续作为 X Layer 唯一 Gas 及原生代币；<strong>一次性销毁 65,256,712.097 枚 OKB</strong>；OKT 停止交易。<span class="tl-src">ChainCatcher / CoinPost</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2025-08-15</span>
+              <span class="tl-body">链上完成一次性销毁，总量降至 <strong>2,100 万枚</strong>；平台按 2025-07-13～08-12 平均收盘价自动将用户 OKT 兑换为等值 OKB。<span class="tl-src">ChainCatcher / CoinPost</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2025-08-18</span>
+              <span class="tl-body">OKB 智能合约升级，<strong>移除增发与人工销毁功能</strong>，总发行量永久固定为 2,100 万枚。<span class="tl-src">OKX 公告（转引）</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2025-08-22</span>
+              <span class="tl-body"><strong>OKB 创历史最高价约 $258.6</strong>（当天前一日曾创 239.91 美元）。<span class="tl-src">ChainCatcher / Gate.io 周线</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2026-01-01</span>
+              <span class="tl-body"><strong>OKTChain 停止运行</strong>，链上 OKT→OKB 兑换支持至此截止。<span class="tl-src">CoinPost / Token.im 下线公告</span></span>
+            </li>
+          </ul>
+
+          <p class="note">
+            <strong>这次销毁意味着什么：</strong>OKB 从最初的 3 亿枚总量降到 2,100 万枚，
+            累计缩减 2.79 亿枚。2025-06-19 之前的 28 次季度销毁累计 213,743,264 枚，
+            加上 2025-08 一次性销毁的 65,256,712 枚，合计 278,999,976 枚——
+            约等于原始总量的 93%。总发行量此后永久固定在 2,100 万枚。
+          </p>
+        </div>
+      </section>
+
+      <!-- ============ HYPE ============ -->
+      <section class="hist-sec" id="hype">
+        <div class="wrap">
+          <div class="hist-head">
+            <span class="hist-code">HYPE</span>
+            <span class="hist-name">Hyperliquid</span>
+            <span class="hist-tag">链上永续交易所 · 无 VC · 无预售</span>
+          </div>
+
+          <dl class="facts">
+            <div>
+              <dt>项目启动</dt>
+              <dd>2022 年 5 月<br />创始团队 11 人</dd>
+            </div>
+            <div>
+              <dt>代币发行</dt>
+              <dd>2024-11-29 创世空投<br /><span class="num">31%</span>（3.1 亿枚）通过空投分发</dd>
+            </div>
+            <div>
+              <dt>供应与回购</dt>
+              <dd>上限固定 <span class="num">10 亿</span> 枚；约 <span class="num">97%</span> 手续费流入 Assistance Fund 回购销毁</dd>
+            </div>
+          </dl>
+
+          <h2>时间线</h2>
+          <ul class="timeline">
+            <li>
+              <span class="tl-date">2022-05</span>
+              <span class="tl-body">项目启动，团队仅 11 人。联合创始人 <strong>Jeff Yan</strong>（X：@chameleon_jeff）。团队自 2020 年起做加密自营做市，2022 年夏转向 DeFi。<span class="tl-src">CoinShares / Hyperliquid 官方文档</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2023-02</span>
+              <span class="tl-body">封闭 Alpha 主网上线，约 4,000 名用户、28 个交易对。<span class="tl-src">CoinShares</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2023-08</span>
+              <span class="tl-body">网络全面开放上线。<span class="tl-src">CoinShares</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2024-05-24</span>
+              <span class="tl-body">主网启用 <strong>HIP-1</strong> 无许可现货代币部署；<strong>HIP-2（Hyperliquidity）</strong>提供协议内置双边做市，0.3% 价差、约每 3 秒刷新。部署需经 31 小时荷兰拍。<span class="tl-src">ChainCatcher / 官方文档</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2024-11-29</span>
+              <span class="tl-body"><strong>HYPE 创世空投</strong>。总供应 10 亿枚，其中 31%（3.1 亿枚）通过空投分发，当时价值约 16 亿美元。无 ICO、无预售、无 VC。<span class="tl-src">The Block / CoinShares</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2025-01-27</span>
+              <span class="tl-body">HIP-1 现货交易手续费不再自动销毁，改由部署者选择收取。<span class="tl-src">官方文档</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2025-02</span>
+              <span class="tl-body"><strong>HyperEVM 推出</strong>，网络兼容 EVM，HYPE 可转入并作为 Gas 代币。<span class="tl-src">CoinShares / Hyper Foundation</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2025-03-12</span>
+              <span class="tl-body">巨鲸约 2 亿美元 ETH 仓位（50 倍杠杆）被清算，<strong>HLP 金库承担约 400 万美元损失</strong>，引发对杠杆与风险机制的争论。<span class="tl-src">Arkham Research / The Defiant</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2025-03-26</span>
+              <span class="tl-body"><strong>JELLY 事件</strong>：交易者操纵 JELLY 价格，HLP 金库浮亏约 1,350 万美元。Hyperliquid 暂停相关交易、下架 JELLYJELLY 合约并手动按 $0.0095 结算；基金会随后按 $0.037555 补偿受影响用户。<span class="tl-src">CoinDesk / The Block</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2025-07-08</span>
+              <span class="tl-body">Builder codes 上线，第三方前端可基于 Hyperliquid 永续市场构建并收取费用。<span class="tl-src">CoinShares</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2025-09</span>
+              <span class="tl-body">生态原生稳定币 USDH 上线。<span class="tl-src">Decrypt / CoinShares</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2025-10-13</span>
+              <span class="tl-body"><strong>HIP-3 激活</strong>：质押 500,000 HYPE 即可无许可创建自有永续市场，创作者获该市场 50% 收入。<span class="tl-src">The Block</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2025-11</span>
+              <span class="tl-body">HYPE 流通量约 2.708 亿枚（总量固定 10 亿枚），市值约 107 亿美元。<span class="tl-src">CoinShares</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2026-03-04</span>
+              <span class="tl-body">Assistance Fund <strong>累计回购突破 10 亿美元</strong>，累计永久销毁 4,171 万枚 HYPE（约 13.5 亿美元，占总供应 4.17%）——距 HYPE 发行仅 15 个月。<span class="tl-src">ChainCatcher（原始来源：分析师 @mlmabc）</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2026-04-13</span>
+              <span class="tl-body">报道称 Jeff Yan 在上线不到一年时<strong>拒绝了约 10 亿美元估值、约 1 亿美元规模的投资意向</strong>，坚持零外部投资。其 2024-01-28 公开原则为"没有投资人、没有付费做市商、不向开发团队收费、没有内部人士"。<span class="tl-src">ChainCatcher（原始来源：Colossus）</span></span>
+            </li>
+            <li>
+              <span class="tl-date">2026-09-23</span>
+              <span class="tl-body"><strong>HYPE 创历史最高价约 $98.00</strong>（2025 年最高约 $59.4）。<span class="tl-src">Gate.io 日线数据</span></span>
+            </li>
+          </ul>
+
+          <p class="note">
+            <strong>为什么它在篮子里：</strong>三个平台中唯一能在链上核对全部手续费收入的。
+            约 97% 的费用流入 Assistance Fund 回购销毁，形成可验证的通缩压力。
+          </p>
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="foot">
+      <div class="wrap">
+        <p class="foot-legal">
+          <strong>本服务不面向中国大陆地区用户。</strong>
+          本站不在中国大陆境内运营，不向中国大陆居民提供营销、推广或相关服务。
+        </p>
+        <p class="foot-meta">BOH · 平台发展史</p>
+      </div>
+    </footer>
+
+    <script type="module" src="/src/history.js"></script>
+  </body>
+</html>

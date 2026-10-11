@@ -1,0 +1,12 @@
+# 统一换行符，避免跨平台协作时满屏 diff
+* text=auto eol=lf
+
+# 二进制文件不做换行转换
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
+
+# 锁文件不做 diff 显示（内容太长，冲突时重新生成即可）
+pnpm-lock.yaml -diff

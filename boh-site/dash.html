@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BOH — 平台币篮子</title>
+    <meta name="description" content="以 BTC 为基准度量的平台币篮子。BNB、OKB、HYPE。" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/dash-v3.css" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 34'%3E%3Crect width='34' height='34' rx='7' fill='%23f2efe6'/%3E%3Crect x='8.6' y='19.5' width='5' height='6.5' rx='1' fill='%23d8a410'/%3E%3Crect x='14.8' y='16' width='5' height='10' rx='1' fill='%232b2b2b'/%3E%3Crect x='21' y='12.5' width='5' height='13.5' rx='1' fill='%231ba98a'/%3E%3C/svg%3E" />
+    <script>
+      (function () {
+        try {
+          var p = localStorage.getItem('boh-theme') || 'auto';
+          var t = (p === 'light' || p === 'dark') ? p
+            : (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+          document.documentElement.setAttribute('data-theme', t);
+        } catch (e) { /* 忽略 */ }
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">跳到主要内容</a>
+
+    <!-- 行情带 -->
+    <div class="ticker" aria-label="实时行情">
+      <div class="ticker-track" id="ticker"></div>
+    </div>
+
+    <header class="head">
+      <div class="wrap head-in">
+        <a class="brand" href="/dash.html" aria-label="BOH 平台币篮子">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 34 34" focusable="false">
+              <rect class="bm-bg" x="0" y="0" width="34" height="34" rx="7" /><!-- 三根依次上升的实体 K 线（光头光脚），按上市顺序：BNB(黄) -> OKB(黑) -> HYPE(青) -->
+              <rect class="bm-candle c1" x="8.6" y="19.5" width="5" height="6.5" rx="1" />
+              <rect class="bm-candle c2" x="14.8" y="16" width="5" height="10" rx="1" />
+              <rect class="bm-candle c3" x="21" y="12.5" width="5" height="13.5" rx="1" />
+            </svg>
+          </span>
+          <span class="brand-text">
+            <span class="brand-name">BOH</span>
+            <span class="brand-sub">平台币篮子</span>
+          </span>
+        </a>
+        <nav class="head-nav" aria-label="主要导航">
+          <a href="/dash.html" data-nav="dash">总览</a>
+          <a href="/history.html" data-nav="history">平台史</a>
+        </nav>
+        <div class="lang" role="group" aria-label="语言">
+          <button type="button" class="is-on" aria-pressed="true">中</button>
+          <button type="button" aria-pressed="false">EN</button>
+        </div>
+        <button class="themebtn" type="button" data-theme-toggle aria-label="切换显示模式">跟随系统</button>
+      </div>
+    </header>
+
+    <main id="main">
+      <!-- 首屏：什么是 BOH + 核心指标 -->
+      <section class="hero" id="top">
+        <div class="wrap hero-in">
+          <div class="hero-copy">
+            <p class="eyebrow">什么是 BOH</p>
+            <h1>BOH 是一篮子平台币。</h1>
+            <p class="df-lead">
+              装的是 BNB、OKB、HYPE 三种平台类代币，等权持有。
+              <strong>你持有 BOH，就是持有这一篮子。</strong>
+            </p>
+
+            <dl class="df-points">
+              <div>
+                <dt>装什么</dt>
+                <dd>BNB、OKB、HYPE 三种。不装 BTC，不装稳定币。</dd>
+              </div>
+              <div>
+                <dt>价值从哪来</dt>
+                <dd>来自这三个币本身，不来自故事。</dd>
+              </div>
+            </dl>
+
+            <p class="df-aside">
+              可以把它想成一只 <strong>ETF</strong>——一篮子资产打包成一个东西，买一份等于买了整篮。
+              <strong>但它不是 ETF：</strong>有锁定期，按净值认购和赎回，不随时买卖。
+            </p>
+          </div>
+
+          <div class="hero-right">
+            <div class="keycard" id="basket">
+              <div class="keycard-head">
+                <span class="keycard-title">跑赢 BTC</span>
+                <span class="ranges" role="group" aria-label="时间范围">
+                  <button type="button" data-range="30">30天</button>
+                  <button type="button" data-range="90">90天</button>
+                  <button type="button" data-range="365" class="is-on" aria-pressed="true">12月</button>
+                </span>
+              </div>
+              <div class="keycard-body">
+                <span class="keynum" id="keynum">—</span>
+                <span class="keyunit" id="keyunit">个百分点 · 累计超额</span>
+              </div>
+              <div class="keycard-grid">
+                <div>
+                  <span class="kg-label">篮子涨跌</span>
+                  <span class="kg-value num" id="mk-basket">—</span>
+                </div>
+                <div>
+                  <span class="kg-label">同期 BTC</span>
+                  <span class="kg-value num" id="mk-btc">—</span>
+                </div>
+                <div>
+                  <span class="kg-label">篮子净值</span>
+                  <span class="kg-value num" id="mk-nav">—</span>
+                </div>
+              </div>
+              <p class="keycard-foot" id="keycard-foot"></p>
+            </div>
+
+            <figure class="hero-chart">
+              <div class="chart-readout">
+                <span class="ro-date" id="ro-date">—</span>
+                <span class="ro-item"><i class="sw sw-basket"></i><b id="ro-basket">—</b></span>
+                <span class="ro-item"><i class="sw sw-btc"></i><b id="ro-btc">—</b></span>
+                <span class="ro-item"><i class="sw sw-vs"></i><b id="ro-vs">—</b></span>
+              </div>
+              <svg id="chart" viewBox="0 0 560 240" role="img"
+                   aria-label="篮子、BTC 与篮子对 BTC 的净值走势"></svg>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <!-- 论证：为什么是现在，为什么是平台币 -->
+      <section class="logic" id="logic">
+        <div class="wrap">
+          <div class="sec-head">
+            <h2>为什么是现在，为什么是平台币</h2>
+          </div>
+
+          <div class="logic-lead">
+            <p>
+              这笔判断分两层。第一层是<strong>周期</strong>：BTC 四年一循环，
+              现在处在高位回落后的低位区域。第二层是<strong>标的</strong>：
+              同一个赛道里，平台币比 BTC 更强。
+            </p>
+            <p>两层都成立，才有现在建仓平台币的理由。</p>
+          </div>
+
+          <!-- 第一层 -->
+          <article class="lnode">
+            <header class="lnode-head">
+              <span class="lnode-idx">第一层</span>
+              <h3>周期：BTC 四年一轮，现在在低位区域</h3>
+            </header>
+            <p class="lnode-body">
+              BTC 的走势不是随机的。过去五年它只走了三段：
+              见顶、下跌、再创新高。现在我们距上一轮顶部约一年、回撤约三分之一——
+              <strong>这是历史上积累仓位的位置，不是追高的位置。</strong>
+            </p>
+
+            <figure class="chartbox">
+              <figcaption class="chart-cap">
+                <span>BTC 周线 · 2021-11 至今</span>
+                <span class="lg-note">
+                  <i class="sw sw-bear"></i>下行区间
+                  <i class="sw sw-bull"></i>上行区间
+                </span>
+              </figcaption>
+              <svg id="cycle-chart" viewBox="0 0 1000 340" role="img"
+                   aria-label="BTC 周线走势，标注上一轮周期顶底、本轮顶部与当前位置"></svg>
+            </figure>
+
+            <div class="lfacts-block" id="cycle-facts"></div>
+          </article>
+
+          <p class="linfer">
+            BTC 处在低位区域 —— <strong>这是买点的第一个条件。</strong>
+          </p>
+
+          <!-- 第二层 -->
+          <article class="lnode">
+            <header class="lnode-head">
+              <span class="lnode-idx">第二层</span>
+              <h3>标的：每一个平台币，从诞生起就领先 BTC</h3>
+            </header>
+            <p class="lnode-body">
+              把三个平台币放在同一张图上，各自从上市首周归一到 100：
+              <strong>BNB 领先 BTC 68.9 万个百分点，OKB 领先 1,433 个，HYPE 领先 1,208 个。</strong>
+              三个窗口，三次领先，没有例外。
+              <strong>这不是某一次押对，这是这个资产类别的特征。</strong>
+            </p>
+
+            <figure class="chartbox">
+              <figcaption class="chart-cap">
+                <span>四条线从同一起点（2024-12）= 100 算起</span>
+                <span class="lg-note" id="pl-legend"></span>
+              </figcaption>
+              <svg id="pl-chart" viewBox="0 0 1000 380" role="img"
+                   aria-label="BNB、OKB、HYPE 各自自上市以来的表现，与 BTC 同期对比"></svg>
+            </figure>
+
+            <div class="lfacts-block" id="pl-facts"></div>
+            <p class="lnode-body lnode-body--wide" style="margin-top:1.35rem">
+              <strong>所以结论不是"捕捉一轮热点"，而是"从现在开始定投这个赛道"。</strong>
+              定投的理由正是上一条：没人知道哪一个平台会出事，也没人知道每一轮是谁领先——
+              但历史上这个赛道整体一直领先。
+            </p>
+          </article>
+
+          <!-- 为什么押赛道 -->
+          <article class="lnode">
+            <header class="lnode-head">
+              <span class="lnode-idx">为什么</span>
+              <h3>押赛道，而不是押单个平台</h3>
+            </header>
+            <p class="lnode-body">
+              单独押一个平台，风险不是"表现差一点"，而是<strong>归零</strong>：
+              平台被盗、创始人出事、被监管关闭、代币模型崩塌——这些都真实发生过。
+              <strong>押整个赛道，是承认自己无法预知哪个平台会出事，
+              </strong>同时又不愿放弃这个赛道整体的强势。
+            </p>
+            <dl class="lfacts" id="spread-facts"></dl>
+          </article>
+
+          <p class="linfer lfinal">
+            周期低位 + 赛道更强 + 单点风险被分散 ——
+            <strong>三个条件同时成立，才构成现在建仓的理由。</strong>
+          </p>
+        </div>
+      </section>
+
+      <!-- 行情快照 -->
+      <section class="snapshot">
+        <div class="wrap">
+          <div class="sec-head">
+            <h2>行情快照</h2>
+          </div>
+          <div class="snap" id="snap"></div>
+        </div>
+      </section>
+
+      <!-- 篮子构成 -->
+      <section class="holdings">
+        <div class="wrap">
+          <div class="sec-head">
+            <h2>篮子构成</h2>
+            <span class="sec-note">等权 · 每日再平衡 · 不装 BTC · 不装稳定币</span>
+          </div>
+          <div class="tablewrap">
+            <table class="grid-table">
+              <caption class="sr-only">篮子各代币的实时数据与历史表现</caption>
+              <thead>
+                <tr>
+                  <th scope="col">代币</th>
+                  <th scope="col" class="n">现价</th>
+                  <th scope="col" class="n">24 小时</th>
+                  <th scope="col" class="n">30 天</th>
+                  <th scope="col" class="n">12 个月</th>
+                  <th scope="col" class="n">对 BTC 超额</th>
+                  <th scope="col" class="n">质押年化</th>
+                  <th scope="col" class="n">市值</th>
+                  <th scope="col">回购 / 销毁</th>
+                </tr>
+              </thead>
+              <tbody id="holdings"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 平台实时信息 -->
+      <section class="platforms" id="platforms">
+        <div class="wrap">
+          <div class="sec-head">
+            <h2>平台实时信息</h2>
+          </div>
+          <div class="plat-grid" id="plat-grid"></div>
+        </div>
+      </section>
+
+      <!-- 平台手续费 -->
+      <section class="fees">
+        <div class="wrap">
+          <div class="sec-head">
+            <h2>平台手续费收入</h2>
+            <span class="sec-note">入选篮子的唯一标准</span>
+          </div>
+          <div class="fee-grid" id="fees"></div>
+        </div>
+      </section>
+
+      <!-- 三个优势 -->
+      <section class="method">
+        <div class="wrap">
+          <div class="sec-head"><h2>为什么是 BOH</h2></div>
+          <div class="method-grid">
+            <article>
+              <h3>一篮子，不是单个</h3>
+              <p>平台币这个赛道里，每一轮领先的币都不同。押单个平台，赌的是它不出事；押整个赛道，要的是赛道整体的强势。</p>
+            </article>
+            <article>
+              <h3>一个动作，买进三条链</h3>
+              <p>BNB 在 BSC、OKB 在 X Layer、HYPE 在 Hyperliquid。自己买要跨三条链，买 BOH 只需要一步。</p>
+            </article>
+            <article>
+              <h3>除了涨跌，还有利息</h3>
+              <p>三个币都能质押生息。这部分收益与行情涨跌无关，同样分给持有 BOH 的人。</p>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <div class="wrap">
+        <p class="foot-legal">
+          <strong>本服务不面向中国大陆地区用户。</strong>
+          本站不在中国大陆境内运营，不向中国大陆居民提供营销、推广或相关服务。
+        </p>
+        <p class="foot-risk">
+          产品设有一年锁定期，期内不能赎回。净值随篮子资产波动，不承诺收益，过往表现不代表未来。
+        </p>
+      </div>
+    </footer>
+
+    <script type="module" src="/src/dash-v3.js"></script>
+  </body>
+</html>
