@@ -7,7 +7,7 @@
    因此站点放在域名根目录或子目录都能正常工作。
    ========================================================================== */
 
-const PAGE_FILES = ['dash.html', 'history.html'];
+const PAGE_FILES = ['dash', 'history'];   // 只比主干名，.html 后缀可有可无
 
 /** 取当前页面所在目录，末尾带 /（如 / 或 /boh/） */
 function pageDir() {
@@ -24,7 +24,7 @@ function resolvePage(rawHref) {
   }
   if (u.origin !== location.origin) return null;
   if (u.pathname.replace(/[^/]*$/, '') !== pageDir()) return null;   // 必须同目录
-  const file = u.pathname.slice(u.pathname.lastIndexOf('/') + 1);
+  const file = u.pathname.slice(u.pathname.lastIndexOf('/') + 1).replace(/\.html$/, '');
   if (!PAGE_FILES.includes(file)) return null;
   return u;
 }
@@ -90,7 +90,7 @@ export function initRouter() {
   });
 
   window.addEventListener('popstate', () => {
-    const file = location.pathname.split('/').pop();
+    const file = location.pathname.split('/').pop().replace(/\.html$/, '');
     if (PAGE_FILES.includes(file)) {
       swapTo(file + location.search, { push: false });
     }
