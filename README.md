@@ -2,7 +2,10 @@
 
 以 BTC 为基准度量的平台币篮子。装的是 **BNB、OKB、HYPE** 三种平台类代币，等权持有。
 
-> 网站由 Cloudflare Pages 自动部署。推送到 `main` 分支后会自动重新构建上线。
+**线上地址：<https://chasebig.xyz>**
+
+> 由 Cloudflare Pages 自动部署，绑定 `chasebig.xyz`。
+> 推送到 `main` 分支后会自动重新构建上线（约 1 分钟）。
 
 ---
 
@@ -65,3 +68,9 @@ Cloudflare Pages，连接本仓库：
 | Build output directory | `dist` |
 
 生产分支：`main`。推送即自动上线。
+
+| | |
+|---|---|
+| 线上地址 | https://chasebig.xyz |
+| Pages 默认地址 | https://boh-aml.pages.dev |
+| 仓库 | https://github.com/yelingwen999-arch/boh |
