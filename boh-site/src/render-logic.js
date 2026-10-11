@@ -88,7 +88,8 @@ function drawLogChart(svg, dates, series, opts = {}) {
     svg.appendChild(svgEl('circle', { cx, cy, r: 3, fill: p.color || 'var(--tx)' }));
     const tx = svgEl('text', {
       class: 'axis', x: cx + (p.dx ?? 7), y: cy + (p.dy ?? -8),
-      'text-anchor': cx > W - 180 ? 'end' : 'start', fill: p.color || 'var(--tx)',
+      'text-anchor': (p.dx ?? 0) < 0 ? 'end' : (cx > W - 180 ? 'end' : 'start'),
+      fill: p.color || 'var(--tx)',
     });
     tx.textContent = p.label;
     svg.appendChild(tx);
@@ -123,17 +124,22 @@ export function renderCycle(cfg) {
   const svg = document.getElementById('cycle-chart');
   if (!svg || !cfg) return;
 
-  // 周期顶全部标注（这是"周期存在"的证据）；再补最近一个底与当前位置
+  // 周期顶全部标注（这是"周期存在"的证据）；再补最近一个底
   const highs = (cfg.turningPoints || []).filter(t => t.kind === 'high');
   const lows = (cfg.turningPoints || []).filter(t => t.kind === 'low');
   const markers = highs.map(t => ({
-    ts: t.ts, label: fmtUsd0(t.price), color: 'var(--clay)', dy: -8,
+    ts: t.ts, label: fmtUsd0(t.price), color: 'var(--clay)', dy: -11,
   }));
   if (lows.length) {
     const l = lows[lows.length - 1];
-    markers.push({ ts: l.ts, label: `底 ${fmtUsd0(l.price)}`, color: 'var(--jade)', dy: 17 });
+    markers.push({ ts: l.ts, label: `底 ${fmtUsd0(l.price)}`, color: 'var(--jade)', dy: 18 });
   }
-  markers.push({ ts: cfg.current.ts, label: `现在 ${fmtUsd0(cfg.current.price)}`, color: 'var(--tx)', dy: 20 });
+  // 末点靠右：文字左移，避免与右侧的终点值标签叠在一起
+  markers.push({
+    ts: cfg.current.ts,
+    label: `现在 ${fmtUsd0(cfg.current.price)}`,
+    color: 'var(--tx)', dx: -34, dy: 20,
+  });
 
   drawLogChart(svg, cfg.dates, [{ values: cfg.prices, cls: 'line-btc-main', endColor: 'var(--tx)' }], {
     bands: (cfg.periods || []).map(p => ({ from: p.from, to: p.to, kind: p.kind })),

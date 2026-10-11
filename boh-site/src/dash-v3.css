@@ -28,6 +28,8 @@
   --base-line: #ffffff18;
   --brass-soft: #c8a44e10;
   --clay-soft: #c66a4e0f;
+  /* 图表专用：深色底用亮黄，浅色底用暗黄铜 */
+  --chart-1: #d8b24a;
   --chip-bg: #12151a;
 }
 
@@ -50,6 +52,7 @@
   --base-line: #00000022;
   --brass-soft: #8a6a1f12;
   --clay-soft: #b04a2c10;
+  --chart-1: #a8801a;
   --chip-bg: #f2efe9;
 }
 
@@ -682,8 +685,19 @@
 .sw-vs { background: var(--brass); }
 
 /* 论证板块里的图线（用饱和色，保证辨识度） */
+/* 折线用主题变量：浅色主题下自动变深，否则黄线在浅底上几乎看不见 */
 #cycle-chart { display: block; width: 100%; height: 340px; }
-.line-btc-main { fill: none; stroke: #c9a227; stroke-width: 1.8; }
+.line-btc-main { fill: none; stroke: var(--chart-1); stroke-width: 1.8; }
+
+/* 图内文字加一圈背景色描边，压在线或色块上也能读清 */
+#cycle-chart .axis,
+#pl-chart .axis,
+#chart .axis {
+  paint-order: stroke;
+  stroke: var(--panel);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
 
 /* 平台币历史图 */
 #pl-chart { display: block; width: 100%; height: 380px; }
