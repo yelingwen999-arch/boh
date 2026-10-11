@@ -179,6 +179,7 @@ export function renderCycle(cfg) {
     const ticks = periods.map(p => p.from).concat(periods[periods.length - 1].to);
 
     el.innerHTML = `
+      <p class="boh-scroll-hint">← 左右滑动查看完整周期 →</p>
       <div class="boh-axis">
         <div class="boh-seg" role="img" aria-label="BTC 历次周期区间的时间轴">
           ${periods.map((p, i) => {

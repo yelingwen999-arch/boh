@@ -621,6 +621,15 @@
 .boh-tick-label.is-first { transform: translateX(0); }
 .boh-tick-label.is-last { transform: translateX(-100%); }
 
+/* 手机上时间轴可横向滑动，提示默认不显示 */
+.boh-scroll-hint {
+  display: none;
+  margin: 0 0 0.1rem;
+  font-size: 0.68rem;
+  color: var(--tx-3);
+  letter-spacing: 0.04em;
+}
+
 .cycle-sum {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1068,19 +1077,45 @@
   .keycard-grid > div + div { padding-left: 0; border-left: 0; border-top: 1px solid var(--rule-2); }
   .lfacts { grid-template-columns: 1fr; }
   .lfacts > div + div { padding-left: 0; border-left: 0; border-top: 1px solid var(--rule-2); }
-  /* 窄屏：色带改为纵向堆叠，两个数字横排；坐标轴刻度与上面无法逐段对齐，改为隐藏 */
-  .boh-rule { display: none; }
-  .boh-seg { flex-direction: column; height: auto; }
-  .boh-seg-part {
-    flex: 0 0 auto !important;
-    height: 3.1rem;
-    flex-direction: row;
-    justify-content: space-between;
-    padding: 0 0.85rem;
+  /*
+    手机：时间轴保持横向（纵向堆叠就失去"轴"的意义了）。
+    七段塞进 343px 会让年月挤在一起，所以整体加宽 + 允许横向滑动。
+  */
+  .boh-axis {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 1.5rem;
+    /* 滑到两端时留一点余量，末端的"现在"标签不被裁掉 */
+    margin-right: calc(var(--pad) * -1);
+    padding-right: var(--pad);
   }
-  .boh-seg-part + .boh-seg-part { border-left: 0; border-top: 1px solid var(--panel); }
-  .boh-seg-pct { font-size: 0.85rem; }
-  .boh-seg-months { font-size: 0.74rem; }
+  .boh-axis > .boh-seg { min-width: 620px; }
+  .boh-axis > .boh-rule { min-width: 620px; }
+  /* 右侧渐隐，提示还能往右滑 */
+  .boh-axis::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 4.6rem;
+    width: 2.2rem;
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent, var(--bg));
+  }
+  .boh-seg { height: 4.6rem; }
+  .boh-seg-part {
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.15rem;
+    padding: 0 0.2rem;
+  }
+  .boh-seg-part + .boh-seg-part { border-left: 1px solid var(--panel); border-top: 0; }
+  .boh-seg-pct { font-size: 0.7rem; }
+  .boh-seg-months { font-size: 0.62rem; }
+  .boh-tick-label { font-size: 0.6rem; }
+  /* 手机上时间轴可横向滑动，给一行提示 */
+  .boh-scroll-hint { display: block; }
   /* 手机上图更高一些，否则 SVG 等比缩放会把文字压得极小 */
   #chart { height: 300px; }
   #pl-chart { height: 320px; }
