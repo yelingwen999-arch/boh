@@ -1074,4 +1074,23 @@
   .hero-chart { padding: 0.6rem 0.7rem 0.3rem; }
   /* 手机上图更小，刻度文字相应缩小一点 */
   #cycle-chart .axis, #pl-chart .axis { font-size: 9.5px; }
+
+  /* 手机纵向节奏：桌面端的区块间距在窄屏会堆成大段空白 */
+  .hero { padding: 2.5rem 0 1.75rem; }
+  .hero-in { gap: 2rem; }
+  .hero-copy h1 { font-size: clamp(1.45rem, 6.5vw, 1.9rem); margin-bottom: 0.9rem; }
+  .hero-copy .df-lead { font-size: 0.95rem; line-height: 1.8; margin-bottom: 1.2rem; }
+  .hero-copy .df-points { margin-bottom: 1.2rem; }
+  .hero-copy .df-aside { margin-bottom: 1.2rem; padding: 0.7rem 0.85rem; }
+  .logic { padding: 0.5rem 0 2.25rem; }
+  .logic-lead { margin-bottom: 1.75rem; font-size: 0.98rem; line-height: 1.85; }
+  .snapshot { padding: 1.75rem 0 0; }
+  .holdings, .platforms, .fees, .method { padding: 1.75rem 0 2.25rem; }
+  .hist-sec { padding: 1.75rem 0 2.25rem; }
+  .hist-pagehead { padding: 2.25rem 0 1.25rem; }
+  .method-grid article { padding: 1.1rem 0 0; }
+  .sec-head { margin-bottom: 1rem; }
+  .boh-axis { padding-bottom: 1.5rem; }
+  .cycle-sum { margin-top: 1.5rem; }
+  .foot { padding: 1.25rem 0 1.75rem; }
 }
