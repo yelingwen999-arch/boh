@@ -98,13 +98,17 @@ body {
   text-rendering: optimizeLegibility;
   /* 让浏览器优化断行位置，减少行尾孤字；不支持的浏览器自动忽略 */
   text-wrap: pretty;
+  /*
+    中文只在标点处换行，不在字与字之间断开。
+    keep-all 禁止在汉字之间断行，因此"第二层是标的"会整段挪到下一行，
+    不会出现"第二层是／标的"或"标／的"这类断法。词汇（加粗词、标题）
+    自然也就不会被劈开。
+    overflow-wrap 是安全阀：万一某个没有标点的长串放不进一行
+    （历史页有 21–26 字的长句），就地断开，而不是溢出容器。
+  */
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
-
-/*
-  加粗短语与标题整段挪行，不从词中间劈开（"标的"断成"标/的"很难看）。
-  keep-all 只禁止在词内断，标点处仍可断——站内所有加粗短语均含标点，无溢出风险。
-*/
-strong, b, h1, h2, h3 { word-break: keep-all; }
 
 .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--pad); }
 
