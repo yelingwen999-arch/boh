@@ -273,6 +273,8 @@ BTC 四年一个循环。**三次周期顶部间隔：4.04 年 / 3.89 年 / 3.91
 
 - 新页面复制现有页面骨架，顶栏由 `chrome.js` 共用，导航在三处页面同步加项
 - 路由 `router.js` 的 `PAGE_FILES` 加了 `strategy`；构建入口 `vite.config.js` 的 `rollupOptions.input` 加一项
+- **切页机制（2026-10-12 重构）**：客户端切换后目标页的 `<script>` 不会执行，所以由路由器动态 `import` 目标页入口并调用其 `renderPage()`；每个入口导出 `renderPage`，直接打开页面时也由路由器挂载。曾因 `currentPage()` 只认 history、把 strategy 当 dash，导致总览页脚本在策略页上跑、报"以下板块渲染失败"——切页机制必须配三页识别一起改
+- 页面内不要在模块级缓存 DOM 节点（`getElementById` 要现取现用），客户端切页后 DOM 是新的
 - **不要**给内容型表格加 `.grid-table` 的 58rem 最小宽度；只有列多的表才需要
 - 图表用 `render-logic.js` 导出的 `drawLogChart`（窄屏 <560px 自动只标首尾日期）
 - 布局改动后**必须在 343px 宽度下模拟验证**，移动端问题都是真机才暴露的

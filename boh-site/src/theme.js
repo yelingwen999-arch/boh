@@ -40,15 +40,24 @@ export function cycle() {
   return next;
 }
 
+let togglesBound = false;   // 页眉在切页时不重建，事件只绑一次
+let mediaBound = false;
+
 export function initTheme() {
   apply(currentPref());
 
-  document.querySelectorAll('[data-theme-toggle]').forEach(btn => {
-    btn.addEventListener('click', () => cycle());
-  });
+  if (!togglesBound) {
+    togglesBound = true;
+    document.querySelectorAll('[data-theme-toggle]').forEach(btn => {
+      btn.addEventListener('click', () => cycle());
+    });
+  }
 
   // 自动模式下跟随系统变化
-  matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => {
-    if (currentPref() === 'auto') apply('auto');
-  });
+  if (!mediaBound) {
+    mediaBound = true;
+    matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => {
+      if (currentPref() === 'auto') apply('auto');
+    });
+  }
 }

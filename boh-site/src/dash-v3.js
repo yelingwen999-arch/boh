@@ -8,7 +8,7 @@ import { renderCycle, renderSpread } from './render-logic.js';
 import { renderPlatformHistory } from './render-platform-history.js';
 import { initChrome } from './chrome.js';
 import { icon } from './icons.js';
-import { initRouter, currentPage } from './router.js';
+import { initRouter } from './router.js';
 import { draw, sliceSeries, LINE_COLOR } from './chart-shared.js';
 
 const ZERO = '—';
@@ -100,8 +100,6 @@ function renderKeycard(range) {
 
 /* ---------- 走势图（首屏） ------------------------------------------------ */
 
-const svg = document.getElementById('chart');
-
 function renderNavLegend() {
   const el = document.getElementById('nav-legend');
   if (!el) return;
@@ -112,6 +110,7 @@ function renderNavLegend() {
 }
 
 function drawChart() {
+  const svg = document.getElementById('chart');   // 每次现取：客户端切页后 DOM 是新的
   if (!DATA || !svg) return;
   const s = sliceSeries(DATA.chart, RANGE);
   draw(svg, s, {
@@ -365,7 +364,7 @@ function renderAll() {
   return failed;
 }
 
-/** 数据回来后重新渲染（客户端切页回来时会再调一次） */
+/** 画一遍总览页所有板块（首次挂载与切页回来都走这里） */
 async function render() {
   const failed = renderAll();
   if (failed.length) {
@@ -379,28 +378,28 @@ async function render() {
   if (new URLSearchParams(location.search).has('debug')) diagnose();
 }
 
-async function init() {
-  initRouter();
-  await initChrome(currentPage());
+/**
+ * 挂载总览页。直接打开页面与客户端切页都由 router 调用这里。
+ * 数据只取一次，切页回来时只重画 DOM。
+ */
+export async function renderPage() {
+  await initChrome('dash');
 
-  const [main, cycle, platHist] = await Promise.all([
-    fetch('./data/data.json').then(r => r.json()),
-    fetch('./data/btc-cycle.json').then(r => r.json()).catch(() => null),
-    fetch('./data/platform-history.json').then(r => r.json()).catch(() => null),
-  ]);
-  DATA = main;
-  CYCLE = cycle;
-  PLAT_HIST = platHist;
+  if (!DATA) {
+    const [main, cycle, platHist] = await Promise.all([
+      fetch('./data/data.json').then(r => r.json()),
+      fetch('./data/btc-cycle.json').then(r => r.json()).catch(() => null),
+      fetch('./data/platform-history.json').then(r => r.json()).catch(() => null),
+    ]);
+    DATA = main;
+    CYCLE = cycle;
+    PLAT_HIST = platHist;
+  }
 
   await render();
-
-  // 客户端切页回来时，重新渲染（顶栏不动）
-  window.addEventListener('boh:navigate', () => {
-    if (currentPage() === 'dash') render();
-  });
 }
 
-init().catch(err => {
+initRouter().catch(err => {
   console.error(err);
   // 把错误直接显示在页面上，避免"图没数据但不知道原因"
   const bar = document.createElement('div');
