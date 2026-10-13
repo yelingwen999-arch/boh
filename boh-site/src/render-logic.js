@@ -250,7 +250,7 @@ export function renderCompare(cfg) {
   const el = document.getElementById('compare-facts');
   if (el) {
     const cells = [
-      ['平台币篮子（等权）', fmtPct(cfg.basketChange), `${fmtDate(cfg.dates[0])} 至 ${fmtDate(cfg.dates[cfg.dates.length - 1])}`],
+      ['平台币篮子（4:3:3）', fmtPct(cfg.basketChange), `${fmtDate(cfg.dates[0])} 至 ${fmtDate(cfg.dates[cfg.dates.length - 1])}`],
       ['BTC（同区间）', fmtPct(cfg.btcChange), '同为起点 100'],
       ['篮子相对 BTC 超额', `${fmtPct(cfg.excess)} 个百分点`, '累计涨幅之差'],
       ['距各自历史最高', `篮子 ${fmtPct(cfg.basketPeak.drawdown)} · BTC ${fmtPct(cfg.btcPeak.drawdown)}`, `全历史峰值 · 篮子 ${fmtDate(cfg.basketPeak.ts)} · BTC ${fmtDate(cfg.btcPeak.ts)}`],

@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>自平衡策略 — BOH</title>
-    <meta name="description" content="BOH 的自平衡策略：等权持有，偏离 5 个百分点触发再平衡。附 7 年历史回测对比。" />
+    <meta name="description" content="BOH 的自平衡策略：4:3:3 持有，偏离 5 个百分点触发再平衡。附 8 年历史回测对比。" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -66,10 +66,10 @@
       <section class="strat-head">
         <div class="wrap">
           <p class="eyebrow">自平衡策略</p>
-          <h1>等权持有，偏离 5 个百分点就拉回。</h1>
+          <h1>按 4:3:3 持有，偏离 5 个百分点就拉回。</h1>
           <p class="strat-lead">
-            不预测哪个平台币更强。三个币等权持有；
-            任何一个的权重偏离等权超过 <strong>5 个百分点</strong>，就卖出多的、买入少的，一次性拉回等权。
+            不预测哪个平台币更强。三个币按 <strong>4:3:3</strong> 持有；
+            任何一个的权重偏离目标超过 <strong>5 个百分点</strong>，就卖出多的、买入少的，一次性拉回目标。
             <strong>这是 BOH 全部的运作规则。</strong>
           </p>
         </div>
@@ -81,16 +81,16 @@
           <div class="sec-head"><h2>自平衡怎么跑</h2></div>
           <div class="method-grid">
             <article>
-              <h3>① 等权持有</h3>
-              <p>三个币各占三分之一。谁涨得多，谁的权重就自动升高——但只让它升高到 5 个百分点为止。</p>
+              <h3>① 按 4:3:3 持有</h3>
+              <p>BNB 40%、OKB 30%、HYPE 30%。多给 BNB 的一份是压舱石——它最久、最大、最稳。谁涨得多，谁的权重就自动升高——只让它升高 5 个百分点。</p>
             </article>
             <article>
               <h3>② ±5pp 触发</h3>
-              <p>每天核对权重。任何一个币偏离等权超过 5 个百分点（超过 38.3% 或低于 28.3%）才动手，不到就不动。</p>
+              <p>每天核对权重。任何一个币偏离目标超过 5 个百分点（BNB 超过 45% 或低于 35%，OKB 与 HYPE 超过 35% 或低于 25%）才动手，不到就不动。</p>
             </article>
             <article>
-              <h3>③ 拉回等权</h3>
-              <p>触发即卖出多的、买入少的，一次性回到等权。然后回到第 ① 步——这就是一个完整的自平衡周期。</p>
+              <h3>③ 拉回目标</h3>
+              <p>触发即卖出多的、买入少的，一次性回到 4:3:3。然后回到第 ① 步——这就是一个完整的自平衡周期。</p>
             </article>
           </div>
         </div>
@@ -104,7 +104,7 @@
             <span class="sec-note" id="bt-stamp"></span>
           </div>
           <p class="strat-intro">
-            同样从 100 起，同样持有 BNB + OKB 等权，唯一区别是<strong>什么时候拉回等权</strong>。
+            同样从 100 起，同样持有 BNB + OKB（4:3:3 里的双币部分，按 57 : 43 换算），唯一区别是<strong>什么时候拉回目标</strong>。
           </p>
           <figure class="chartbox">
             <figcaption class="chart-cap">
@@ -124,9 +124,10 @@
           </div>
 
           <p class="strat-note">
-            三条结论：每一种再平衡都大幅跑赢不调仓——两个币轮着领先，等权策略自动高卖低买；
-            <strong>±5pp 收益最高、调仓最少</strong>（85 次 vs 每日的 2,716 次）；
-            五种策略的最大回撤都在 −81% 左右——崩盘时两个币一起跌，拉回等权改变不了行情，
+            三条结论：每一种再平衡都大幅跑赢不调仓——两个币轮着领先，按目标配比自动高卖低买；
+            两种阈值策略的结果只差约 4%，换一种权重排名还会互换，<strong>属噪音</strong>——
+            选定 ±5pp 是因为它对权重的约束更紧，调仓也只有 80 次；
+            五种策略的最大回撤都在 −80% 左右——崩盘时两个币一起跌，拉回目标改变不了行情，
             这个策略管的是权重纪律。
           </p>
         </div>

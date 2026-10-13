@@ -95,7 +95,7 @@ function renderKeycard(range) {
 
   const days = range === 365 ? '近 12 个月' : `近 ${range} 天`;
   document.getElementById('keycard-foot').textContent =
-    `${days} · 等权篮子 · 篮子按实际成交价折算份额`;
+    `${days} · 4:3:3 篮子 · 篮子按实际成交价折算份额`;
 }
 
 /* ---------- 走势图（首屏） ------------------------------------------------ */
@@ -126,7 +126,7 @@ function drawChart() {
   });
 }
 
-/* ---------- 分散板块：补上「等权篮子」那一格（数字取自 data.json） --------- */
+/* ---------- 分散板块：补上「4:3:3 篮子」那一格（数字取自 data.json） --------- */
 
 function appendBasketSpreadCell() {
   const el = document.getElementById('spread-facts');
@@ -134,7 +134,7 @@ function appendBasketSpreadCell() {
   const m = DATA.basket.metrics['365'];
   const div = document.createElement('div');
   div.innerHTML =
-    `<dt>等权篮子 · 近 12 个月</dt>` +
+    `<dt>4:3:3 篮子 · 近 12 个月</dt>` +
     `<dd class="${cls(m.abs)}">${fmtPct(m.abs)}` +
     `<small>BTC 同期 ${fmtPct(m.btc)}</small></dd>`;
   el.appendChild(div);

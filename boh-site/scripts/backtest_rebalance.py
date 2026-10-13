@@ -90,8 +90,8 @@ def run(prices, strategy, fee_on=True, target=(0.5, 0.5)):
     """prices: [[p0...],[p1...]] 每步已按 day 对齐。
     返回 (期末值, 最大回撤, 调仓次数, 累计费用, 净值序列)。"""
     n = len(prices[0])
-    # 初始：各投一半，总值从 100 起（便于直接读百分比）
-    w = [50.0 / prices[i][0] for i in range(len(prices))]
+    # 初始：按目标权重配置，总值从 100 起（便于直接读百分比）
+    w = [100.0 * t / prices[i][0] for i, t in enumerate(target)]
     v = [w[i] * prices[i][0] for i in range(len(prices))]
     days = 0
     fees = 0.0
@@ -159,12 +159,15 @@ def main():
     years = (end_ts - start_ts) / (365.25 * DAY)
 
     prices_pair = [p_bnb, p_okb]
+    # 产品目标权重 4:3:3（BNB 40 / OKB 30 / HYPE 30，多给 BNB 的一份是压舱石）。
+    # 回测只含双币：剔除 HYPE 后按比例换算 BNB 40/70≈57%、OKB 30/70≈43%。
+    TARGET = (0.57, 0.43)
     strategies = [
-        ("buyhold", "不调仓", "初始 50/50，此后不再动作"),
-        ("daily", "每日再平衡", "每个交易日拉回等权"),
-        ("weekly", "每周再平衡", "每 7 天拉回等权"),
-        ("th5", "阈值 ±5pp", "偏离超过 5 个百分点才拉回"),
-        ("th10", "阈值 ±10pp", "偏离超过 10 个百分点才拉回"),
+        ("buyhold", "不调仓", "初始按目标比例，此后不再动作"),
+        ("daily", "每日再平衡", "每个交易日拉回目标比例"),
+        ("weekly", "每周再平衡", "每 7 天拉回目标比例"),
+        ("th5", "阈值 ±5pp", "偏离目标超过 5 个百分点才拉回"),
+        ("th10", "阈值 ±10pp", "偏离目标超过 10 个百分点才拉回"),
     ]
 
     results = []
@@ -175,7 +178,7 @@ def main():
         print(f"{'策略':<16s} {'期末净值':>12s} {'总收益':>10s} {'CAGR':>8s} "
               f"{'最大回撤':>9s} {'调仓次数':>8s} {'费用合计':>11s}")
         for key, label, rule in strategies:
-            end, mdd, cnt, fees, nav = run(prices_pair, key, fee_on)
+            end, mdd, cnt, fees, nav = run(prices_pair, key, fee_on, target=TARGET)
             cagr = (end / 100) ** (1 / years) - 1
             if fee_on:
                 # 净值曲线按周采样（给页面画图用，体积可控），并保证末点在内
@@ -219,7 +222,10 @@ def main():
     payload = {
         "generatedAt": int(time.time()),
         "source": "DefiLlama Coins API (coins.llama.fi), daily",
-        "pair": ["BNB", "OKB"], "weighting": "equal 50/50",
+        "pair": ["BNB", "OKB"],
+        "weighting": "57 : 43（产品 4:3:3 剔除 HYPE 后的双币换算）",
+        "target": {"BNB": 0.57, "OKB": 0.43},
+        "productWeights": {"BNB": 0.4, "OKB": 0.3, "HYPE": 0.3},
         "start": start_ts, "end": end_ts, "startDate": d0, "endDate": d1,
         "days": n, "years": round(years, 2), "feeRate": "0.1% per side",
         "results": results, "references": ref_out,

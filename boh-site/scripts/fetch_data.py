@@ -30,6 +30,8 @@ GATE_PAIRS = {
 }
 
 BASKET = ["HYPE", "BNB", "OKB"]
+# 4:3:3 目标权重（BNB 最久经考验，多给的 10 个百分点是压舱石——风险机制，不是押注谁更强）
+WEIGHTS = {"BNB": 0.4, "OKB": 0.3, "HYPE": 0.3}
 BASE_TS = 1757000000
 SPAN = 400
 PERIOD = "1d"
@@ -256,14 +258,14 @@ def main() -> None:
             "vsBtc": vs,
         }
 
-    # 篮子：等权（每日再平衡），以 BTC 计价
+    # 篮子：4:3:3（每日再平衡），以 BTC 计价
     lens = len(dates)
 
     def approx_turnover(days: int = 365):
-        """自建仓以来，调仓产生的累计换手率（等权再平衡的日均换手 × 天数）。"""
+        """自建仓以来，调仓产生的累计换手率（4:3:3 再平衡的日均换手 × 天数）。"""
         from_idx = max(0, lens - days)
         base = {s: series[s][from_idx] for s in BASKET}
-        weights = {s: 1 / 3 for s in BASKET}
+        weights = dict(WEIGHTS)
         total = 0.0
         for i in range(from_idx + 1, lens):
             vals = {s: series[s][i] / base[s] for s in BASKET}
@@ -271,7 +273,7 @@ def main() -> None:
             cur_w = {s: vals[s] / tot for s in BASKET}
             total += sum(abs(cur_w[s] - weights[s]) for s in BASKET) / 2
             base = {s: series[s][i] for s in BASKET}
-            weights = {s: 1 / 3 for s in BASKET}
+            weights = dict(WEIGHTS)
         return total
 
     # ---- 统一序列：以下所有数字都从这一条派生，避免口径不一致 ----
@@ -286,9 +288,9 @@ def main() -> None:
 
     btc_norm = [series["BTC"][i] / series["BTC"][chart_from] * 100 for i in chart_idx]
 
-    # 等权篮子（每日再平衡）
+    # 4:3:3 篮子（每日再平衡）
     basket_norm = [
-        sum(basket_series[s][k] for s in BASKET) / len(BASKET)
+        sum(basket_series[s][k] * WEIGHTS[s] for s in BASKET)
         for k in range(len(chart_idx))
     ]
 
@@ -454,7 +456,7 @@ def main() -> None:
         },
         "basket": {
             "constituents": BASKET,
-            "weighting": "equal",
+            "weighting": "4:3:3",
             "windowDays": CHART_DAYS,
             "metrics": metrics,
             "approxTurnover365": approx_turnover(CHART_DAYS),

@@ -1,6 +1,6 @@
 /* ==========================================================================
    BOH — 策略页渲染
-   结论：等权 + 阈值 ±5pp 触发再平衡（回测选出，见 backtest-result.json）。
+   结论：4:3:3 + 阈值 ±5pp 触发再平衡（权重为风险机制，阈值经回测比选，见 backtest-result.json）。
    图：五条净值曲线（对数刻度），表：回测参数与各策略指标。
    ========================================================================== */
 
@@ -54,10 +54,12 @@ export function renderStrategy(cfg) {
   if (par) {
     const items = [
       ['回测区间', `${cfg.startDate} → ${cfg.endDate}`],
-      ['长度', `${fmtInt(cfg.days)} 天 ≈ ${cfg.years} 年`],
-      ['回测标的', cfg.pair.join(' + ') + ' 等权'],
+      ['长度', `约 ${cfg.years} 年 · ${fmtInt(cfg.days)} 个交易日`],
+      ['回测标的', cfg.target
+        ? `${cfg.pair[0]} ${Math.round(cfg.target.BNB * 100)}% + ${cfg.pair[1]} ${Math.round(cfg.target.OKB * 100)}%`
+        : cfg.pair.join(' + ')],
       ['手续费', '单边 0.1%'],
-      ['起始值', '100，两币各半'],
+      ['起始值', '100，按目标比例'],
     ];
     par.innerHTML = items.map(([k, v]) =>
       `<div class="bt-p"><span class="bt-p-k">${k}</span><span class="bt-p-v">${v}</span></div>`
