@@ -164,73 +164,10 @@ body {
   letter-spacing: -0.022em;
   max-width: 20em;
 }
-.lede {
-  margin: 0;
-  font-size: 1.05rem;
-  line-height: 1.85;
-  color: var(--tx-2);
-  max-width: 34em;
-}
 
 /* ---------- 主数字 -------------------------------------------------------- */
 
 .figure { padding: 1rem 0 3.5rem; }
-.figure-main {
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--rule);
-  display: flex; flex-direction: column; gap: 0.5rem;
-}
-.fig-label {
-  font-size: 0.82rem; color: var(--tx-3); letter-spacing: 0.02em;
-}
-.fig-value {
-  font-family: var(--mono);
-  font-size: clamp(3rem, 6.5vw, 4.6rem);
-  font-weight: 500;              /* 中等字重，不靠发光撑气势 */
-  line-height: 1;
-  letter-spacing: -0.04em;
-  color: var(--tx);              /* 数字本身不加颜色 */
-}
-.fig-note {
-  font-size: 0.8rem; color: var(--tx-3);
-  font-family: var(--mono);
-  letter-spacing: 0.01em;
-}
-
-.stats {
-  margin: 2.5rem 0 0;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0;
-}
-.stats > div {
-  padding: 1.15rem 1.5rem 1.15rem 0;
-  border-top: 1px solid var(--rule-2);
-}
-.stats > div + div {
-  padding-left: 1.5rem;
-  border-left: 1px solid var(--rule-2);
-}
-.stats dt {
-  font-size: 0.78rem; color: var(--tx-3);
-  margin-bottom: 0.45rem;
-}
-.stats dd {
-  margin: 0;
-  font-family: var(--mono);
-  font-size: 1.28rem;
-  font-weight: 500;
-  letter-spacing: -0.015em;
-}
-.stats dd small {
-  display: block;
-  font-family: var(--sans);
-  font-size: 0.72rem;
-  font-weight: 400;
-  color: var(--tx-3);
-  letter-spacing: 0;
-  margin-top: 0.15rem;
-}
 
 /* ---------- 章节头 -------------------------------------------------------- */
 
@@ -267,10 +204,6 @@ body {
   outline: none;
   border-bottom-color: var(--brass);
 }
-
-/* ---------- 图表 ---------------------------------------------------------- */
-
-.chartsec { padding: 3rem 0; }
 .chartbox {
   margin: 0;
   border-top: 1px solid var(--rule-2);
@@ -305,28 +238,7 @@ body {
 .legend dd { margin: 0; }
 .k-basket { background: var(--tx); }
 .k-btc { background: var(--tx-3); }
-.k-vs { background: var(--brass); }
-
-/* ---------- 表格 ---------------------------------------------------------- */
-
-.table-sec { padding: 3rem 0; }
-.ledger { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-.ledger th {
-  text-align: left;
-  font-size: 0.76rem; font-weight: 500;
-  color: var(--tx-3);
-  padding: 0 1rem 0.7rem 0;
-  border-bottom: 1px solid var(--rule);
-  white-space: nowrap;
-}
-.ledger td {
-  padding: 0.95rem 1rem 0.95rem 0;
-  border-bottom: 1px solid var(--rule-2);
-  vertical-align: middle;
-}
-.ledger tbody tr:hover td { background: var(--hover); }
 .n { text-align: right; }
-.ledger th:last-child, .ledger td:last-child { padding-right: 0; }
 
 .tok-code {
   font-family: var(--mono);
@@ -387,8 +299,5 @@ body {
 @media (max-width: 640px) {
   :root { --pad: 1.1rem; }
   .hero h1 { font-size: 1.6rem; }
-  .ledger { font-size: 0.82rem; }
-  .ledger th, .ledger td { padding-right: 0.6rem; }
-  .ledger .col-hide { display: none; }
   .readout { flex-wrap: wrap; gap: 0.5rem 1.25rem; }
 }
