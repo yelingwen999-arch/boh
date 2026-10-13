@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>自平衡策略 — BOH</title>
+    <meta name="description" content="BOH 的自平衡策略：等权持有，偏离 5 个百分点触发再平衡。附 7 年历史回测对比。" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/dash-v3.css" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 34'%3E%3Crect width='34' height='34' rx='7' fill='%23f2efe6'/%3E%3Crect x='8.6' y='19.5' width='5' height='6.5' rx='1' fill='%23d8a410'/%3E%3Crect x='14.8' y='16' width='5' height='10' rx='1' fill='%232b2b2b'/%3E%3Crect x='21' y='12.5' width='5' height='13.5' rx='1' fill='%231ba98a'/%3E%3C/svg%3E" />
+    <script>
+      (function () {
+        try {
+          var p = localStorage.getItem('boh-theme') || 'auto';
+          var t = (p === 'light' || p === 'dark') ? p
+            : (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+          document.documentElement.setAttribute('data-theme', t);
+        } catch (e) { /* 忽略 */ }
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">跳到主要内容</a>
+
+    <!-- 行情带 -->
+    <div class="ticker" aria-label="实时行情">
+      <div class="ticker-track" id="ticker"></div>
+    </div>
+
+    <header class="head">
+      <div class="wrap head-in">
+        <a class="brand" href="/dash" aria-label="BOH 平台币篮子">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 34 34" focusable="false">
+              <rect class="bm-bg" x="0" y="0" width="34" height="34" rx="7" />
+              <rect class="bm-candle c1" x="8.6" y="19.5" width="5" height="6.5" rx="1" />
+              <rect class="bm-candle c2" x="14.8" y="16" width="5" height="10" rx="1" />
+              <rect class="bm-candle c3" x="21" y="12.5" width="5" height="13.5" rx="1" />
+            </svg>
+          </span>
+          <span class="brand-text">
+            <span class="brand-name">BOH</span>
+            <span class="brand-sub">平台币篮子</span>
+          </span>
+        </a>
+        <nav class="head-nav" aria-label="主要导航">
+          <a href="/dash" data-nav="dash">总览</a>
+          <a href="/strategy" data-nav="strategy">策略</a>
+          <a href="/history" data-nav="history">平台史</a>
+        </nav>
+        <div class="lang" role="group" aria-label="语言">
+          <button type="button" class="is-on" aria-pressed="true">中</button>
+          <button type="button" aria-pressed="false">EN</button>
+        </div>
+        <button class="themebtn" type="button" data-theme-toggle aria-label="切换显示模式">跟随系统</button>
+      </div>
+    </header>
+
+    <main id="main">
+      <!-- 页首：策略一句话 -->
+      <section class="strat-head">
+        <div class="wrap">
+          <p class="eyebrow">自平衡策略</p>
+          <h1>等权持有，偏离 5 个百分点就拉回。</h1>
+          <p class="strat-lead">
+            不预测哪个平台币更强。三个币等权持有；
+            任何一个的权重偏离等权超过 <strong>5 个百分点</strong>，就卖出多的、买入少的，一次性拉回等权。
+            <strong>这是 BOH 全部的运作规则。</strong>
+          </p>
+        </div>
+      </section>
+
+      <!-- 策略三步 -->
+      <section class="strat-steps">
+        <div class="wrap">
+          <div class="sec-head"><h2>自平衡怎么跑</h2></div>
+          <div class="method-grid">
+            <article>
+              <h3>① 等权持有</h3>
+              <p>三个币各占三分之一。谁涨得多，谁的权重就自动升高——但只让它升高到 5 个百分点为止。</p>
+            </article>
+            <article>
+              <h3>② ±5pp 触发</h3>
+              <p>每天核对权重。任何一个币偏离等权超过 5 个百分点（超过 38.3% 或低于 28.3%）才动手，不到就不动。</p>
+            </article>
+            <article>
+              <h3>③ 拉回等权</h3>
+              <p>触发即卖出多的、买入少的，一次性回到等权。然后回到第 ① 步——这就是一个完整的自平衡周期。</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- 回测图 -->
+      <section class="strat-chart">
+        <div class="wrap">
+          <div class="sec-head">
+            <h2>回测：同一笔钱，五种策略</h2>
+            <span class="sec-note" id="bt-stamp"></span>
+          </div>
+          <p class="strat-intro">
+            同样从 100 起，同样持有 BNB + OKB 等权，唯一区别是<strong>什么时候拉回等权</strong>。
+          </p>
+          <figure class="chartbox">
+            <figcaption class="chart-cap">
+              <span>同区间 · 同从 100 起 · 含手续费 0.1%</span>
+              <span class="lg-note" id="bt-legend"></span>
+            </figcaption>
+            <svg id="bt-chart" viewBox="0 0 1000 360" role="img"
+                 aria-label="五种再平衡策略的净值对比"></svg>
+          </figure>
+
+          <div class="lfacts-block" id="bt-params"></div>
+          <div id="bt-table"></div>
+
+          <div class="strat-refs">
+            <span class="strat-refs-k">同区间买入不卖</span>
+            <span class="bt-refs" id="bt-refs"></span>
+          </div>
+
+          <p class="strat-note">
+            三条结论：每一种再平衡都大幅跑赢不调仓——两个币轮着领先，等权策略自动高卖低买；
+            <strong>±5pp 收益最高、调仓最少</strong>（85 次 vs 每日的 2,716 次）；
+            五种策略的最大回撤都在 −81% 左右——崩盘时两个币一起跌，拉回等权改变不了行情，
+            这个策略管的是权重纪律。
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <div class="wrap">
+        <p class="foot-legal">
+          <strong>本服务不面向中国大陆地区用户。</strong>
+          本站不在中国大陆境内运营，不向中国大陆居民提供营销、推广或相关服务。
+        </p>
+        <p class="foot-risk">
+          产品设有一年锁定期，期内不能赎回。净值随篮子资产波动，不承诺收益，过往表现不代表未来。
+        </p>
+      </div>
+    </footer>
+
+    <script type="module" src="/src/strategy.js"></script>
+  </body>
+</html>

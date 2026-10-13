@@ -7,7 +7,7 @@
    因此站点放在域名根目录或子目录都能正常工作。
    ========================================================================== */
 
-const PAGE_FILES = ['dash', 'history'];   // 只比主干名，.html 后缀可有可无
+const PAGE_FILES = ['dash', 'strategy', 'history'];   // 只比主干名，.html 后缀可有可无
 
 /** 取当前页面所在目录，末尾带 /（如 / 或 /boh/） */
 function pageDir() {

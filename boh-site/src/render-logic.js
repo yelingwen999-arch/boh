@@ -26,7 +26,7 @@ const cls = v => (v == null ? 'flat' : v > 0 ? 'up' : v < 0 ? 'down' : 'flat');
 
 /* ---------- 通用：对数坐标折线图 ------------------------------------------ */
 
-function drawLogChart(svg, dates, series, opts = {}) {
+export function drawLogChart(svg, dates, series, opts = {}) {
   const W = svg.clientWidth || 1000;
   const H = svg.clientHeight || 340;
   // 窄屏收紧边距，否则绘图区只剩一小条，横轴标签会互相压住

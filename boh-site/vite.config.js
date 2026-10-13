@@ -15,6 +15,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         dash: resolve(__dirname, 'dash.html'),
+        strategy: resolve(__dirname, 'strategy.html'),
         history: resolve(__dirname, 'history.html'),
       },
     },
