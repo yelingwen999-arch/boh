@@ -243,7 +243,6 @@
 /* ---------- 为什么是平台币 ------------------------------------------------ */
 
 .why { padding: 1rem 0 3.5rem; }
-.reason .r-evi .k { color: var(--tx-3); font-size: 0.68rem; }
 
 /* ---------- 章节头 -------------------------------------------------------- */
 
@@ -1036,9 +1035,7 @@
 
 @media (max-width: 1000px) {
   .hero-in { grid-template-columns: 1fr; gap: 2.25rem; }
-  .reasons { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .reason:nth-child(3) { padding-left: 0; border-left: 0; }
-  .boh-seg { height: 5.2rem; }
+      .boh-seg { height: 5.2rem; }
   .boh-seg-pct { font-size: 0.72rem; }
   .boh-seg-months { font-size: 0.6rem; }
   .boh-tick-label { font-size: 0.58rem; }

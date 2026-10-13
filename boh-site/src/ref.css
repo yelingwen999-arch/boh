@@ -286,11 +286,6 @@ body {
 
 @media (max-width: 860px) {
   .hero { padding: 3.5rem 0 2rem; }
-  .stats { grid-template-columns: 1fr; }
-  .stats > div + div {
-    padding-left: 0;
-    border-left: 0;
-  }
   #chart { height: 260px; }
   .nav { display: none; }
   .lang { border-left: 0; padding-left: 0; margin-left: auto; }
