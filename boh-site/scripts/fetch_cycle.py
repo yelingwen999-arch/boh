@@ -15,7 +15,7 @@ import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SRC = ROOT / "src"
+SRC = ROOT / "public" / "data"   # 网站读 public/data；此前误写 src
 
 IDS = {
     "BTC": "coingecko:bitcoin",
@@ -211,7 +211,7 @@ def main() -> None:
     }
     print(f"  basket {compare['basketChange']:+.1f}%  BTC {compare['btcChange']:+.1f}%  excess {compare['excess']:+.1f}pp")
 
-    for name, payload in (("btc-cycle.json", btc_cycle), ("compare.json", compare)):
+    for name, payload in (("btc-cycle.json", btc_cycle),):   # compare.json 已废弃，不再生成
         out = SRC / name
         tmp = out.with_suffix(".json.tmp")
         tmp.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")

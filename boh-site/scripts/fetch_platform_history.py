@@ -13,7 +13,7 @@ import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-OUT = ROOT / "src" / "platform-history.json"
+OUT = ROOT / "public" / "data" / "platform-history.json"
 
 IDS = {
     "BTC": "coingecko:bitcoin",

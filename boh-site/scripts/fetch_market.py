@@ -10,7 +10,7 @@ import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-OUT = ROOT / "src" / "market.json"
+OUT = ROOT / "public" / "data" / "market.json"
 
 # 顺序即展示顺序
 SYMBOLS = ["BTC", "ETH", "SOL", "BNB", "XRP", "HYPE", "OKB", "ZEC"]
