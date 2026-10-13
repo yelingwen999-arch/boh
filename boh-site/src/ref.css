@@ -100,6 +100,12 @@ body {
   text-wrap: pretty;
 }
 
+/*
+  加粗短语与标题整段挪行，不从词中间劈开（"标的"断成"标/的"很难看）。
+  keep-all 只禁止在词内断，标点处仍可断——站内所有加粗短语均含标点，无溢出风险。
+*/
+strong, b, h1, h2, h3 { word-break: keep-all; }
+
 .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--pad); }
 
 .sr-only {
