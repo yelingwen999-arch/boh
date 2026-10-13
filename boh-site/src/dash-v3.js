@@ -9,6 +9,7 @@ import { renderPlatformHistory } from './render-platform-history.js';
 import { initChrome } from './chrome.js';
 import { icon } from './icons.js';
 import { initRouter } from './router.js';
+import { live } from './live-quote.js';
 import { draw, sliceSeries, LINE_COLOR } from './chart-shared.js';
 
 const ZERO = '—';
@@ -19,6 +20,19 @@ const ASSET_META = {
   OKB: { name: 'OKX' },
 };
 const ORDER = ['BNB', 'OKB', 'HYPE'];
+
+/**
+ * 现价：优先用实时报价，取不到则回退到快照里的值。
+ * 快照（data.json）只在重新抓取时更新，静态站点上会越来越旧。
+ */
+function px(sym) {
+  const q = live.quote[sym];
+  const a = DATA?.assets?.[sym];
+  return {
+    price: q?.price ?? a?.price ?? null,
+    change24h: q?.change24h ?? a?.change24h ?? null,
+  };
+}
 
 let DATA = null;
 let RANGE = 365;
@@ -49,6 +63,7 @@ const fmtDate = ts => {
 function renderSnapshot() {
   document.getElementById('snap').innerHTML = ['BTC', ...ORDER].map(sym => {
     const a = DATA.assets[sym];
+    const p = px(sym);
     const isBtc = sym === 'BTC';
     const v365 = isBtc ? null : (a.vsBtc?.['365'] ?? null);
     return `
@@ -58,8 +73,8 @@ function renderSnapshot() {
           <span class="snap-code">${sym}</span>
           <span class="snap-name">${ASSET_META[sym].name}</span>
         </div>
-        <span class="snap-price">${fmtUsd(a.price)}</span>
-        <span class="snap-chg ${cls(a.change24h)}">${fmtPct(a.change24h)} <span style="color:var(--tx-3)">24h</span></span>
+        <span class="snap-price">${fmtUsd(p.price)}</span>
+        <span class="snap-chg ${cls(p.change24h)}">${fmtPct(p.change24h)} <span style="color:var(--tx-3)">24h</span></span>
         <div class="snap-row">
           <span>12月 ${fmtPct(a.rolling?.['365'], 1)}</span>
           ${isBtc ? '<span>基准</span>' : `<span class="${cls(v365)}">对BTC ${fmtPct(v365, 1)}</span>`}
@@ -157,8 +172,8 @@ function renderHoldings() {
             <span class="tok-name">${ASSET_META[sym].name}</span>
           </span>
         </td>
-        <td class="n"><span class="cell-num">${fmtUsd(a.price)}</span></td>
-        <td class="n"><span class="cell-num ${cls(a.change24h)}">${fmtPct(a.change24h)}</span></td>
+        <td class="n"><span class="cell-num">${fmtUsd(px(sym).price)}</span></td>
+        <td class="n"><span class="cell-num ${cls(px(sym).change24h)}">${fmtPct(px(sym).change24h)}</span></td>
         <td class="n"><span class="cell-num ${cls(a.rolling?.['30'])}">${fmtPct(a.rolling?.['30'], 1)}</span></td>
         <td class="n"><span class="cell-num ${cls(a.rolling?.['365'])}">${fmtPct(a.rolling?.['365'], 1)}</span></td>
         <td class="n"><span class="cell-num ${cls(a.vsBtc?.['365'])}">${fmtPct(a.vsBtc?.['365'], 1)}</span></td>
@@ -215,8 +230,8 @@ function renderPlatforms() {
             <span class="plat-name">${ASSET_META[sym].name} · ${sup.chain}</span>
           </span>
           <span class="plat-price">
-            <span class="plat-price-v">${fmtUsd(a.price)}</span>
-            <span class="plat-price-c ${cls(a.change24h)}">${fmtPct(a.change24h)} 24h</span>
+            <span class="plat-price-v">${fmtUsd(px(sym).price)}</span>
+            <span class="plat-price-c ${cls(px(sym).change24h)}">${fmtPct(px(sym).change24h)} 24h</span>
           </span>
         </div>
 
@@ -368,6 +383,17 @@ export async function renderPage() {
   }
 
   await render();
+
+  // 实时价到位后，重画带价格的板块（快照值 -> 实时值）
+  live.subscribe(() => {
+    try {
+      renderSnapshot();
+      renderHoldings();
+      renderPlatforms();
+    } catch (err) {
+      console.error('[BOH] 实时价刷新渲染失败', err);
+    }
+  });
 }
 
 initRouter().catch(err => {
