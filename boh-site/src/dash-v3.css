@@ -987,28 +987,8 @@
   border-left: 2px solid var(--clay); padding-left: 0.6rem; line-height: 1.65;
 }
 
-/* ---------- 手续费卡 ------------------------------------------------------ */
+/* ---------- 平台实时信息（已删除「平台手续费」板块） ---------------------- */
 
-.fees { padding: 2.5rem 0 3rem; }
-.fee-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
-.fee-card {
-  border: 1px solid var(--rule); border-radius: 3px;
-  background: var(--panel);
-  padding: 1.1rem 1.15rem 1.2rem;
-  display: flex; flex-direction: column; gap: 0.65rem;
-}
-.fee-head { display: flex; align-items: baseline; gap: 0.55rem; }
-.fee-code { font-family: var(--mono); font-weight: 600; letter-spacing: 0.05em; }
-.fee-name { font-size: 0.72rem; color: var(--tx-3); }
-.fee-row {
-  display: flex; justify-content: space-between; align-items: baseline;
-  padding: 0.35rem 0; border-bottom: 1px solid var(--rule-2); font-size: 0.82rem;
-}
-.fee-row:first-of-type { border-top: 1px solid var(--rule-2); }
-.fee-k { color: var(--tx-3); font-size: 0.75rem; }
-.fee-v { font-family: var(--mono); font-size: 0.86rem; font-weight: 500; }
-.fee-v.empty { font-family: var(--sans); font-size: 0.78rem; color: var(--tx-3); font-weight: 400; }
-.fee-note { font-size: 0.72rem; color: var(--tx-3); margin: 0; line-height: 1.65; }
 .src-note { font-size: 0.74rem; color: var(--tx-3); margin: 1rem 0 0; max-width: 52em; }
 
 /* ---------- 方法 / 风险 --------------------------------------------------- */
@@ -1161,7 +1141,7 @@
   .bt-p:nth-child(4) { padding-left: 0; border-left: 0; }
   .bt-p:nth-child(n+4) { border-top: 1px solid var(--rule-2); }
   #bt-chart { height: 300px; }
-  .plat-grid, .fee-grid { grid-template-columns: 1fr; }
+  .plat-grid { grid-template-columns: 1fr; }
   .method-grid { grid-template-columns: 1fr; }
   .method-grid article + article { padding-left: 0; border-left: 0; border-top: 1px solid var(--rule-2); }
   #chart { height: 280px; }
@@ -1252,7 +1232,7 @@
   .logic { padding: 0.5rem 0 2.25rem; }
   .logic-lead { margin-bottom: 1.75rem; font-size: 0.98rem; line-height: 1.85; }
   .snapshot { padding: 1.75rem 0 0; }
-  .holdings, .platforms, .fees, .method { padding: 1.75rem 0 2.25rem; }
+  .holdings, .platforms, .method { padding: 1.75rem 0 2.25rem; }
   .hist-sec { padding: 1.75rem 0 2.25rem; }
   .hist-pagehead { padding: 2.25rem 0 1.25rem; }
   .method-grid article { padding: 1.1rem 0 0; }

@@ -233,34 +233,6 @@ function renderPlatforms() {
   }).join('');
 }
 
-/* ---------- 手续费 -------------------------------------------------------- */
-
-function renderFees() {
-  document.getElementById('fees').innerHTML = ORDER.map(sym => {
-    const sup = DATA.supplementary[sym];
-    const f = sup.feeRevenue;
-
-    const rows = f
-      ? [
-        ['24 小时', fmtBig(f.day)],
-        ['30 天', fmtBig(f.month)],
-        ['12 个月', fmtBig(f.year)],
-        ['累计', fmtBig(f.allTime)],
-      ].map(([k, v]) => `<div class="fee-row"><span class="fee-k">${k}</span><span class="fee-v">${v}</span></div>`).join('')
-      : '';
-
-    return `
-      <div class="fee-card">
-        <div class="fee-head">
-          <span class="fee-code">${sym}</span>
-          <span class="fee-name">${ASSET_META[sym].name}</span>
-        </div>
-        ${rows}
-      </div>
-    `;
-  }).join('');
-}
-
 /* ---------- 页脚 ---------------------------------------------------------- */
 
 function renderStamp() {
@@ -318,7 +290,7 @@ function diagnose() {
     if (strokes.length) rows.push(`    stroke: ${[...new Set(strokes)].join(' | ')}`);
   }
   // 数据条是否渲染
-  for (const id of ['cycle-facts', 'pl-facts', 'plat-grid', 'holdings', 'fees']) {
+  for (const id of ['cycle-facts', 'pl-facts', 'plat-grid', 'holdings']) {
     const el = document.getElementById(id);
     rows.push(`${id}: ${el ? (el.childElementCount + ' 个子元素, ' + el.innerHTML.length + ' 字符') : '不存在'}`);
   }
@@ -348,7 +320,6 @@ function renderAll() {
     ['basketCell', appendBasketSpreadCell],
     ['platforms', renderPlatforms],
     ['holdings', renderHoldings],
-    ['fees', renderFees],
     ['stamp', renderStamp],
   ];
 
