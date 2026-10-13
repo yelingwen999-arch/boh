@@ -96,6 +96,8 @@ body {
   font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  /* 让浏览器优化断行位置，减少行尾孤字；不支持的浏览器自动忽略 */
+  text-wrap: pretty;
 }
 
 .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--pad); }
