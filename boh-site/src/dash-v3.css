@@ -704,6 +704,43 @@
 }
 .strat-note strong { color: var(--tx); }
 
+/* 回测结论：有序列表，四点各自成条（不限宽，与表格同宽） */
+.strat-findings {
+  margin: 1.5rem 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: finding;
+  border-top: 1px solid var(--rule);
+}
+.strat-findings li {
+  counter-increment: finding;
+  position: relative;
+  padding: 1.1rem 0 1.1rem 3rem;
+  border-bottom: 1px solid var(--rule-2);
+  font-size: 0.92rem;
+  line-height: 1.9;
+  color: var(--tx-2);
+}
+/* 序号：黄铜色方块 */
+.strat-findings li::before {
+  content: counter(finding);
+  position: absolute;
+  left: 0;
+  top: 1.15rem;
+  width: 1.7rem;
+  height: 1.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--bg);
+  background: var(--brass);
+  border-radius: 2px;
+}
+.strat-findings strong { color: var(--tx); font-weight: 600; }
+
 /* 策略页的子标题（阈值扫描 / 稳健性检验） */
 .strat-sub { margin-top: 3rem; }
 .strat-sub h2 { font-size: 1.02rem; letter-spacing: 0.01em; }
@@ -1224,6 +1261,9 @@
   .strat-table .n { padding-right: 0.45rem; }
   .strat-table .n:last-child { padding-right: 0; }
   .strat-note { font-size: 0.85rem; }
+  /* 结论列表：手机上收窄序号占位与内边距 */
+  .strat-findings li { padding: 0.9rem 0 0.9rem 2.35rem; font-size: 0.86rem; line-height: 1.85; }
+  .strat-findings li::before { width: 1.45rem; height: 1.45rem; font-size: 0.72rem; top: 0.95rem; }
   /* 阈值扫描：手机上条形列收窄，数字列自动压缩 */
   .strat-sub { margin-top: 2.25rem; }
   .strat-sub h2 { font-size: 0.95rem; }
