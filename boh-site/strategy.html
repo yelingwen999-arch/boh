@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>自平衡策略 — BOH</title>
-    <meta name="description" content="BOH 的自平衡策略：4:3:3 持有，偏离 5 个百分点触发再平衡。附 8 年历史回测对比。" />
+    <meta name="description" content="BOH 的自平衡策略：4:3:3 持有，偏离 15 个百分点触发再平衡。附 8 年历史回测、阈值扫描与稳健性检验。" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -66,10 +66,10 @@
       <section class="strat-head">
         <div class="wrap">
           <p class="eyebrow">自平衡策略</p>
-          <h1>按 4:3:3 持有，偏离 5 个百分点就拉回。</h1>
+          <h1>按 4:3:3 持有，偏离 15 个百分点就拉回。</h1>
           <p class="strat-lead">
             不预测哪个平台币更强。三个币按 <strong>4:3:3</strong> 持有；
-            任何一个的权重偏离目标超过 <strong>5 个百分点</strong>，就卖出多的、买入少的，一次性拉回目标。
+            任何一个的权重偏离目标超过 <strong>15 个百分点</strong>，就卖出多的、买入少的，一次性拉回目标。
             <strong>这是 BOH 全部的运作规则。</strong>
           </p>
         </div>
@@ -82,11 +82,11 @@
           <div class="method-grid">
             <article>
               <h3>① 按 4:3:3 持有</h3>
-              <p>BNB 40%、OKB 30%、HYPE 30%。多给 BNB 的一份是压舱石——它最久、最大、最稳。谁涨得多，谁的权重就自动升高——只让它升高 5 个百分点。</p>
+              <p>BNB 40%、OKB 30%、HYPE 30%。多给 BNB 的一份是压舱石——它最久、最大、最稳。谁涨得多，谁的权重就自动升高——但只让它升高到一定程度。</p>
             </article>
             <article>
-              <h3>② ±5pp 触发</h3>
-              <p>每天核对权重。任何一个币偏离目标超过 5 个百分点（BNB 超过 45% 或低于 35%，OKB 与 HYPE 超过 35% 或低于 25%）才动手，不到就不动。</p>
+              <h3>② ±15pp 触发</h3>
+              <p>每天核对权重。任何一个币偏离目标超过 15 个百分点（BNB 超过 55% 或低于 25%，OKB 与 HYPE 超过 45% 或低于 15%）才动手，不到就不动。这个 15 不是猜的——见下方阈值扫描与稳健性检验。</p>
             </article>
             <article>
               <h3>③ 拉回目标</h3>
@@ -100,7 +100,7 @@
       <section class="strat-chart">
         <div class="wrap">
           <div class="sec-head">
-            <h2>回测：同一笔钱，五种策略</h2>
+            <h2>回测：同一笔钱，各种策略</h2>
             <span class="sec-note" id="bt-stamp"></span>
           </div>
           <p class="strat-intro">
@@ -118,17 +118,40 @@
           <div class="lfacts-block" id="bt-params"></div>
           <div id="bt-table"></div>
 
+          <div class="sec-head strat-sub">
+            <h2>阈值扫描：15 是从这里挑出来的</h2>
+            <span class="sec-note">含手续费 0.1%</span>
+          </div>
+          <p class="strat-intro">
+            把阈值从 3 个百分点一路放宽到 30，看收益怎么变。
+            <strong>太紧会频繁交易，太宽等于不管</strong>——中间有一段明显的优势区。
+          </p>
+          <div id="bt-scan"></div>
+
+          <div class="sec-head strat-sub">
+            <h2>稳健性检验：这不是运气</h2>
+          </div>
+          <p class="strat-intro">
+            一个数字好看，可能只是刚好赶上某段行情。<strong>所以换九种切法再算一遍</strong>——
+            按自然年、按滚动三年、按牛熊分段。每一行里最优的那个加粗；
+            如果同一个阈值在多数行都加粗，它就站得住。
+          </p>
+          <div id="bt-robust"></div>
+
           <div class="strat-refs">
             <span class="strat-refs-k">同区间买入不卖</span>
             <span class="bt-refs" id="bt-refs"></span>
           </div>
 
           <p class="strat-note">
-            三条结论：每一种再平衡都大幅跑赢不调仓——两个币轮着领先，按目标配比自动高卖低买；
-            两种阈值策略的结果只差约 4%，换一种权重排名还会互换，<strong>属噪音</strong>——
-            选定 ±5pp 是因为它对权重的约束更紧，调仓也只有 80 次；
-            五种策略的最大回撤都在 −80% 左右——崩盘时两个币一起跌，拉回目标改变不了行情，
-            这个策略管的是权重纪律。
+            四条结论。<strong>第一，再平衡远好于放着不管</strong>——8 年下来 3,520 变成 10,230，
+            两个币轮着领先，按目标配比自动高卖低买。
+            <strong>第二，阈值太紧反而吃亏</strong>：每天调仓（2,716 次）只到 6,857，
+            ±5pp（80 次）7,006——交易越频繁，费用和踏错节奏的损耗越大。
+            <strong>第三，15 个百分点是优势区的中心</strong>：扫描里它最高（10,230），
+            换九种切法重算，它在自然年、滚动三年、牛熊分段里夺冠次数都最多。
+            <strong>第四，它不防崩盘</strong>——所有策略最大回撤都在 −80% 左右，
+            崩盘时两个币一起跌，拉回目标改变不了行情；这个策略管的是权重纪律，不是避险。
           </p>
         </div>
       </section>

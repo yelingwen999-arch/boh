@@ -23,3 +23,6 @@ desktop.ini
 *.log
 npm-debug.log*
 pnpm-debug.log*
+# Python 缓存
+__pycache__/
+*.pyc

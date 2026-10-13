@@ -622,11 +622,13 @@
 
 /* 净值曲线：选定策略（±5pp）青绿加粗，其余中性色 */
 #bt-chart { display: block; width: 100%; height: 360px; }
-.bt-th5    { fill: none; stroke: #3fbf87; stroke-width: 2.5; }
-.bt-daily  { fill: none; stroke: #4aa8d8; stroke-width: 1.5; }
-.bt-weekly { fill: none; stroke: #d98a3d; stroke-width: 1.5; }
-.bt-th10   { fill: none; stroke: #8a7fd6; stroke-width: 1.5; }
-.bt-bh     { fill: none; stroke: #a8a29a; stroke-width: 1.5; stroke-dasharray: 5 3; }
+.bt-sel     { fill: none; stroke: #3fbf87; stroke-width: 2.5; }
+.bt-t5      { fill: none; stroke: #4aa8d8; stroke-width: 1.5; }
+.bt-t10     { fill: none; stroke: #8a7fd6; stroke-width: 1.5; }
+.bt-t20     { fill: none; stroke: #d98a3d; stroke-width: 1.5; }
+.bt-daily   { fill: none; stroke: #6ba3c9; stroke-width: 1.5; }
+.bt-weekly  { fill: none; stroke: #c9a227; stroke-width: 1.5; }
+.bt-bh      { fill: none; stroke: #a8a29a; stroke-width: 1.5; stroke-dasharray: 5 3; }
 .lg-item.is-sel { font-weight: 600; }
 .lg-item.is-sel .lg-line { height: 3px; }
 
@@ -701,6 +703,46 @@
   max-width: 62em;
 }
 .strat-note strong { color: var(--tx); }
+
+/* 策略页的子标题（阈值扫描 / 稳健性检验） */
+.strat-sub { margin-top: 3rem; }
+.strat-sub h2 { font-size: 1.02rem; letter-spacing: 0.01em; }
+.strat-sub .sec-note { font-size: 0.72rem; }
+
+/* 阈值扫描：条形按期末值相对长度 */
+.scan-table td, .scan-table th { padding-top: 0.55rem; padding-bottom: 0.55rem; }
+.scan-pp {
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  font-family: var(--mono); font-size: 0.86rem; font-weight: 600;
+  white-space: nowrap;
+}
+.scan-bar-cell { width: 42%; padding-right: 1rem; }
+.scan-bar {
+  display: block; height: 0.62rem; border-radius: 2px;
+  background: var(--rule);
+}
+.scan-table tr.is-sel .scan-bar { background: var(--jade); }
+
+/* 稳健性检验：最优格子加粗并着青绿 */
+.rob-block { margin: 0 0 2rem; }
+.rob-block h3 {
+  margin: 0 0 0.7rem;
+  font-size: 0.86rem; font-weight: 600;
+  color: var(--tx-2); letter-spacing: 0.02em;
+}
+.rob-note {
+  margin: 0.55rem 0 0;
+  font-family: var(--mono);
+  font-size: 0.71rem;
+  color: var(--tx-3);
+}
+.rob-tip {
+  margin: 0.25rem 0 0;
+  font-size: 0.78rem;
+  color: var(--tx-3);
+  line-height: 1.75;
+}
+.cell-num.is-best { color: var(--jade); font-weight: 600; }
 
 .cycle-sum {
   display: grid;
@@ -1182,6 +1224,15 @@
   .strat-table .n { padding-right: 0.45rem; }
   .strat-table .n:last-child { padding-right: 0; }
   .strat-note { font-size: 0.85rem; }
+  /* 阈值扫描：手机上条形列收窄，数字列自动压缩 */
+  .strat-sub { margin-top: 2.25rem; }
+  .strat-sub h2 { font-size: 0.95rem; }
+  .scan-bar-cell { width: 30%; padding-right: 0.5rem; }
+  .scan-pp { font-size: 0.78rem; gap: 0.3rem; }
+  .rob-block { margin-bottom: 1.5rem; }
+  .rob-block h3 { font-size: 0.8rem; }
+  .rob-note { font-size: 0.66rem; }
+  .rob-tip { font-size: 0.74rem; }
 
   /*
     对比表只有四列，不该套用「篮子构成表」的 58rem 最小宽度，
