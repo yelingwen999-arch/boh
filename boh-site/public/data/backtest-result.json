@@ -1,5 +1,5 @@
 {
- "generatedAt": 1792130051,
+ "generatedAt": 1792215518,
  "source": "DefiLlama Coins API (coins.llama.fi), daily",
  "pair": [
   "BNB",
@@ -16,10 +16,10 @@
   "HYPE": 0.3
  },
  "start": 1528329600,
- "end": 1792108800,
+ "end": 1792195200,
  "startDate": "2018-06-07",
- "endDate": "2026-10-16",
- "days": 2720,
+ "endDate": "2026-10-17",
+ "days": 2721,
  "years": 8.36,
  "feeRate": "0.1% per side",
  "results": [
@@ -28,9 +28,9 @@
    "key": "buyhold",
    "label": "不调仓",
    "rule": "初始按目标比例，此后不再动作",
-   "endValue": 3478.55,
-   "totalReturnPct": 3378.55,
-   "cagrPct": 52.9,
+   "endValue": 3456.86,
+   "totalReturnPct": 3356.86,
+   "cagrPct": 52.76,
    "maxDrawdownPct": -79.89,
    "rebalances": 0,
    "feesPaid": 0.0
@@ -40,21 +40,21 @@
    "key": "daily",
    "label": "每日再平衡",
    "rule": "每个交易日拉回目标比例",
-   "endValue": 6758.92,
-   "totalReturnPct": 6658.92,
-   "cagrPct": 65.55,
+   "endValue": 6730.03,
+   "totalReturnPct": 6630.03,
+   "cagrPct": 65.43,
    "maxDrawdownPct": -80.21,
-   "rebalances": 2719,
-   "feesPaid": 77.54
+   "rebalances": 2720,
+   "feesPaid": 77.59
   },
   {
    "fee": true,
    "key": "weekly",
    "label": "每周再平衡",
    "rule": "每 7 天拉回目标比例",
-   "endValue": 6425.95,
-   "totalReturnPct": 6325.95,
-   "cagrPct": 64.55,
+   "endValue": 6397.55,
+   "totalReturnPct": 6297.55,
+   "cagrPct": 64.44,
    "maxDrawdownPct": -80.27,
    "rebalances": 388,
    "feesPaid": 30.23
@@ -64,9 +64,9 @@
    "key": "th5",
    "label": "阈值 ±5pp",
    "rule": "偏离目标超过 5 个百分点才拉回",
-   "endValue": 6906.12,
-   "totalReturnPct": 6806.12,
-   "cagrPct": 65.97,
+   "endValue": 6875.24,
+   "totalReturnPct": 6775.24,
+   "cagrPct": 65.86,
    "maxDrawdownPct": -80.13,
    "rebalances": 80,
    "feesPaid": 21.86
@@ -76,9 +76,9 @@
    "key": "th10",
    "label": "阈值 ±10pp",
    "rule": "偏离目标超过 10 个百分点才拉回",
-   "endValue": 7213.97,
-   "totalReturnPct": 7113.97,
-   "cagrPct": 66.84,
+   "endValue": 7190.35,
+   "totalReturnPct": 7090.35,
+   "cagrPct": 66.75,
    "maxDrawdownPct": -80.31,
    "rebalances": 31,
    "feesPaid": 12.63
@@ -88,9 +88,9 @@
    "key": "th15",
    "label": "阈值 ±15pp",
    "rule": "偏离目标超过 15 个百分点才拉回",
-   "endValue": 10071.57,
-   "totalReturnPct": 9971.57,
-   "cagrPct": 73.64,
+   "endValue": 10034.49,
+   "totalReturnPct": 9934.49,
+   "cagrPct": 73.53,
    "maxDrawdownPct": -79.83,
    "rebalances": 19,
    "feesPaid": 22.78
@@ -100,9 +100,9 @@
    "key": "th20",
    "label": "阈值 ±20pp",
    "rule": "偏离目标超过 20 个百分点才拉回",
-   "endValue": 9459.77,
-   "totalReturnPct": 9359.77,
-   "cagrPct": 72.34,
+   "endValue": 9412.45,
+   "totalReturnPct": 9312.45,
+   "cagrPct": 72.21,
    "maxDrawdownPct": -79.89,
    "rebalances": 10,
    "feesPaid": 12.19
@@ -112,9 +112,9 @@
    "key": "buyhold",
    "label": "不调仓",
    "rule": "初始按目标比例，此后不再动作",
-   "endValue": 3478.55,
-   "totalReturnPct": 3378.55,
-   "cagrPct": 52.9,
+   "endValue": 3456.86,
+   "totalReturnPct": 3356.86,
+   "cagrPct": 52.76,
    "maxDrawdownPct": -79.89,
    "rebalances": 0,
    "feesPaid": 0.0
@@ -124,11 +124,11 @@
    "key": "daily",
    "label": "每日再平衡",
    "rule": "每个交易日拉回目标比例",
-   "endValue": 7027.68,
-   "totalReturnPct": 6927.68,
-   "cagrPct": 66.32,
+   "endValue": 6997.7,
+   "totalReturnPct": 6897.7,
+   "cagrPct": 66.21,
    "maxDrawdownPct": -80.16,
-   "rebalances": 2719,
+   "rebalances": 2720,
    "feesPaid": 0.0
   },
   {
@@ -136,9 +136,9 @@
    "key": "weekly",
    "label": "每周再平衡",
    "rule": "每 7 天拉回目标比例",
-   "endValue": 6522.19,
-   "totalReturnPct": 6422.19,
-   "cagrPct": 64.84,
+   "endValue": 6493.36,
+   "totalReturnPct": 6393.36,
+   "cagrPct": 64.73,
    "maxDrawdownPct": -80.25,
    "rebalances": 388,
    "feesPaid": 0.0
@@ -148,9 +148,9 @@
    "key": "th5",
    "label": "阈值 ±5pp",
    "rule": "偏离目标超过 5 个百分点才拉回",
-   "endValue": 6977.2,
-   "totalReturnPct": 6877.2,
-   "cagrPct": 66.18,
+   "endValue": 6946.0,
+   "totalReturnPct": 6846.0,
+   "cagrPct": 66.06,
    "maxDrawdownPct": -80.12,
    "rebalances": 80,
    "feesPaid": 0.0
@@ -160,9 +160,9 @@
    "key": "th10",
    "label": "阈值 ±10pp",
    "rule": "偏离目标超过 10 个百分点才拉回",
-   "endValue": 7262.39,
-   "totalReturnPct": 7162.39,
-   "cagrPct": 66.98,
+   "endValue": 7238.61,
+   "totalReturnPct": 7138.61,
+   "cagrPct": 66.88,
    "maxDrawdownPct": -80.31,
    "rebalances": 31,
    "feesPaid": 0.0
@@ -172,9 +172,9 @@
    "key": "th15",
    "label": "阈值 ±15pp",
    "rule": "偏离目标超过 15 个百分点才拉回",
-   "endValue": 10134.25,
-   "totalReturnPct": 10034.25,
-   "cagrPct": 73.77,
+   "endValue": 10096.94,
+   "totalReturnPct": 9996.94,
+   "cagrPct": 73.66,
    "maxDrawdownPct": -79.82,
    "rebalances": 19,
    "feesPaid": 0.0
@@ -184,9 +184,9 @@
    "key": "th20",
    "label": "阈值 ±20pp",
    "rule": "偏离目标超过 20 个百分点才拉回",
-   "endValue": 9500.25,
-   "totalReturnPct": 9400.25,
-   "cagrPct": 72.43,
+   "endValue": 9452.73,
+   "totalReturnPct": 9352.73,
+   "cagrPct": 72.29,
    "maxDrawdownPct": -79.89,
    "rebalances": 10,
    "feesPaid": 0.0
@@ -195,15 +195,15 @@
  "references": [
   {
    "label": "BNB 买入持有",
-   "multiple": 42.479
+   "multiple": 42.013
   },
   {
    "label": "OKB 买入持有",
-   "multiple": 24.587
+   "multiple": 24.701
   },
   {
    "label": "BTC 买入持有",
-   "multiple": 10.802
+   "multiple": 10.719
   }
  ],
  "curve": {
@@ -597,7 +597,7 @@
    1790640000,
    1791244800,
    1791849600,
-   1792108800
+   1792195200
   ],
   "values": {
    "buyhold": [
@@ -990,7 +990,7 @@
     3609.2,
     3786.6,
     3519.5,
-    3478.6
+    3456.9
    ],
    "daily": [
     100.0,
@@ -1382,7 +1382,7 @@
     6973.4,
     7379.0,
     6856.7,
-    6759.1
+    6730.1
    ],
    "weekly": [
     100.0,
@@ -1774,7 +1774,7 @@
     6633.1,
     7017.7,
     6519.5,
-    6426.0
+    6397.6
    ],
    "th5": [
     100.0,
@@ -2166,7 +2166,7 @@
     7140.5,
     7542.7,
     7006.2,
-    6906.1
+    6875.2
    ],
    "th10": [
     100.0,
@@ -2558,7 +2558,7 @@
     7440.9,
     7896.7,
     7331.8,
-    7214.0
+    7190.4
    ],
    "th15": [
     100.0,
@@ -2950,7 +2950,7 @@
     10396.9,
     11016.3,
     10229.8,
-    10071.6
+    10034.5
    ],
    "th20": [
     100.0,
@@ -3342,7 +3342,7 @@
     9791.1,
     10321.5,
     9589.0,
-    9459.8
+    9412.5
    ]
   }
  },
@@ -3357,63 +3357,63 @@
  "scan": [
   {
    "pp": 3,
-   "endValue": 6810.24,
-   "totalReturnPct": 6710.24,
-   "cagrPct": 65.7,
+   "endValue": 6778.93,
+   "totalReturnPct": 6678.93,
+   "cagrPct": 65.58,
    "maxDrawdownPct": -80.04,
    "rebalances": 182,
    "feesPaid": 29.34
   },
   {
    "pp": 5,
-   "endValue": 6906.12,
-   "totalReturnPct": 6806.12,
-   "cagrPct": 65.97,
+   "endValue": 6875.24,
+   "totalReturnPct": 6775.24,
+   "cagrPct": 65.86,
    "maxDrawdownPct": -80.13,
    "rebalances": 80,
    "feesPaid": 21.86
   },
   {
    "pp": 7,
-   "endValue": 6708.41,
-   "totalReturnPct": 6608.41,
-   "cagrPct": 65.4,
+   "endValue": 6682.78,
+   "totalReturnPct": 6582.78,
+   "cagrPct": 65.3,
    "maxDrawdownPct": -80.33,
    "rebalances": 51,
    "feesPaid": 17.86
   },
   {
    "pp": 10,
-   "endValue": 7213.97,
-   "totalReturnPct": 7113.97,
-   "cagrPct": 66.84,
+   "endValue": 7190.35,
+   "totalReturnPct": 7090.35,
+   "cagrPct": 66.75,
    "maxDrawdownPct": -80.31,
    "rebalances": 31,
    "feesPaid": 12.63
   },
   {
    "pp": 15,
-   "endValue": 10071.57,
-   "totalReturnPct": 9971.57,
-   "cagrPct": 73.64,
+   "endValue": 10034.49,
+   "totalReturnPct": 9934.49,
+   "cagrPct": 73.53,
    "maxDrawdownPct": -79.83,
    "rebalances": 19,
    "feesPaid": 22.78
   },
   {
    "pp": 20,
-   "endValue": 9459.77,
-   "totalReturnPct": 9359.77,
-   "cagrPct": 72.34,
+   "endValue": 9412.45,
+   "totalReturnPct": 9312.45,
+   "cagrPct": 72.21,
    "maxDrawdownPct": -79.89,
    "rebalances": 10,
    "feesPaid": 12.19
   },
   {
    "pp": 30,
-   "endValue": 8844.57,
-   "totalReturnPct": 8744.57,
-   "cagrPct": 70.96,
+   "endValue": 8812.21,
+   "totalReturnPct": 8712.21,
+   "cagrPct": 70.85,
    "maxDrawdownPct": -79.89,
    "rebalances": 4,
    "feesPaid": 4.11
@@ -3503,10 +3503,10 @@
   {
    "year": 2026,
    "values": {
-    "th5": 95.4,
-    "th10": 94.1,
-    "th15": 94.1,
-    "th20": 94.1
+    "th5": 95.0,
+    "th10": 93.8,
+    "th15": 93.8,
+    "th20": 93.8
    },
    "best": 5
   }
@@ -3611,12 +3611,12 @@
   {
    "label": "2025-10 至今",
    "values": {
-    "th5": 70.0,
-    "th10": 69.9,
-    "th15": 67.9,
-    "th20": 67.9
+    "th5": 69.7,
+    "th10": 69.6,
+    "th15": 67.6,
+    "th20": 67.6
    },
-   "buyhold": 67.9,
+   "buyhold": 67.6,
    "best": 5
   }
  ],
