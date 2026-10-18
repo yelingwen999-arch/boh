@@ -1,60 +1,33 @@
 {
- "generatedAt": "2026-10-18T13:30:03+00:00",
+ "generatedAt": "2026-10-18T17:34:14+00:00",
  "baseline": true,
- "prevUpdated": "2026-10-18T09:06:00+00:00",
- "nowUpdated": "2026-10-18T13:30:03+00:00",
- "n": 4,
+ "prevUpdated": "2026-10-18T13:30:03+00:00",
+ "nowUpdated": "2026-10-18T17:34:14+00:00",
+ "n": 2,
  "alerts": [
-  {
-   "type": "share_risk",
-   "level": "warn",
-   "title": "占比过高 · AAPLB/USDT · BNB Chain · 0.01%",
-   "detail": "按本金 $10,000 算，占池子 14.1%（TVL $60.8K）— 你即市场",
-   "pool": "bsc|0x0905edec2928b701fb6c6354e4eee4960895a82f",
-   "prev": {
-    "share": 12.53
-   },
-   "now": {
-    "share": 14.13
-   }
-  },
-  {
-   "type": "share_risk",
-   "level": "warn",
-   "title": "占比过高 · TSLAB/USDT · BNB Chain · 0.05%",
-   "detail": "按本金 $10,000 算，占池子 16.3%（TVL $51.3K）— 你即市场",
-   "pool": "bsc|0x53c6291d0a5a02c76cedfa1b8f57a8ac3762f7a9",
-   "prev": {
-    "share": 12.62
-   },
-   "now": {
-    "share": 16.31
-   }
-  },
   {
    "type": "new_pool",
    "level": "info",
-   "title": "新池上线 · SPY/USDG · Robinhood · 0.05%",
-   "detail": "TVL $986.5K · APR30 20%",
-   "pool": "robinhood|0xe5923c8a8be481ec89a2ca784a2bbfa4235de6d88f92260fd66b660c4babf907",
+   "title": "新池上线 · GOOGLB/USDT · BNB Chain · 0.25%",
+   "detail": "TVL $1.55M · APR30 34%",
+   "pool": "bsc|0x89001d846f7ca36ee089f73eefc25657e1798144",
    "prev": null,
    "now": {
-    "tvl": 986540.7497,
-    "apr30": 20.4312103409912
+    "tvl": 1550384.3932,
+    "apr30": 33.86705133890756
    }
   },
   {
-   "type": "top_rank",
+   "type": "tvl_swing",
    "level": "info",
-   "title": "新进 APR 前 5 · TSLAB/USDT · BNB Chain · 0.05%",
-   "detail": "上次第 6 名 → 当前第 4 名 · APR30 114%",
-   "pool": "bsc|0x53c6291d0a5a02c76cedfa1b8f57a8ac3762f7a9",
+   "title": "TVL 暴涨 · AAPLB/USDT · BNB Chain · 0.01%",
+   "detail": "$60.8K → $83.2K（+37%）",
+   "pool": "bsc|0x0905edec2928b701fb6c6354e4eee4960895a82f",
    "prev": {
-    "rank": 6
+    "tvl": 60783.0125
    },
    "now": {
-    "rank": 4,
-    "apr30": 113.9336583917101
+    "tvl": 83212.5954
    }
   }
  ]
