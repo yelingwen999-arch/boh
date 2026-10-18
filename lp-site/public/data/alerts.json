@@ -1,123 +1,76 @@
 {
- "generatedAt": "2026-10-18T03:40:47+00:00",
+ "generatedAt": "2026-10-18T09:06:00+00:00",
  "baseline": true,
- "prevUpdated": "2026-10-17T20:55:43+08:00",
- "nowUpdated": "2026-10-18T03:40:47+00:00",
- "n": 9,
+ "prevUpdated": "2026-10-18T03:40:47+00:00",
+ "nowUpdated": "2026-10-18T09:06:00+00:00",
+ "n": 5,
  "alerts": [
+  {
+   "type": "apr_jump",
+   "level": "warn",
+   "title": "APR 飙升 · AAPLB/USDT · BNB Chain · 0.005% ⚠️微型池",
+   "detail": "146% → 368%（+153%） · TVL $1.9K",
+   "pool": "bsc|0xd2c580195bd00297f97ad8f7eb9e7ff87b8d5ab19a5b500a031855d32ba79f4a",
+   "prev": {
+    "apr30": 145.6704656508963,
+    "tvl": 5849.4999
+   },
+   "now": {
+    "apr30": 368.2117578210329,
+    "tvl": 1932.5779
+   }
+  },
   {
    "type": "share_risk",
    "level": "warn",
-   "title": "占比过高 · AAPLB/USDT · BNB Chain · 0.005%",
-   "detail": "按本金 $10,000 算，占池子 63.1%（TVL $5.8K）— 你即市场",
-   "pool": "bsc|0xd2c580195bd00297f97ad8f7eb9e7ff87b8d5ab19a5b500a031855d32ba79f4a",
+   "title": "占比过高 · AAPLB/USDT · BNB Chain · 0.001%",
+   "detail": "按本金 $10,000 算，占池子 23.0%（TVL $33.4K）— 你即市场",
+   "pool": "bsc|0x23fc3a1a2a535ff5bf2962e0ae06dedd29074e2ff38ab9faf8abccc63d5cc569",
    "prev": {
     "share": 0
    },
    "now": {
-    "share": 63.09
-   }
-  },
-  {
-   "type": "share_risk",
-   "level": "warn",
-   "title": "占比过高 · TSLAB/USDT · BNB Chain · 0.05%",
-   "detail": "按本金 $10,000 算，占池子 13.2%（TVL $65.6K）— 你即市场",
-   "pool": "bsc|0x53c6291d0a5a02c76cedfa1b8f57a8ac3762f7a9",
-   "prev": {
-    "share": 7.37
-   },
-   "now": {
-    "share": 13.22
-   }
-  },
-  {
-   "type": "tvl_swing",
-   "level": "warn",
-   "title": "TVL 骤降 · TSLAB/USDT · BNB Chain · 0.05%",
-   "detail": "$125.7K → $65.6K（-48%）",
-   "pool": "bsc|0x53c6291d0a5a02c76cedfa1b8f57a8ac3762f7a9",
-   "prev": {
-    "tvl": 125650.0851
-   },
-   "now": {
-    "tvl": 65641.8452
-   }
-  },
-  {
-   "type": "tvl_swing",
-   "level": "warn",
-   "title": "TVL 骤降 · SPY/USDG · Robinhood · 0.008%",
-   "detail": "$305.8K → $195.6K（-36%）",
-   "pool": "robinhood|0x05e146f995aa70d0bf8481ee3d27368a537a8e0d",
-   "prev": {
-    "tvl": 305764.6698
-   },
-   "now": {
-    "tvl": 195610.2688
-   }
-  },
-  {
-   "type": "apr_jump",
-   "level": "info",
-   "title": "APR 飙升 · TSLAB/USDT · BNB Chain · 0.05%",
-   "detail": "49% → 90%（+85%） · TVL $65.6K",
-   "pool": "bsc|0x53c6291d0a5a02c76cedfa1b8f57a8ac3762f7a9",
-   "prev": {
-    "apr30": 48.83510087819054,
-    "tvl": 125650.0851
-   },
-   "now": {
-    "apr30": 90.10559441452757,
-    "tvl": 65641.8452
+    "share": 23.03
    }
   },
   {
    "type": "new_pool",
    "level": "info",
-   "title": "新池上线 · SKHYB/USDT · BNB Chain · 0.25%",
-   "detail": "TVL $866.5K · APR30 152%",
-   "pool": "bsc|0xd7d30f434b12f7ed9b0ae11ff1c754745a10ad52",
+   "title": "新池上线 · AAPLB/USDT · BNB Chain · 0.001%",
+   "detail": "TVL $33.4K · APR30 44%",
+   "pool": "bsc|0x23fc3a1a2a535ff5bf2962e0ae06dedd29074e2ff38ab9faf8abccc63d5cc569",
    "prev": null,
    "now": {
-    "tvl": 866496.6724,
-    "apr30": 152.185532376058
-   }
-  },
-  {
-   "type": "new_pool",
-   "level": "info",
-   "title": "新池上线 · SPY/USDG · Robinhood · 0.01%",
-   "detail": "TVL $500.5K · APR30 14%",
-   "pool": "robinhood|0x38453c115607463ac284820ce959831042f3df4e",
-   "prev": null,
-   "now": {
-    "tvl": 500508.8739,
-    "apr30": 14.180333194038418
+    "tvl": 33419.5127,
+    "apr30": 43.78723579045066
    }
   },
   {
    "type": "top_rank",
    "level": "info",
-   "title": "新进 APR 前 5 · AAPLB/USDT · BNB Chain · 0.01%",
-   "detail": "当前第 2 名 · APR30 242%",
-   "pool": "bsc|0x0905edec2928b701fb6c6354e4eee4960895a82f",
-   "prev": null,
+   "title": "新进 APR 前 5 · NVDAB/USDT · BNB Chain · 0.05%",
+   "detail": "上次第 7 名 → 当前第 4 名 · APR30 89%",
+   "pool": "bsc|0xdd9d5164ccbc57be377a964fc064135b03d06177",
+   "prev": {
+    "rank": 7
+   },
    "now": {
-    "rank": 2,
-    "apr30": 242.24339907926873
+    "rank": 4,
+    "apr30": 88.97514640853346
    }
   },
   {
    "type": "top_rank",
    "level": "info",
-   "title": "新进 APR 前 5 · TSLAB/USDT · BNB Chain · 0.05%",
-   "detail": "当前第 5 名 · APR30 90%",
-   "pool": "bsc|0x53c6291d0a5a02c76cedfa1b8f57a8ac3762f7a9",
-   "prev": null,
+   "title": "新进 APR 前 5 · SPCX/USDG · Robinhood · 0.05%",
+   "detail": "上次第 6 名 → 当前第 5 名 · APR30 89%",
+   "pool": "robinhood|0xc61284332117c3fb23a2a56cceffd07f7af60029",
+   "prev": {
+    "rank": 6
+   },
    "now": {
     "rank": 5,
-    "apr30": 90.10559441452757
+    "apr30": 88.95080466058691
    }
   }
  ]

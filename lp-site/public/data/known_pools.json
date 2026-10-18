@@ -1,8 +1,9 @@
 {
- "updated": "2026-10-18T03:40:47+00:00",
+ "updated": "2026-10-18T09:06:00+00:00",
  "pools": [
   "base|0xa3b1e3f9747065e2073722ff4c9027d3ea4994f0",
   "bsc|0x0905edec2928b701fb6c6354e4eee4960895a82f",
+  "bsc|0x23fc3a1a2a535ff5bf2962e0ae06dedd29074e2ff38ab9faf8abccc63d5cc569",
   "bsc|0x51a45a72cc96ca3ba615e25e80a6af2740ae2e2d",
   "bsc|0x53c6291d0a5a02c76cedfa1b8f57a8ac3762f7a9",
   "bsc|0x8fb4243b553ac29ba088acf00b9b7da24bd6690c",
