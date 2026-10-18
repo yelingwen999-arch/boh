@@ -20,6 +20,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.normpath(os.path.join(HERE, "..", "public", "data"))
 POOLS_PATH = os.path.join(DATA_DIR, "pools.json")
 STATE_PATH = os.path.join(DATA_DIR, "prev_pools.json")
+KNOWN_PATH = os.path.join(DATA_DIR, "known_pools.json")
 ALERTS_PATH = os.path.join(DATA_DIR, "alerts.json")
 
 # ---- 阈值：先按保守值起，观察几天再调 ----
@@ -150,20 +151,33 @@ def detect(cur, prev):
 
     cur_top = top_ranks(cur.get("pools", []), APR_TOP_RANK)
     prev_top = top_ranks(prev.get("pools", []), APR_TOP_RANK)
+
+    # 上一版里所有池子的 APR 名次（不限前 N），用来说明「从第几名上来的」
+    def all_ranks(pools):
+        ranked = sorted(
+            [p for p in pools if (p.get("tvl") or 0) >= TVL_ABS_MIN],
+            key=lambda x: -(x.get("apr30") or 0),
+        )
+        return {key_of(p): i + 1 for i, p in enumerate(ranked)}
+
+    prev_rank_all = all_ranks(prev.get("pools", []))
+
     for k, rank in cur_top.items():
         if k in prev_top:
             continue
         if k not in prev_pools:
             continue  # 新池已经报过了，别重复
         p = cur_pools[k]
+        was = prev_rank_all.get(k)
+        move = f"上次第 {was} 名 → " if was else ""
         alerts.append(
             {
                 "type": "top_rank",
                 "level": "info",
                 "title": f"新进 APR 前 {APR_TOP_RANK} · {label(p)}",
-                "detail": f"当前第 {rank} 名 · APR30 {p.get('apr30', 0):.0f}%",
+                "detail": f"{move}当前第 {rank} 名 · APR30 {p.get('apr30', 0):.0f}%",
                 "pool": k,
-                "prev": None,
+                "prev": {"rank": was},
                 "now": {"rank": rank, "apr30": p.get("apr30")},
             }
         )
@@ -265,6 +279,7 @@ def main():
         return 0
 
     prev = load(STATE_PATH)
+    known = load(KNOWN_PATH)
 
     # 基线保护：如果本次结果比上一版少了太多池子，说明抓取中途出问题，
     # 不能拿它当新基线，否则下一轮会把一堆「消失的池子」误判成异常，
@@ -279,6 +294,36 @@ def main():
         alerts = detect(cur, prev)   # 仍然对比并报告，但不覆盖基线
     else:
         alerts = detect(cur, prev)
+
+    # ---- 过滤假「新池」 ----
+    # 抓取本身有波动：受预算 / 限流影响，某个池子可能这轮没抓到、下轮又出现。
+    # 只看「上一轮有没有」会把它误报成新池。所以维护一份「见过的池子」，
+    # 只有从未出现过的才算真·新池。
+    seen = set((known or {}).get("pools", []))
+    filtered = []
+    suppressed = 0
+    for a in alerts:
+        if a["type"] == "new_pool":
+            pid = a["pool"]
+            if pid in seen:
+                suppressed += 1
+                continue
+            seen.add(pid)
+        filtered.append(a)
+    if suppressed:
+        print(f"（{suppressed} 条「新池上线」是抓取波动导致的误报，已过滤）")
+    alerts = filtered
+
+    # 记录所有见过的池子（含本轮所有池，不只是报警过的）
+    for p in cur.get("pools", []):
+        seen.add(key_of(p))
+    with open(KNOWN_PATH, "w", encoding="utf-8") as f:
+        json.dump(
+            {"updated": cur.get("updated"), "pools": sorted(seen)},
+            f,
+            ensure_ascii=False,
+            indent=1,
+        )
 
     payload = {
         "generatedAt": datetime.now(timezone.utc).isoformat(timespec="seconds"),
