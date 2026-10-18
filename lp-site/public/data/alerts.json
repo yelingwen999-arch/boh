@@ -1,33 +1,46 @@
 {
- "generatedAt": "2026-10-18T17:34:14+00:00",
+ "generatedAt": "2026-10-18T20:51:36+00:00",
  "baseline": true,
- "prevUpdated": "2026-10-18T13:30:03+00:00",
- "nowUpdated": "2026-10-18T17:34:14+00:00",
- "n": 2,
+ "prevUpdated": "2026-10-18T17:34:14+00:00",
+ "nowUpdated": "2026-10-18T20:51:35+00:00",
+ "n": 3,
  "alerts": [
   {
-   "type": "new_pool",
-   "level": "info",
-   "title": "新池上线 · GOOGLB/USDT · BNB Chain · 0.25%",
-   "detail": "TVL $1.55M · APR30 34%",
-   "pool": "bsc|0x89001d846f7ca36ee089f73eefc25657e1798144",
-   "prev": null,
+   "type": "share_risk",
+   "level": "warn",
+   "title": "占比过高 · NVDA/USDG · Robinhood · 0.3%",
+   "detail": "按本金 $10,000 算，占池子 7.5%（TVL $122.5K）— 你即市场",
+   "pool": "robinhood|0x18a5af4e442f8be68968cc1f00d537f8af2d12cd",
+   "prev": {
+    "share": 0
+   },
    "now": {
-    "tvl": 1550384.3932,
-    "apr30": 33.86705133890756
+    "share": 7.55
    }
   },
   {
-   "type": "tvl_swing",
-   "level": "info",
-   "title": "TVL 暴涨 · AAPLB/USDT · BNB Chain · 0.01%",
-   "detail": "$60.8K → $83.2K（+37%）",
+   "type": "share_risk",
+   "level": "warn",
+   "title": "占比过高 · AAPLB/USDT · BNB Chain · 0.01%",
+   "detail": "按本金 $10,000 算，占池子 11.4%（TVL $77.4K）— 你即市场",
    "pool": "bsc|0x0905edec2928b701fb6c6354e4eee4960895a82f",
    "prev": {
-    "tvl": 60783.0125
+    "share": 10.73
    },
    "now": {
-    "tvl": 83212.5954
+    "share": 11.44
+   }
+  },
+  {
+   "type": "new_pool",
+   "level": "info",
+   "title": "新池上线 · NVDA/USDG · Robinhood · 0.3%",
+   "detail": "TVL $122.5K · APR30 2241%",
+   "pool": "robinhood|0x18a5af4e442f8be68968cc1f00d537f8af2d12cd",
+   "prev": null,
+   "now": {
+    "tvl": 122519.5499,
+    "apr30": 2240.713881762371
    }
   }
  ]
