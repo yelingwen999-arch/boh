@@ -1,28 +1,31 @@
-name: 每日更新 LP 看板数据
+name: LP 看板监控
 
-# 抓取美股代币 LP 池的链上数据，提交后由 Cloudflare Pages 自动重新部署。
-# 也可在 Actions 页面手动触发（workflow_dispatch）。
+# 抓取 → 异动检测 → 推送（Telegram / 邮件）
+# 推送渠道没配就静默跳过，不影响数据更新。
 
 on:
   schedule:
-    # UTC 02:10 = 北京时间 10:10，每天早上更新一次
-    # 注：GitHub 的定时任务在高峰期可能延迟几分钟到半小时，属正常
-    - cron: '10 2 * * *'
+    # 每小时一次（UTC 整点后 5 分，避开整点的 Actions 高峰）
+    # 注：公开仓库的 Actions 免费不限量
+    - cron: '5 * * * *'
   workflow_dispatch:
+    inputs:
+      notify_test:
+        description: '只发一条测试通知（验证 Telegram / 邮件配置）'
+        type: boolean
+        default: false
 
 permissions:
   contents: write
 
-# 同一时间只跑一个，避免两次抓取互相覆盖
 concurrency:
-  group: daily-lp-data
+  group: lp-monitor
   cancel-in-progress: false
 
 jobs:
-  fetch:
+  monitor:
     runs-on: ubuntu-latest
-    # 抓取脚本自带 25 分钟预算，这里留出余量
-    timeout-minutes: 30
+    timeout-minutes: 35
 
     steps:
       - name: 检出仓库
@@ -33,42 +36,81 @@ jobs:
         with:
           python-version: '3.12'
 
+      # ---- 只发测试消息的分支 ----
+      - name: 发送测试通知
+        if: inputs.notify_test == true
+        working-directory: lp-site/scripts
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+        run: python notify.py --test
+
+      # ---- 正常流程：抓取 → 检测 → 推送 ----
       - name: 抓取 LP 池数据
+        if: inputs.notify_test != true
         working-directory: lp-site/scripts
         env:
           FETCH_BUDGET_S: '1500'
-        run: |
-          set -e
-          python fetch_pools.py
+        run: python fetch_pools.py
+
+      - name: 异动检测
+        if: inputs.notify_test != true
+        working-directory: lp-site/scripts
+        run: python detect.py
+
+      - name: 推送异动
+        if: inputs.notify_test != true
+        working-directory: lp-site/scripts
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+          SITE_URL: https://chasebig.xyz
+        run: python notify.py
 
       - name: 检查是否有变化
         id: diff
+        if: inputs.notify_test != true
         run: |
-          if git diff --quiet -- lp-site/public/data/pools.json; then
+          if git diff --quiet -- lp-site/public/data/; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "数据无变化，跳过提交"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
-            git diff --stat -- lp-site/public/data/pools.json
+            git diff --stat -- lp-site/public/data/
           fi
 
       - name: 提交并推送
-        if: steps.diff.outputs.changed == 'true'
+        if: inputs.notify_test != true && steps.diff.outputs.changed == 'true'
         run: |
           git config user.name  "LP Bot"
           git config user.email "lp-bot@users.noreply.github.com"
-          git add lp-site/public/data/pools.json
+          git add lp-site/public/data/
           git commit -m "LP 数据更新 $(date -u '+%Y-%m-%d %H:%M') UTC"
           git push
 
       - name: 输出摘要
+        if: inputs.notify_test != true
         run: |
           {
-            echo "### LP 数据更新"
+            echo "### LP 看板监控"
             echo ""
+            if [ -f lp-site/public/data/alerts.json ]; then
+              N=$(python -c "import json;print(json.load(open('lp-site/public/data/alerts.json')).get('n',0))")
+              echo "本轮异动：**${N}** 条"
+            fi
             if [ "${{ steps.diff.outputs.changed }}" = "true" ]; then
-              echo "有更新，已提交并触发重新部署。"
+              echo "数据有更新，已提交。"
             else
-              echo "无变化（数据与上次一致）。"
+              echo "数据无变化。"
             fi
           } >> "$GITHUB_STEP_SUMMARY"

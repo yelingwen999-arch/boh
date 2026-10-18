@@ -339,9 +339,41 @@ tr.sparkrow:hover{background:var(--bg-raised)}
 .criteria .cr i{font:400 11px 'Inter';font-style:normal;color:var(--t3);margin-left:6px}
 .criteria .cr-note{color:var(--t3);margin-left:auto;font-size:11px}
 
+/* 异动播报 */
+.alerts{border-bottom:1px solid var(--line);padding:0 36px;background:var(--bg)}
+.al-head{display:flex;align-items:center;gap:12px;padding:13px 0 10px;flex-wrap:wrap}
+.al-title{font:600 12px 'Inter';letter-spacing:.6px;color:var(--t1)}
+.al-count{
+  font:600 11px 'IBM Plex Mono';padding:2px 8px;border-radius:10px;
+  background:var(--badge-warn-bg);color:var(--warn);
+}
+.al-time{font:400 11px 'IBM Plex Mono';color:var(--t3)}
+.al-toggle{
+  margin-left:auto;background:none;border:none;color:var(--t3);cursor:pointer;
+  font:500 11px 'Inter';padding:3px 6px;border-radius:5px;
+}
+.al-toggle:hover{background:var(--hover);color:var(--t1)}
+.al-list{list-style:none;margin:0 0 12px;display:flex;flex-direction:column;gap:1px}
+.al-list li{
+  display:flex;align-items:baseline;gap:10px;
+  padding:8px 0;border-top:1px solid var(--line);
+}
+.al-list li:first-child{border-top:none}
+.al-ico{flex-shrink:0;font-size:12px;line-height:1.6}
+.al-main{min-width:0;flex:1}
+.al-t{font:600 12.5px 'Inter';color:var(--t1);margin-bottom:1px}
+.al-d{font:400 11.5px 'IBM Plex Mono';color:var(--t2)}
+.al-badge{
+  flex-shrink:0;font:500 10px 'Inter';padding:2px 7px;border-radius:10px;
+  background:var(--bg-raised);color:var(--t3);white-space:nowrap;
+}
+.al-list li.warn .al-ico{color:var(--warn)}
+.al-list li.info .al-ico{color:var(--accent)}
+.al-empty{font:400 11.5px 'Inter';color:var(--t3);padding:4px 0 14px}
+
 @media(max-width:960px){
   .rail{display:none}
-  .top,.filters,.tblwrap,.method,.criteria{padding-left:16px;padding-right:16px}
+  .top,.filters,.tblwrap,.method,.criteria,.alerts{padding-left:16px;padding-right:16px}
   .criteria .cr-note{margin-left:0}
   thead th{top:0}
 }
@@ -420,6 +452,17 @@ tr.sparkrow:hover{background:var(--bg-raised)}
     <span class="cr">TVL ≥ $50K<i>排除微型陷阱池</i></span>
     <span class="cr-note">这是筛选条件，不是推荐</span>
   </div>
+
+  <!-- ═══════════ 异动播报（由 detect.py 生成 alerts.json） ═══════════ -->
+  <section class="alerts" id="alerts" hidden>
+    <div class="al-head">
+      <span class="al-title">本轮异动</span>
+      <span class="al-count" id="al-count"></span>
+      <span class="al-time" id="al-time"></span>
+      <button class="al-toggle" id="al-toggle" type="button" aria-expanded="true">收起</button>
+    </div>
+    <ul class="al-list" id="al-list"></ul>
+  </section>
 
   <!-- ═══════════ table ═══════════ -->
   <div class="tblwrap">
@@ -952,8 +995,77 @@ wireDD('dd-stock','stock',it=>{
 });
 $('#f-cap').addEventListener('input',()=>{updateBest();render();});
 
+/* ============ 异动播报 ============ */
+const AL_TYPE={
+  apr_jump:'APR 飙升', new_pool:'新池上线', top_rank:'进前五',
+  tvl_swing:'TVL 变化', volume_dry:'量能萎缩', share_risk:'占比过高',
+};
+let AL_COLLAPSED=false;
+
+function renderAlerts(d){
+  const box=$('#alerts'), list=$('#al-list');
+  if(!box||!list)return;
+  const alerts=(d&&d.alerts)||[];
+
+  // 首次运行还没建基线：说明清楚，别让人以为「无事发生」
+  if(d&&d.baseline===false){
+    box.hidden=false;
+    $('#al-count').textContent='建基线中';
+    $('#al-count').style.background='var(--bg-raised)';
+    $('#al-count').style.color='var(--t3)';
+    $('#al-time').textContent=d.nowUpdated?d.nowUpdated.slice(0,16).replace('T',' '):'';
+    list.innerHTML='<li class="al-empty">第一次运行，正在建立对比基线。下一轮起才会报告异动。</li>';
+    $('#al-toggle').style.display='none';
+    return;
+  }
+
+  if(!alerts.length){ box.hidden=true; return; }
+
+  box.hidden=false;
+  $('#al-toggle').style.display='';
+  $('#al-count').textContent=alerts.length+' 条';
+  $('#al-time').textContent=(d.nowUpdated||'').slice(0,16).replace('T',' ');
+
+  list.innerHTML=alerts.map(a=>{
+    const lvl=a.level==='warn'?'warn':'info';
+    const ico=lvl==='warn'?'⚠':'●';
+    return `<li class="${lvl}">
+      <span class="al-ico">${ico}</span>
+      <div class="al-main">
+        <div class="al-t">${esc(a.title)}</div>
+        <div class="al-d">${esc(a.detail)}</div>
+      </div>
+      <span class="al-badge">${esc(AL_TYPE[a.type]||a.type)}</span>
+    </li>`;
+  }).join('');
+
+  list.style.display=AL_COLLAPSED?'none':'';
+  $('#al-toggle').textContent=AL_COLLAPSED?'展开':'收起';
+  $('#al-toggle').setAttribute('aria-expanded',String(!AL_COLLAPSED));
+}
+
+$('#al-toggle')?.addEventListener('click',()=>{
+  AL_COLLAPSED=!AL_COLLAPSED;
+  const list=$('#al-list');
+  list.style.display=AL_COLLAPSED?'none':'';
+  $('#al-toggle').textContent=AL_COLLAPSED?'展开':'收起';
+  $('#al-toggle').setAttribute('aria-expanded',String(!AL_COLLAPSED));
+});
+
+async function loadAlerts(){
+  try{
+    const r=await fetch('/data/alerts.json',{cache:'no-store'});
+    if(!r.ok){ $('#alerts').hidden=true; return; }   // 没有这个文件就整块不显示
+    renderAlerts(await r.json());
+  }catch(e){
+    $('#alerts').hidden=true;
+  }
+}
+
 load();
+loadAlerts();
 setInterval(load,60000);
+setInterval(loadAlerts,60000);
 </script>
 </body>
 </html>
