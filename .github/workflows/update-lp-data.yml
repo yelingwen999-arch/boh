@@ -1,0 +1,74 @@
+name: 每日更新 LP 看板数据
+
+# 抓取美股代币 LP 池的链上数据，提交后由 Cloudflare Pages 自动重新部署。
+# 也可在 Actions 页面手动触发（workflow_dispatch）。
+
+on:
+  schedule:
+    # UTC 02:10 = 北京时间 10:10，每天早上更新一次
+    # 注：GitHub 的定时任务在高峰期可能延迟几分钟到半小时，属正常
+    - cron: '10 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# 同一时间只跑一个，避免两次抓取互相覆盖
+concurrency:
+  group: daily-lp-data
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    # 抓取脚本自带 25 分钟预算，这里留出余量
+    timeout-minutes: 30
+
+    steps:
+      - name: 检出仓库
+        uses: actions/checkout@v4
+
+      - name: 安装 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 抓取 LP 池数据
+        working-directory: lp-site/scripts
+        env:
+          FETCH_BUDGET_S: '1500'
+        run: |
+          set -e
+          python fetch_pools.py
+
+      - name: 检查是否有变化
+        id: diff
+        run: |
+          if git diff --quiet -- lp-site/public/data/pools.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "数据无变化，跳过提交"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            git diff --stat -- lp-site/public/data/pools.json
+          fi
+
+      - name: 提交并推送
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name  "LP Bot"
+          git config user.email "lp-bot@users.noreply.github.com"
+          git add lp-site/public/data/pools.json
+          git commit -m "LP 数据更新 $(date -u '+%Y-%m-%d %H:%M') UTC"
+          git push
+
+      - name: 输出摘要
+        run: |
+          {
+            echo "### LP 数据更新"
+            echo ""
+            if [ "${{ steps.diff.outputs.changed }}" = "true" ]; then
+              echo "有更新，已提交并触发重新部署。"
+            else
+              echo "无变化（数据与上次一致）。"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

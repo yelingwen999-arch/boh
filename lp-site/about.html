@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<title>口径与声明 · 美股代币 LP 看板</title>
+<meta name="description" content="美股代币 LP 看板的数据来源、计算口径与免责声明。本站只做公开数据汇总，不构成投资建议。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+/* theme tokens — must match index.html */
+:root, [data-theme="dark"]{
+  --bg:#0A0B0E; --bg-rail:#0E1014; --bg-raised:rgba(255,255,255,.024);
+  --line:rgba(255,255,255,.07); --line-strong:rgba(255,255,255,.12);
+  --hover:rgba(255,255,255,.045);
+  --t1:#F0F2F6; --t2:#9BA3B5; --t3:#5D6575;
+  --accent:#7C9EF5; --up:#4ADE9B; --down:#F87171; --warn:#FBBF24;
+  --badge-warn-bg:rgba(251,191,36,.1);
+}
+[data-theme="light"]{
+  --bg:#FFFFFF; --bg-rail:#F7F7F5; --bg-raised:rgba(0,0,0,.028);
+  --line:rgba(0,0,0,.09); --line-strong:rgba(0,0,0,.15);
+  --hover:rgba(0,0,0,.05);
+  --t1:#111318; --t2:#555C6B; --t3:#98A0AF;
+  --accent:#2F4FD8; --up:#0B8A5F; --down:#C93A3A; --warn:#A36A00;
+  --badge-warn-bg:rgba(163,106,0,.09);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--bg)}
+body{
+  font-family:'Inter','PingFang SC','Microsoft YaHei',system-ui,sans-serif;
+  color:var(--t1);min-height:100vh;font-size:13.5px;background:var(--bg);
+  transition:background .25s,color .25s;display:flex;
+}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+::selection{background:var(--accent);color:#fff}
+
+/* rail — identical to index.html */
+.rail{
+  width:52px;flex-shrink:0;background:var(--bg-rail);
+  border-right:1px solid var(--line);
+  display:flex;flex-direction:column;align-items:center;
+  padding:14px 0 18px;position:sticky;top:0;height:100vh;
+}
+.logo-mark{
+  width:30px;height:30px;border-radius:8px;background:var(--accent);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font:700 13px 'IBM Plex Mono';margin-bottom:26px;letter-spacing:-.5px;
+}
+.rail .nav{display:flex;flex-direction:column;gap:4px;flex:1}
+.rnav{
+  width:36px;height:36px;border-radius:8px;border:none;background:transparent;
+  color:var(--t3);cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:background .12s,color .12s;position:relative;text-decoration:none;
+}
+.rnav:hover{background:var(--hover);color:var(--t1);text-decoration:none}
+.rnav.on{background:var(--hover);color:var(--accent)}
+.rnav svg{width:17px;height:17px}
+.rnav .tip{
+  position:absolute;left:46px;top:50%;transform:translateY(-50%);
+  background:var(--t1);color:var(--bg);font:500 11px/1 'Inter';
+  padding:6px 10px;border-radius:6px;white-space:nowrap;
+  opacity:0;pointer-events:none;transition:opacity .12s;
+}
+.rnav:hover .tip{opacity:1}
+.tbtn{
+  width:36px;height:36px;border-radius:8px;border:1px solid var(--line);
+  background:transparent;color:var(--t2);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:15px;
+  transition:background .12s;
+}
+.tbtn:hover{background:var(--hover)}
+
+/* content */
+.col{flex:1;min-width:0}
+.wrap{max-width:760px;padding:56px 36px 100px}
+.eyebrow{font:500 10.5px 'IBM Plex Mono';color:var(--t3);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px}
+h1{font:600 26px/1.3 'Inter','PingFang SC',sans-serif;letter-spacing:-.4px;margin-bottom:14px}
+.lede{font:400 14px/1.9 'Inter';color:var(--t2);margin-bottom:44px}
+h2{
+  font:600 12px 'Inter';color:var(--t3);letter-spacing:1.2px;
+  margin:44px 0 16px;padding-bottom:10px;border-bottom:1px solid var(--line);
+  text-transform:uppercase;
+}
+h2:first-of-type{margin-top:0}
+p{font:400 13.5px/2 'Inter';color:var(--t2);margin-bottom:14px}
+p strong,li strong{color:var(--t1);font-weight:600}
+code{font:500 12px 'IBM Plex Mono';color:var(--accent);background:var(--bg-raised);padding:1px 5px;border-radius:4px}
+
+dl{margin:0 0 6px}
+dt{font:600 13px 'Inter';color:var(--t1);margin-bottom:5px}
+dd{font:400 13px/1.95 'Inter';color:var(--t2);margin:0 0 20px;padding-left:14px;border-left:1px solid var(--line)}
+
+ul{list-style:none;margin:0 0 14px}
+li{font:400 13.5px/2 'Inter';color:var(--t2);padding-left:16px;position:relative;margin-bottom:6px}
+li::before{content:'—';position:absolute;left:0;color:var(--t3)}
+
+.disclaim{
+  margin-top:52px;padding:22px 24px;border:1px solid var(--line-strong);
+  border-radius:10px;background:var(--bg-raised);
+}
+.disclaim h3{
+  font:600 12px 'Inter';color:var(--warn);letter-spacing:1px;
+  margin-bottom:14px;text-transform:uppercase;
+}
+.disclaim p{font-size:13px;line-height:1.95;margin-bottom:12px}
+.disclaim p:last-child{margin-bottom:0}
+
+.colophon{
+  margin-top:52px;padding-top:22px;border-top:1px solid var(--line);
+  display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  font:400 11px 'Inter';color:var(--t3);
+}
+.colophon .mono{font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.5px}
+
+@media(max-width:960px){
+  .rail{display:none}
+  .wrap{padding:36px 16px 72px}
+}
+</style>
+</head>
+<body>
+
+<nav class="rail" aria-label="主导航">
+  <a class="logo-mark" href="/" aria-label="返回看板" style="text-decoration:none">LP</a>
+  <div class="nav">
+    <a class="rnav" href="/" aria-label="看板">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z"/></svg>
+      <span class="tip">看板</span>
+    </a>
+    <a class="rnav on" href="/about.html" aria-label="口径与声明" aria-current="page">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg>
+      <span class="tip">口径与声明</span>
+    </a>
+  </div>
+  <button class="tbtn" id="theme" aria-label="切换日间/夜间模式" title="切换日间/夜间模式">☾</button>
+</nav>
+
+<div class="col">
+<div class="wrap">
+
+  <div class="eyebrow">Methodology &amp; Disclosure</div>
+  <h1>口径与声明</h1>
+  <p class="lede">
+    本站汇总公开的链上池子数据，用于研究美股代币（tokenized equity）在去中心化交易所的流动性状况。
+    它是一张<strong>数据看板</strong>，不是策略服务，也不是投资顾问。
+  </p>
+
+  <h2>本站是什么</h2>
+  <p>
+    扫描 Solana、BNB Chain、Base、Robinhood Chain 四条链上，<strong>美股代币与稳定币</strong>构成的流动性池，
+    按链上公开数据计算 TVL、成交量、费率与 APR，并标出几项客观预警。
+  </p>
+  <p>
+    收录范围<strong>不含</strong> Fables / Metric 的动态费率池——这类池子的费率随行情变动，
+    用固定的「成交量 × 费率 ÷ TVL」算出来会失真，请直接看它们的官方前端。
+  </p>
+
+  <h2>数据来源</h2>
+  <dl>
+    <dt>池子数据</dt>
+    <dd>GeckoTerminal 公开 API（TVL、24h 量、日线 OHLCV、池子费率、代币合约）。</dd>
+
+    <dt>更新方式</dt>
+    <dd>由 GitHub Actions <strong>每日定时抓取一次</strong>，写入静态 JSON，随站点部署。页面顶部的「更新时间」是数据的抓取时间，不是页面加载时间。</dd>
+  </dl>
+
+  <h2>计算口径</h2>
+  <dl>
+    <dt>APR（手续费年化）</dt>
+    <dd>
+      按 <code>(30 日均日成交量 × 池子费率) ÷ TVL</code> 年化。分母用的是<strong>当前 TVL</strong>，
+      分子用的是<strong>过去 30 天的成交</strong>——两者不是同一时点，市场剧烈变化时会放大或缩小这个数。
+    </dd>
+
+    <dt>占比（你的资金占池子比例）</dt>
+    <dd>
+      按页面上的本金输入框计算：<code>本金 ÷ (TVL + 本金)</code>。
+      占比越高，你越接近「自己就是市场」，进出滑点和无常损失都会显著放大。
+    </dd>
+
+    <dt>日收入</dt>
+    <dd>
+      按 7 日日均成交量 × 费率 × 你的占比估算。这是<strong>手续费毛收入</strong>，未扣任何成本。
+    </dd>
+
+    <dt>净收益为什么是「表值 ÷ 2–3」</dt>
+    <dd>
+      手续费收入要和套利者的亏损（LVR）及无常损失对勾。按 Blockworks 的实测，
+      股票/稳定币池的费收大约只覆盖套利成本的 <strong>2.9–3.3 倍</strong>，
+      所以毛收入的 2/3 到 3/4 会被吃掉。<strong>表上的 APR 是毛收益率，不是你能拿到的收益率。</strong>
+    </dd>
+
+    <dt>三项预警</dt>
+    <dd>
+      <strong>占比 &gt; 5%</strong>：你即市场本身。<br>
+      <strong>量能萎缩</strong>：7 日日均量 &lt; 30 日日均量 × 0.6，池子可能在流失交易。<br>
+      <strong>APR &lt; 50%</strong>：低于一般的迁移阈值，意味着资金留在这里的机会成本较高。
+    </dd>
+  </dl>
+
+  <h2>「筛选后」视图说明</h2>
+  <p>
+    看板默认的「筛选后」视图，是把数据按<strong>四个客观条件</strong>过了一遍：
+    占比 ≤ 5%、7 日均量 ≥ 30 日均量 × 0.6、APR 30d ≥ 50%、TVL ≥ $50K。
+  </p>
+  <p>
+    这四条是<strong>筛选条件，不是推荐</strong>。它们只回答「哪些池子没有被这几项客观指标排除」，
+    不回答「哪个池子该投」，也不代表这些池子在当前时点值得进场。
+  </p>
+
+  <h2>已知局限</h2>
+  <ul>
+    <li>数据来自第三方 API，可能有延迟、口径差异或抓取失败；某一天没抓到就沿用上一版数据。</li>
+    <li>APR 是<strong>回溯值</strong>，历史成交不代表未来成交。池子的费用、激励、TVL 随时会变。</li>
+    <li>同一个标的不同链、不同费率档之间收益差别很大，可切换「按交易对」视图对照。</li>
+    <li>未纳入流动性挖矿激励、质押收益、平台积分等场外收益。</li>
+    <li>「去哪组」链接跳转到各 DEX 官方前端，那里的实际费率与激励以官方为准。</li>
+  </ul>
+
+  <div class="disclaim">
+    <h3>免责声明</h3>
+    <p>
+      <strong>本站所有内容仅供研究与信息参考，不构成投资建议、要约或招揽。</strong>
+      本站不代客理财、不托管资产、不发行任何产品，也不提供任何形式的收益承诺。
+    </p>
+    <p>
+      提供流动性存在本金损失风险，包括但不限于无常损失、代币价格剧烈波动、智能合约漏洞、
+      稳定币脱锚与链上拥堵。过往数据不代表未来表现。
+    </p>
+    <p>
+      <strong>你的资金决策由你自己作出，并由你自己承担全部后果。</strong>
+      在投入任何资金前，请自行核对链上数据、阅读对应协议文档，并评估自身风险承受能力。
+    </p>
+    <p>
+      数据可能存在错误或延迟。如果你发现数据有误，欢迎指出，我们会尽快核对修正。
+    </p>
+  </div>
+
+  <div class="colophon">
+    <span>美股代币 LP 看板</span>
+    <span class="mono">GECKOTERMINAL · CLOUDFLARE PAGES</span>
+  </div>
+
+</div>
+</div>
+
+<script>
+/* 主题：与 index.html 同一套逻辑与同一个 localStorage key，
+   否则两页之间来回切换时主题会跳 */
+(function(){
+  const KEY='lpdash-theme';
+  const html=document.documentElement;
+  const btn=document.getElementById('theme');
+
+  function apply(t){
+    html.setAttribute('data-theme',t);
+    if(btn)btn.textContent = t==='dark' ? '☾' : '☀';
+  }
+  function saved(){
+    try{return localStorage.getItem(KEY);}catch(e){return null;}
+  }
+  apply(saved()==='light' ? 'light' : 'dark');
+
+  if(btn){
+    btn.addEventListener('click',()=>{
+      const next = html.getAttribute('data-theme')==='dark' ? 'light' : 'dark';
+      apply(next);
+      try{localStorage.setItem(KEY,next);}catch(e){}
+    });
+  }
+})();
+</script>
+</body>
+</html>
