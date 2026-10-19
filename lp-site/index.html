@@ -130,6 +130,18 @@ h1{font:600 19px/1.2 'Inter','PingFang SC',sans-serif;letter-spacing:-.2px}
 .seg-btn:hover{background:var(--hover)}
 .seg-btn.on{background:var(--accent);color:#fff}
 
+/* ---- 本金档位 ---- */
+#capseg .seg-btn{padding:6.5px 11px;font-variant-numeric:tabular-nums}
+.capin-wrap{display:inline-flex}
+.capin-wrap[hidden]{display:none}
+.caplink{
+  background:none;border:none;color:var(--t3);cursor:pointer;
+  font:500 11px 'Inter';padding:5px 7px;border-radius:6px;
+  transition:background .12s,color .12s;
+}
+.caplink:hover{background:var(--hover);color:var(--t1)}
+.caplink.on{color:var(--accent)}
+
 /* ---- pair-group rows ---- */
 tr.pairhead td{
   background:var(--bg-raised);cursor:pointer;
@@ -545,8 +557,18 @@ tr.sparkrow:hover{background:var(--bg-raised)}
       <button class="dd-btn" type="button"><span class="dd-btn-ico" id="dd-stock-ico"></span><span id="dd-stock-lbl">全部标的</span><span class="dd-arr">▾</span></button>
       <div class="dd-menu" id="dd-stock-menu"></div>
     </div>
-    <span class="fl">本金 $</span>
-    <input class="capin" id="f-cap" type="number" value="10000" step="1000" min="100">
+    <span class="fl">本金</span>
+    <div class="seg" id="capseg">
+      <button class="seg-btn" data-cap="1000">$1K</button>
+      <button class="seg-btn" data-cap="5000">$5K</button>
+      <button class="seg-btn on" data-cap="10000">$10K</button>
+      <button class="seg-btn" data-cap="50000">$50K</button>
+      <button class="seg-btn" data-cap="100000">$100K</button>
+    </div>
+    <span class="capin-wrap" id="capin-wrap" hidden>
+      <input class="capin" id="f-cap" type="number" value="10000" step="1000" min="100" placeholder="自定义">
+    </span>
+    <button class="caplink" id="caplink" type="button" title="输入任意金额">自定义</button>
     <span class="fl" style="margin-left:auto;color:var(--t3)">点击表头排序 · 点击行展开 30 天量能</span>
   </div>
   <div class="criteria" id="criteria">
@@ -797,10 +819,76 @@ window.addEventListener('resize',setHdrTop);
 window.addEventListener('load',setHdrTop);
 setHdrTop();
 
-/* 顶部「最高 APR」只在够格的池子里取：
-     占比 ≤5% · TVL ≥ $50K · 且数据可信（无换手异常 / 样本不足）
-   否则像 AAPLB 那种 TVL 一千刀、换手 2221× 的池子会用虚高的 APR
-   霸占这个位置，而它根本不是能放钱的地方。本金变化时要跟着重算。 */
+/* ============ 本金档位 ============
+   CAP 是全局的本金，占比 / 日收入 / APR 都按它算。
+   常见金额做成几个按钮，点一下就行；需要别的数走「自定义」。
+   档位和自定义输入都写 CAP，所以任何一处改动都会同步。 */
+const CAP_PRESETS=[1000,5000,10000,50000,100000];
+const CAP_KEY='lp-cap';
+
+function setCap(v, {fromInput=false}={}){
+  const n=Number(v);
+  if(!Number.isFinite(n) || n<=0) return;
+  CAP=n;
+  try{ localStorage.setItem(CAP_KEY,String(n)); }catch(e){}
+  // 档位按钮高亮：正好等于某个预设才亮
+  const preset=CAP_PRESETS.includes(n);
+  document.querySelectorAll('#capseg .seg-btn').forEach(b=>{
+    b.classList.toggle('on', preset && Number(b.dataset.cap)===n);
+  });
+  // 自定义输入框：非预设时展开并回填
+  const wrap=$('#capin-wrap'), inp=$('#f-cap'), link=$('#caplink');
+  if(wrap&&inp){
+    if(!preset){
+      wrap.hidden=false;
+      if(!fromInput) inp.value=String(n);
+    }else{
+      wrap.hidden=true;
+      inp.value=String(n);
+    }
+  }
+  if(link) link.classList.toggle('on',!preset);
+}
+
+function initCap(){
+  let v=10000;
+  try{
+    const saved=Number(localStorage.getItem(CAP_KEY));
+    if(Number.isFinite(saved) && saved>0) v=saved;
+  }catch(e){}
+  // 只同步状态和按钮外观；此时 POOLS 可能还没加载，不触发 render
+  setCap(v);
+
+  // 档位按钮
+  document.querySelectorAll('#capseg .seg-btn').forEach(b=>{
+    b.addEventListener('click',()=>{
+      setCap(Number(b.dataset.cap));
+      updateBest();
+      render();
+    });
+  });
+
+  // 「自定义」：展开输入框并聚焦
+  $('#caplink')?.addEventListener('click',()=>{
+    const wrap=$('#capin-wrap'), inp=$('#f-cap');
+    if(!wrap||!inp)return;
+    wrap.hidden=false;
+    inp.value=String(CAP);
+    inp.focus();
+    inp.select();
+  });
+
+  // 自定义输入
+  $('#f-cap')?.addEventListener('input',()=>{
+    const n=parseFloat($('#f-cap').value);
+    if(Number.isFinite(n) && n>0){
+      setCap(n,{fromInput:true});
+      updateBest();
+      render();
+    }
+  });
+}
+
 /* 顶部「最佳收益池」只在够格的池子里取：
      占比 ≤5% · TVL ≥ $50K · 且数据可信（无换手异常 / 样本不足）
    否则像 AAPLB 那种 TVL 一千刀、换手 2221× 的池子会用虚高的 APR
@@ -810,7 +898,7 @@ setHdrTop();
    否则一个「30 天平均 270% 但现在量能只剩 18%」或者「APR 147% 但标的
    7 日跌 12%」的池会误导人。显示仍用它的 APR 7d，说明收益水平。 */
 function updateBest(){
-  const capNow=parseFloat($('#f-cap').value)||10000;
+  const capNow=CAP;
   const solid=POOLS.filter(p=>{
     const sh=capNow/(p.tvl+capNow)*100;
     // 还要求有标的价格数据——没有价格的池子无法判断本金风险，不能当「最佳」
@@ -867,7 +955,7 @@ function showEmpty(big,small){
 
 function view(){
   const net=DDSTATE.net,stock=DDSTATE.stock;
-  CAP=parseFloat($('#f-cap').value)||10000;
+  // CAP 由本金档位统一管理，这里不再读输入框
   let rows=POOLS.filter(p=>(!net||p.net===net)&&(!stock||p.stock===stock));
   rows=rows.map(p=>{
     const share=CAP/(p.tvl+CAP);
@@ -1558,7 +1646,9 @@ wireDD('dd-stock','stock',it=>{
   buildStockCards();
   wireStockCards();
 });
-$('#f-cap').addEventListener('input',()=>{updateBest();render();});
+
+/* 本金档位初始化（放在最后，确保 DOM 与 render 都已就绪） */
+initCap();
 
 /* ============ 异动播报 ============ */
 const AL_TYPE={
