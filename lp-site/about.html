@@ -152,12 +152,36 @@ li::before{content:'—';position:absolute;left:0;color:var(--t3)}
 
   <h2>本站是什么</h2>
   <p>
-    扫描 Solana、BNB Chain、Base、Robinhood Chain 四条链上，<strong>美股代币与稳定币</strong>构成的流动性池，
+    扫描 Solana、BNB Chain、Base、Robinhood Chain 四条链上，美股代币构成的流动性池，
     按链上公开数据计算 TVL、成交量、费率与 APR，并标出几项客观预警。
+  </p>
+  <p>
+    <strong>同一个股票在不同链上的代币符号不一样</strong>，本站会合并成同一个标的：
+    BSC 上是 <code>SKHYB</code>、Base 上是 <code>SKHYc</code>、Solana 上是
+    <code>SKHYx</code>、Robinhood 上是 <code>SKHY</code>，都归到 <strong>SKHY</strong> 下面。
+    所以点开一个标的能同时看到它在四条链上的所有池子。
+  </p>
+  <p>
+    计价资产分两类：<strong>稳定币</strong>（USDT / USDC / USDG）和
+    <strong>原生币</strong>（WBNB / SOL / WETH 等，会标「原生币」）。
+    稳定币池的 APR 基本就是净收益；原生币池做市时你同时在承担原生币的涨跌，
+    风险是两层的，两者不要混着比。
   </p>
   <p>
     收录范围<strong>不含</strong> Fables / Metric 的动态费率池——这类池子的费率随行情变动，
     用固定的「成交量 × 费率 ÷ TVL」算出来会失真，请直接看它们的官方前端。
+    股票对股票（如 NVDA/TSLA）的池子也不收，口径完全不同。
+  </p>
+  <h3>Solana 的池为什么 APR 显示「费率未知」</h3>
+  <p>
+    GeckoTerminal 对 Solana 上的池（Raydium / Orca / Meteora 等）<strong>基本不返回费率</strong>，
+    池名里也不带费率档（不像 BSC 的「SKHYB / USDT 0.25%」）。
+    没有费率就算不出 APR，这里<strong>如实写「费率未知」，不用 0 或估算值凑数</strong>——
+    一个假的数字比没有数字更危险。
+  </p>
+  <p>
+    这类池子仍然会出现在列表里（TVL、成交量、换手、标的走势都是真实的），
+    「去哪组」一列会显示具体 DEX 名称，点过去可以在官方界面看到真实费率档。
   </p>
 
   <h2>数据来源</h2>

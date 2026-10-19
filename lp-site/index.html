@@ -311,6 +311,16 @@ tr:hover .chainb{border-color:var(--t3)}
 .p-down{color:var(--down);background:var(--badge-down-bg)} .p-down::before{background:var(--down)}
 .p-mut{color:var(--t3);background:var(--bg-raised)} .p-mut::before{background:var(--t3)}
 
+/* 计价资产标记：原生币计价的池子风险多一层 */
+.qtag{
+  font:500 9px 'Inter';padding:1px 4px;border-radius:3px;margin-left:5px;
+  vertical-align:1.5px;cursor:help;white-space:nowrap;
+}
+.qtag.native{color:var(--warn);background:var(--badge-warn-bg)}
+
+/* 费率未知的提示样式 */
+.apr-na{font:500 10.5px 'Inter';color:var(--t3);cursor:help}
+
 /* 数据存疑的行：整体压暗 + 左侧红条，让人一眼知道「这行别当真」 */
 tr.sus > td{opacity:.62}
 tr.sus > td:first-child{box-shadow:inset 3px 0 0 var(--down)}
@@ -757,6 +767,21 @@ function dexOf(p){
   return GTDEX[p.net]||'未知';
 }
 /* full DEX info: {label, iconClass, url} for the 去哪组 column */
+/* Solana 上有多个 DEX，池地址分不出是哪家，靠后端抓到的 dex 字段区分。
+   费率通常拿不到（GeckoTerminal 对 Solana 池基本不返回 pool_fee_percentage），
+   所以这里给的是「去哪儿看」而不是「费率是多少」。 */
+const SOLANA_DEX={
+  'raydium-clmm':'Raydium CLMM',
+  'raydium':'Raydium',
+  'orca':'Orca',
+  'meteora':'Meteora',
+  'pumpfun':'pump.fun',
+  'pump-fun':'pump.fun',
+  'meteora-dlmm':'Meteora DLMM',
+  'phoenix':'Phoenix',
+  'lifinity':'Lifinity',
+};
+
 function dexInfo(p){
   const a=(p.addr||'').toLowerCase();
   if(a.startsWith('0x3216')){
@@ -780,7 +805,13 @@ function dexInfo(p){
     // Uniswap pools — Uniswap's own UI returns "pool not found" for them.
     // Send users to Fables' pool list where these actually live.
     case 'robinhood':return {label:'Fables',icon:'dl-fables',url:'https://www.fables.fi/'};
-    case 'solana':return {label:'Raydium',icon:'dl-raydium',url:'https://raydium.io/liquidity/positions'};
+    // Solana 上的池可能来自 Raydium / Orca / Meteora 等多家 DEX。
+    // 用后端抓到的 dex 字段给出真实名称，链接统一走 GeckoTerminal 的池详情页
+    // （那里有正确的「Add Liquidity」入口，不会像硬猜某家深链那样落空）。
+    case 'solana':{
+      const label=SOLANA_DEX[(p.dex||'').toLowerCase()]||'GeckoTerminal';
+      return {label,icon:'dl-raydium',url:poolURL(p)};
+    }
   }
   return {label:'未知',icon:'',url:poolURL(p)};
 }
@@ -965,7 +996,8 @@ function updateBest(){
     const sh=capNow/(p.tvl+capNow)*100;
     // 还要求有标的价格数据——没有价格的池子无法判断本金风险，不能当「最佳」
     const hasPx=p.px&&(p.px.chg7d!=null||p.px.chg1d!=null);
-    return sh<=5 && p.tvl>=50000 && isTrusted(p) && hasPx;
+    // 费率未知的池算不出收益，不能当选「最佳」
+    return sh<=5 && p.tvl>=50000 && p.fee!=null && isTrusted(p) && hasPx;
   });
   if(!solid.length){ $('#k-best').textContent='–'; return; }
   // 复用 view() 的收益口径
@@ -1021,11 +1053,16 @@ function view(){
   let rows=POOLS.filter(p=>(!net||p.net===net)&&(!stock||p.stock===stock));
   rows=rows.map(p=>{
     const share=CAP/(p.tvl+CAP);
-    const day7=p.v7*p.fee/100*share;
+    // 费率可能为 null（Solana 的池常缺这个字段）。null*number 在 JS 里是 0，
+    // 直接算会显示成「0% 收益」，比显示「未知」更误导，所以显式区分。
+    const feeKnown=p.fee!=null;
+    const day7=feeKnown?p.v7*p.fee/100*share:null;
     const h=health(p);
     const t=trend(p);
-    return {...p,share_pct:share*100,day7,apr7:day7*365/CAP*100,
-            apr30:p.v30*p.fee/100*share*365/CAP*100,turn:p.vol24/p.tvl,
+    return {...p,share_pct:share*100,day7,
+            apr7:feeKnown?day7*365/CAP*100:null,
+            apr30:feeKnown?p.v30*p.fee/100*share*365/CAP*100:null,
+            turn:p.vol24/p.tvl,
             _health:h.level,_flags:h.flags,_trend:t,
             px7:(p.px&&p.px.chg7d!=null)?p.px.chg7d:(p.px&&p.px.chg1d!=null?p.px.chg1d:null),
             trendKey:t.dir==='up'?2:t.dir==='flat'?1:0};
@@ -1033,7 +1070,11 @@ function view(){
   const k=SORT.k,dir=SORT.dir;
   // 可信度优先于一切：数据存疑的池子永远沉底，不管按哪列排。
   // 否则「按 APR 降序」一开，那个换手 2221× 的池子就霸屏了。
-  const rank = p => p._health==='suspicious' ? 2 : p._health==='thin' ? 1 : 0;
+  // 费率未知的池没法比收益，单独排一档（在存疑之后、薄池之前），
+  // 否则它的综合分会被当成 0 分挤到最后，反而看不出是「缺数据」而非「收益差」
+  const rank = p => p.apr30==null ? 3
+                 : p._health==='suspicious' ? 2
+                 : p._health==='thin' ? 1 : 0;
   rows.sort((a,b)=>{
     const ra=rank(a), rb=rank(b);
     if(ra!==rb) return ra-rb;
@@ -1153,12 +1194,31 @@ function statusPills(p){
     pills.push(`<span class="pill p-down" title="标的 7 日 ${drop.toFixed(1)}%，手续费收入很可能盖不住本金缩水">标的跌${Math.abs(drop).toFixed(0)}%</span>`);
   }
   // APR 偏低只是提示，不再是筛选门槛。给个中性措辞，别像警告。
-  if(p.apr30<50)pills.push('<span class="pill p-mut" title="APR 30d 低于 50%，手续费收入相对有限">APR 偏低</span>');
+  // 费率未知时 APR 是 null，既不能说偏低也不能说健康，单独标出来。
+  if(p.apr30==null){
+    pills.push('<span class="pill p-mut" title="数据源没有提供这个池的费率，算不出 APR">费率未知</span>');
+  }else if(p.apr30<50){
+    pills.push('<span class="pill p-mut" title="APR 30d 低于 50%，手续费收入相对有限">APR 偏低</span>');
+  }
   if(!pills.length)pills.push('<span class="pill p-ok">健康</span>');
   return pills;
 }
 /* APR 显示：数据存疑时加问号，避免被当成确切收益 */
+/* 计价资产标记：股票代币后面那个 /USDT 是稳定币还是原生币。
+   稳定币池的 APR 基本就是净收益；原生币池（/WBNB、/SOL、/WETH）做市时
+   你同时在承担原生币涨跌，风险是两层的，标出来避免混淆。 */
+function quoteTag(p){
+  if(p&&p.qkind==='native'){
+    return '<span class="qtag native" title="计价资产是原生币，你要同时承担它的涨跌风险">原生币</span>';
+  }
+  return '';
+}
+
 function aprText(p){
+  // 费率未知时数据源没给，明确写出来，别用破折号假装是 0
+  if(p.apr30==null){
+    return '<span class="apr-na" title="数据源没有提供这个池的费率，算不出 APR">费率未知</span>';
+  }
   const h=p._health||health(p).level;
   return fmtPct(p.apr30)+(h==='suspicious'?'?':'');
 }
@@ -1214,16 +1274,17 @@ function pxDrop(p){
 
 function pairRowsHTML(p,i,isBest){
   const pills=statusPills(p);
-  const a30=p.apr30>=100?'hot':p.apr30>=50?'mid':'low';
+  const a30=p.apr30==null?'':p.apr30>=100?'hot':p.apr30>=50?'mid':'low';
   return `<tr${p._health==='suspicious'?' class="sus"':''}>
     <td class="poolname">${isBest?'<span class="best-mark">★ </span>':''}${p.fee!=null?p.fee+'%':'?'} 档
+      ${quoteTag(p)}
       <a class="addr2" href="${poolURL(p)}" target="_blank" rel="noopener">${short(p.addr)}</a></td>
     <td><a class="dexb" href="${dexInfo(p).url}" target="_blank" rel="noopener" title="去 ${dexInfo(p).label} 加流动性"><span class="dexlogo ${dexInfo(p).icon}">${dexInfo(p).label[0]}</span>${dexInfo(p).label}<span class="go">↗</span></a></td>
     <td>${pxCell(p)}</td>
     <td class="mono">$${fmtUSD(p.tvl)}</td>
     <td class="mono">$${fmtUSD(p.vol24)}</td>
     <td class="mono">${p.turn.toFixed(1)}×</td>
-    <td class="mono $">${p.day7.toFixed(2)}</td>
+    <td class="mono $">${p.day7!=null?p.day7.toFixed(2):"–"}</td>
     <td class="apr ${a30}" style="font:600 12px 'IBM Plex Mono'">${aprText(p)}</td>
     <td>${trendCell(p)}</td>
     <td><div class="pills">${pills.join('')}</div></td>
@@ -1266,7 +1327,7 @@ function renderPairView(rows,tb){
     head.dataset.pair=k;
     head.innerHTML=`<td colspan="14"><div class="ptitle">
       ${stkChip(stock)}
-      <span class="pn">${esc(stock)} / ${esc(stable)}</span>
+      <span class="pn">${esc(stock)} / ${esc(stable)}${quoteTag(best)}</span>
       <span class="chainb"><span class="cdot ${net}"></span>${NETNAME[net]}</span>
       <span class="psummary">${nPools} 个池 · 合计 TVL $${fmtUSD(totalTVL)}</span>
       <span class="bestpill">最优 ${best?fmtPct(best.apr30):'?'}</span>
@@ -1324,6 +1385,7 @@ function render(){
     const sig=rows.filter(p=>
       p.share_pct<=5 &&            // you're not the market
       p.tvl>=50000 &&              // not a micro-trap
+      p.apr30!=null &&             // 费率已知，否则没法比收益
       p._health==='ok'             // 数据可信度过关
     );
     const flagged=rows.filter(p=>!sig.includes(p));
@@ -1335,11 +1397,11 @@ function render(){
     const dex=dexOf(p);
     const pills=statusPills(p);
     const a7=p.apr7>=100?'hot':p.apr7>=50?'mid':'low';
-    const a30=p.apr30>=100?'hot':p.apr30>=50?'mid':'low';
+    const a30=p.apr30==null?'':p.apr30>=100?'hot':p.apr30>=50?'mid':'low';
     tr.className=p._health==='suspicious'?'sus':'';
     tr.innerHTML=`
       <td class="rk">${i+1}</td>
-      <td><div class="stkrow">${stkChip(p.stock)}<div><span class="pname"><span class="stk">${esc(p.stock)}</span> / ${esc(p.stable)}${dt}</span>
+      <td><div class="stkrow">${stkChip(p.stock)}<div><span class="pname"><span class="stk">${esc(p.stock)}</span> / ${esc(p.stable)}${quoteTag(p)}${dt}</span>
         <a class="addr" href="${poolURL(p)}" target="_blank" rel="noopener" title="在 GeckoTerminal 打开池详情">${short(p.addr)}</a>
         <span class="psub">${dex} · ${esc(p.name)}</span></div></div></td>
       <td><a class="dexb" href="${dexInfo(p).url}" target="_blank" rel="noopener" title="去 ${dexInfo(p).label} 加流动性"><span class="dexlogo ${dexInfo(p).icon}">${dexInfo(p).label[0]}</span>${dexInfo(p).label}<span class="go">↗</span></a></td>
@@ -1350,7 +1412,7 @@ function render(){
       <td class="mono">$${fmtUSD(p.vol24)}</td>
       <td class="mono mut">${p.turn.toFixed(1)}×</td>
       <td class="shareN ${p.share_pct>5?'risk':''}">${p.share_pct.toFixed(2)}%</td>
-      <td class="mono">$${p.day7.toFixed(2)}</td>
+      <td class="mono">$${p.day7!=null?p.day7.toFixed(2):"–"}</td>
       <td class="apr7">${fmtPct(p.apr7)}</td>
       <td class="apr ${a30}">${aprText(p)}${aprWarn(p)}</td>
       <td>${trendCell(p)}</td>
@@ -1384,11 +1446,11 @@ function render(){
     const dex=dexOf(p);
     const pills=statusPills(p);
     const a7=p.apr7>=100?'hot':p.apr7>=50?'mid':'low';
-    const a30=p.apr30>=100?'hot':p.apr30>=50?'mid':'low';
+    const a30=p.apr30==null?'':p.apr30>=100?'hot':p.apr30>=50?'mid':'low';
     tr.className=p._health==='suspicious'?'sus':'';
     tr.innerHTML=`
       <td class="rk">${i+1}</td>
-      <td><div class="stkrow">${stkChip(p.stock)}<div><span class="pname"><span class="stk">${esc(p.stock)}</span> / ${esc(p.stable)}${dt}</span>
+      <td><div class="stkrow">${stkChip(p.stock)}<div><span class="pname"><span class="stk">${esc(p.stock)}</span> / ${esc(p.stable)}${quoteTag(p)}${dt}</span>
         <a class="addr" href="${poolURL(p)}" target="_blank" rel="noopener" title="在 GeckoTerminal 打开池详情">${short(p.addr)}</a>
         <span class="psub">${dex} · ${esc(p.name)}</span></div></div></td>
       <td><a class="dexb" href="${dexInfo(p).url}" target="_blank" rel="noopener" title="去 ${dexInfo(p).label} 加流动性"><span class="dexlogo ${dexInfo(p).icon}">${dexInfo(p).label[0]}</span>${dexInfo(p).label}<span class="go">↗</span></a></td>
@@ -1399,7 +1461,7 @@ function render(){
       <td class="mono">$${fmtUSD(p.vol24)}</td>
       <td class="mono mut">${p.turn.toFixed(1)}×</td>
       <td class="shareN ${p.share_pct>5?'risk':''}">${p.share_pct.toFixed(2)}%</td>
-      <td class="mono">$${p.day7.toFixed(2)}</td>
+      <td class="mono">$${p.day7!=null?p.day7.toFixed(2):"–"}</td>
       <td class="apr7">${fmtPct(p.apr7)}</td>
       <td class="apr ${a30}">${aprText(p)}${aprWarn(p)}</td>
       <td>${trendCell(p)}</td>
@@ -2205,6 +2267,7 @@ initCap();
 const AL_TYPE={
   apr_jump:'APR 飙升', new_pool:'新池上线', top_rank:'进前五',
   tvl_swing:'TVL 变化', volume_dry:'量能萎缩', share_risk:'占比过高',
+  scope_change:'口径变化',
 };
 // 默认折叠：异动列表占地方，一般只想看个条数，需要时再点开。
 // 记住用户的选择，展开过就一直是展开的。

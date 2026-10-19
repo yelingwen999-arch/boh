@@ -27,6 +27,9 @@ ALERTS_PATH = os.path.join(DATA_DIR, "alerts.json")
 APR_JUMP_PCT = 60          # APR 相对上次涨幅 ≥60% 触发（且绝对值有意义）
 APR_ABS_MIN = 30           # APR 低于这个值不谈「飙升」，避免小池子噪音
 APR_TOP_RANK = 5           # 新进 APR 前 N 名也报一次
+# 池数增长超过这个比例就认为「监控范围变了」而不是「市场变了」。
+# 触发时本轮不报新池/排名变化，改报一条「监控范围扩大」。
+SCOPE_GROWTH = 1.3
 TVL_SWING_PCT = 35         # TVL 变化 ≥35% 触发
 TVL_ABS_MIN = 20000        # TVL 小于该值时 TVL 变化不算数（小池子抖动大）
 VOL_DRY_PCT = -60          # 7 日量能相对 30 日掉 ≥60% 视为萎缩
@@ -80,6 +83,13 @@ def fmt_usd(v):
     return f"${v:.0f}"
 
 
+def fmt_apr(v):
+    """APR 可能为 None（Solana 的池常缺费率字段）。别用 0 冒充，明确写未知。"""
+    if v is None:
+        return "未知"
+    return f"{v:.0f}%"
+
+
 def detect(cur, prev):
     """对比两版数据，返回警报列表。"""
     alerts = []
@@ -90,8 +100,33 @@ def detect(cur, prev):
     cur_pools = {key_of(p): p for p in cur.get("pools", [])}
     prev_pools = {key_of(p): p for p in prev.get("pools", [])}
 
+    # ---- 0. 先判断「监控范围是不是变了」----
+    # 抓取策略调整（比如这次把 Solana 的池放进来，池数从 51 涨到 72）会让
+    # 剩下所有新增池都变成「新池上线」。那不是市场变化，是我们自己的口径变了，
+    # 混在异动里只会淹掉真正有用的信息。
+    n_cur, n_prev = len(cur_pools), len(prev_pools)
+    scope_changed = n_prev > 0 and n_cur > n_prev * SCOPE_GROWTH
+    if scope_changed:
+        alerts.append(
+            {
+                "type": "scope_change",
+                "level": "info",
+                "title": "监控范围扩大",
+                "detail": (
+                    f"上一轮 {n_prev} 个池 → 本轮 {n_cur} 个"
+                    f"（+{n_cur - n_prev}）。本轮不报「新池上线」，"
+                    f"避免把口径变化当成市场变化"
+                ),
+                "pool": None,
+                "prev": {"n": n_prev},
+                "now": {"n": n_cur},
+            }
+        )
+
     # ---- 1. 新池上线 ----
     for k, p in cur_pools.items():
+        if scope_changed:
+            break                       # 范围变了，逐个报新池没有意义
         if k in prev_pools:
             continue
         tvl = p.get("tvl") or 0
@@ -103,7 +138,7 @@ def detect(cur, prev):
                 "type": "new_pool",
                 "level": "info",
                 "title": f"新池上线 · {label(p)}",
-                "detail": f"TVL {fmt_usd(tvl)} · APR30 {p.get('apr30', 0):.0f}%",
+                "detail": f"TVL {fmt_usd(tvl)} · APR30 {fmt_apr(p.get('apr30'))}",
                 "pool": key_of(p),
                 "prev": None,
                 "now": {
@@ -143,9 +178,15 @@ def detect(cur, prev):
 
     # ---- 3. 新进 APR 前 N ----
     def top_ranks(pools, n):
+        # 费率未知（apr30 为 None）的池没法参与收益排名，排除掉。
+        # 否则它们会被当成 0% 参与排序，把真实的高收益池挤出榜单。
         ranked = sorted(
-            [p for p in pools if (p.get("tvl") or 0) >= TVL_ABS_MIN],
-            key=lambda x: -(x.get("apr30") or 0),
+            [
+                p
+                for p in pools
+                if (p.get("tvl") or 0) >= TVL_ABS_MIN and p.get("apr30") is not None
+            ],
+            key=lambda x: -x["apr30"],
         )[:n]
         return {key_of(p): i + 1 for i, p in enumerate(ranked)}
 
@@ -155,14 +196,20 @@ def detect(cur, prev):
     # 上一版里所有池子的 APR 名次（不限前 N），用来说明「从第几名上来的」
     def all_ranks(pools):
         ranked = sorted(
-            [p for p in pools if (p.get("tvl") or 0) >= TVL_ABS_MIN],
-            key=lambda x: -(x.get("apr30") or 0),
+            [
+                p
+                for p in pools
+                if (p.get("tvl") or 0) >= TVL_ABS_MIN and p.get("apr30") is not None
+            ],
+            key=lambda x: -x["apr30"],
         )
         return {key_of(p): i + 1 for i, p in enumerate(ranked)}
 
     prev_rank_all = all_ranks(prev.get("pools", []))
 
     for k, rank in cur_top.items():
+        if scope_changed:
+            break                       # 范围变了，排名不可比
         if k in prev_top:
             continue
         if k not in prev_pools:
@@ -175,7 +222,7 @@ def detect(cur, prev):
                 "type": "top_rank",
                 "level": "info",
                 "title": f"新进 APR 前 {APR_TOP_RANK} · {label(p)}",
-                "detail": f"{move}当前第 {rank} 名 · APR30 {p.get('apr30', 0):.0f}%",
+                "detail": f"{move}当前第 {rank} 名 · APR30 {fmt_apr(p.get('apr30'))}",
                 "pool": k,
                 "prev": {"rank": was},
                 "now": {"rank": rank, "apr30": p.get("apr30")},
