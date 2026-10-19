@@ -1736,6 +1736,9 @@ function openKline(g, tf){
   });
 
   panel.hidden=false;
+  // 换标的后旧的 OHLC 读数要清掉，否则会短暂显示上一只票的数字
+  const ohlc=$('#kp-ohlc');
+  if(ohlc) ohlc.textContent='';
   drawKline();
 }
 
@@ -1775,8 +1778,20 @@ function drawKline(){
   wireKline(chart);
 }
 
-/* 悬停十字线 + OHLC 读数、滚轮缩放、拖动平移 */
+/* 悬停十字线 + OHLC 读数、滚轮缩放、拖动平移
+
+   注意：drawKline() 每次都会调这里，而缩放/平移又会触发 drawKline，
+   所以监听器必须能干净地解绑——否则一次拖动就叠出几十个监听，
+   每个都再触发一次 drawKline，页面直接卡死。
+   统一用 AbortController：重绘前 abort 上一次的全部监听。 */
+let KP_AC=null;
+
 function wireKline(chart){
+  // 先清掉上一次绑的（含挂在 window 上的）
+  if(KP_AC) KP_AC.abort();
+  KP_AC=new AbortController();
+  const signal=KP_AC.signal;
+
   const svg=chart.querySelector('svg.kline');
   if(!svg) return;
   const cursor=chart.querySelector('#kp-cursor');
@@ -1791,6 +1806,9 @@ function wireKline(chart){
       : `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
   };
   const fmtP=v=>v>=1000?v.toFixed(2):v>=1?v.toFixed(3):v.toFixed(5);
+
+  // 拖动状态要提前声明：下面的悬停监听里会读它（TDZ 会直接抛错）
+  let dragging=false, dragStartX=0, dragStartView=null;
 
   function showAt(idx){
     const m=KP_STATE.meta[idx];
@@ -1839,14 +1857,25 @@ function wireKline(chart){
 
   // 悬停：定位到最近的一根
   chart.addEventListener('mousemove',e=>{
-    if(dragging) return;
+    if(dragging) return;              // 拖动时不做悬停，避免和拖拽抢
     const rect=svg.getBoundingClientRect();
     const x=e.clientX-rect.left-g.pad.l;
     const idx=Math.floor(x/g.colW);
     if(idx<0||idx>=KP_STATE.meta.length){ hideCursor(); return; }
     showAt(idx);
-  });
-  chart.addEventListener('mouseleave',hideCursor);
+  },{signal});
+  chart.addEventListener('mouseleave',hideCursor,{signal});
+
+  // 重绘节流：滚轮和拖动都会连续触发，直接用 rAF 合并到每帧一次。
+  // 不节流的话一次拖动会重绘几十次，每次都重建整个 SVG 并重绑监听。
+  let rafId=null;
+  function scheduleDraw(){
+    if(rafId!=null) return;
+    rafId=requestAnimationFrame(()=>{
+      rafId=null;
+      drawKline();
+    });
+  }
 
   // 滚轮缩放：以鼠标位置为锚点
   chart.addEventListener('wheel',e=>{
@@ -1863,30 +1892,33 @@ function wireKline(chart){
     count=Math.max(12, Math.min(total, count));
     let start=Math.round(anchor-frac*count);
     KP_STATE.view={start,count};
-    drawKline();
-  },{passive:false});
+    scheduleDraw();
+  },{passive:false,signal});
 
-  // 拖动平移
-  let dragging=false, dragStartX=0, dragStartView=null;
+  // 拖动平移（dragging 等变量已在函数开头声明）
   chart.addEventListener('mousedown',e=>{
+    if(e.button!==0) return;
     dragging=true;
     dragStartX=e.clientX;
     dragStartView=kRange(bars.length,KP_STATE.view);
     chart.style.cursor='grabbing';
-  });
+    hideCursor();
+  },{signal});
+  // 挂在 window 上是为了鼠标拖出图表外再松手也能正确结束；
+  // signal 保证每次重绘时被清掉，不会累积。
   window.addEventListener('mouseup',()=>{
     if(dragging){
       dragging=false;
       chart.style.cursor='crosshair';
     }
-  });
+  },{signal});
   chart.addEventListener('mousemove',e=>{
     if(!dragging) return;
     const dx=e.clientX-dragStartX;
     const shift=Math.round(-dx/g.colW);
     KP_STATE.view={start:dragStartView.start+shift, count:dragStartView.count};
-    drawKline();
-  });
+    scheduleDraw();
+  },{signal});
 }
 
 /* 卡片交互：点击筛选 / 悬停看图 */
