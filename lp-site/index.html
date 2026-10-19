@@ -1611,7 +1611,8 @@ function klineSVG(bars, W, H, view, opts){
   const slice=bars.slice(start, start+count);
   if(!slice.length) return '';
 
-  const pad={t:10,r:56,b:22,l:8};
+  // 底部 26px 给时间轴文字 + 刻度线，左 8 右 56 给价格刻度
+  const pad={t:10,r:56,b:26,l:8};
   const w=W-pad.l-pad.r, h=H-pad.t-pad.b;
 
   // 价格范围：留 6% 余量，别让最高最低贴着边
@@ -1669,19 +1670,60 @@ function klineSVG(bars, W, H, view, opts){
     }
   }
 
-  // 时间轴：只标首尾，中间太挤
-  const fmtTs=t=>{
+  // 时间轴：按宽度算出能放几个标签，均匀打点。
+  // 只看首尾两个不够用——看不出中间的节奏和疏密。
+  // 注意 tf 是 'd' / 'h'（不是 'day' / 'hour'），两边要保持一致。
+  const isHour=opts&&(opts.timeframe==='h'||opts.timeframe==='hour');
+  const fmtTs=(t,full)=>{
     const d=new Date(t*1000);
     const mm=String(d.getMonth()+1).padStart(2,'0');
     const dd=String(d.getDate()).padStart(2,'0');
     const hh=String(d.getHours()).padStart(2,'0');
-    return opts&&opts.timeframe==='hour'?`${mm}-${dd} ${hh}:00`:`${mm}-${dd}`;
+    if(isHour){
+      return full?`${mm}-${dd} ${hh}:00`:`${hh}:00`;
+    }
+    return `${mm}-${dd}`;
   };
-  const firstTs=slice[0].t, lastTs=slice[slice.length-1].t;
-  const axis=`<text x="${pad.l}" y="${H-6}" fill="${KC.axis}" font-size="9"
-                font-family="IBM Plex Mono">${fmtTs(firstTs)}</text>
-              <text x="${pad.l+w}" y="${H-6}" fill="${KC.axis}" font-size="9"
-                text-anchor="end" font-family="IBM Plex Mono">${fmtTs(lastTs)}</text>`;
+  // 每个标签大约需要 52px（小时线只显示 HH:00 时 34px 就够）
+  const labelW=isHour?52:48;
+  const maxTicks=Math.max(2, Math.floor(w/labelW));
+  const tickCount=Math.min(maxTicks, slice.length);
+  const dayKey=t=>{
+    const d=new Date(t*1000);
+    return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
+  };
+  let ticks='';
+  let lastDay=null;
+  for(let i=0;i<tickCount;i++){
+    // 均匀分布：i=0 落在最左，最后一个落在最右
+    const frac=tickCount===1?0:i/(tickCount-1);
+    const idx=Math.round(frac*(slice.length-1));
+    const b=slice[idx];
+    if(!b) continue;
+    const cx=pad.l+colW*(idx+0.5);
+    // 首尾贴边，中间的居中，避免文字被裁
+    let anchor='middle', x=cx;
+    if(i===0){ anchor='start'; x=Math.max(pad.l, cx-colW/2); }
+    else if(i===tickCount-1){ anchor='end'; x=Math.min(pad.l+w, cx+colW/2); }
+
+    // 小时线默认显示 HH:00；跨天时换成 MM-DD 作为日分隔
+    const dk=dayKey(b.t);
+    const isNewDay=lastDay!==null && dk!==lastDay;
+    let text;
+    if(isHour){
+      text = (i===0 || isNewDay) ? fmtTs(b.t,true) : fmtTs(b.t,false);
+    }else{
+      text = fmtTs(b.t,true);
+    }
+    lastDay=dk;
+
+    ticks+=`<text x="${x.toFixed(1)}" y="${H-6}" fill="${KC.axis}" font-size="9"
+              font-family="IBM Plex Mono" text-anchor="${anchor}">${text}</text>`;
+    // 刻度短线
+    ticks+=`<line x1="${cx.toFixed(1)}" x2="${cx.toFixed(1)}" y1="${pad.t+h}" y2="${pad.t+h+3}"
+              stroke="${KC.grid}"/>`;
+  }
+  const axis=ticks;
 
   // 每根蜡烛的位置信息，交给外层做悬停提示
   const meta=slice.map((b,i)=>({cx:pad.l+colW*(i+0.5), b}));
@@ -1762,7 +1804,8 @@ function drawKline(){
 
   // 用容器宽度画，保证满宽
   const W=Math.max(320, chart.clientWidth-4);
-  const H=Math.max(220, Math.min(360, Math.round(W*0.34)));
+  // 最低 240 保证有空间放时间轴刻度
+  const H=Math.max(240, Math.min(380, Math.round(W*0.36)));
 
   const res=klineSVG(bars, W, H, KP_STATE.view, {timeframe:KP_STATE.tf, ma:true});
   if(!res){ chart.innerHTML=''; return; }
