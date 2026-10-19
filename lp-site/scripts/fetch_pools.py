@@ -108,13 +108,24 @@ def gt_pool(net, addr):
 
 
 def gt_daily(net, addr):
+    """返回 (成交量 list, 收盘价 list)，都按时间正序（最新在后）。
+
+    OHLCV 每行是 [ts, open, high, low, close, volume]，一次请求两样都拿到，
+    不用为价格多发一次 —— GeckoTerminal 的额度很紧。
+    """
     d = get(
         f"https://api.geckoterminal.com/api/v2/networks/{net}/pools/{addr}"
         f"/ohlcv/day?aggregate=1&limit=30&currency=usd"
     )
-    if d and "data" in d and d["data"].get("attributes", {}).get("ohlcv_list"):
-        return [float(b[5]) for b in d["data"]["attributes"]["ohlcv_list"] if b[5]]
-    return []
+    rows = None
+    if d and "data" in d:
+        rows = d["data"].get("attributes", {}).get("ohlcv_list")
+    if not rows:
+        return [], []
+    rows = list(reversed(rows))          # API 是倒序（最新在前），翻成正序
+    vols = [float(b[5]) for b in rows if b[5]]
+    closes = [float(b[4]) for b in rows if b[4]]
+    return vols, closes
 
 
 def scan_stock_pools():
@@ -205,7 +216,7 @@ def enrich(pool):
     vol24 = float((a.get("volume_usd") or {}).get("h24") or 0) or pool["vol"]
 
     time.sleep(GT_GAP)          # 两个请求之间限速，避免 429
-    vols = gt_daily(pool["net"], pool["addr"])
+    vols, closes = gt_daily(pool["net"], pool["addr"])
 
     if not tvl or fee is None:
         return None
@@ -224,6 +235,24 @@ def enrich(pool):
     day7 = v7 * fee / 100 * share
     apr7 = day7 * 365 / CAP * 100
     apr30 = v30 * fee / 100 * share * 365 / CAP * 100
+
+    # ---- 标的本身的价格走势 ----
+    # 手续费再高，标的在跌也是白搭。存下收盘价序列和几个关键涨跌幅。
+    px = {
+        "last": closes[-1] if closes else None,
+        "chg1d": None,
+        "chg7d": None,
+        "chg30d": None,
+        "series": closes[-30:],
+    }
+    if closes:
+        if len(closes) >= 2:
+            px["chg1d"] = (closes[-1] / closes[-2] - 1) * 100
+        if len(closes) >= 8:
+            px["chg7d"] = (closes[-1] / closes[-8] - 1) * 100
+        if len(closes) >= 2:
+            px["chg30d"] = (closes[-1] / closes[0] - 1) * 100
+
     return {
         "name": pool["name"],
         "stock": pool["stock"],
@@ -241,6 +270,7 @@ def enrich(pool):
         "apr7": apr7,
         "apr30": apr30,
         "spark": vols[-30:],
+        "px": px,
         "tok_a": tok_a,
         "tok_b": tok_b,
     }

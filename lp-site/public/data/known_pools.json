@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-19T01:26:03+00:00",
+ "updated": "2026-10-19T15:31:51+08:00",
  "pools": [
   "base|0xa3b1e3f9747065e2073722ff4c9027d3ea4994f0",
   "bsc|0x0905edec2928b701fb6c6354e4eee4960895a82f",
@@ -17,6 +17,7 @@
   "robinhood|0x18a5af4e442f8be68968cc1f00d537f8af2d12cd",
   "robinhood|0x38453c115607463ac284820ce959831042f3df4e",
   "robinhood|0x654e4143e82a5824445ade0824351c2a9acd95a8",
+  "robinhood|0xba2f1ed4ceb2169d538d1e614d847e83c5a55913",
   "robinhood|0xc61284332117c3fb23a2a56cceffd07f7af60029",
   "robinhood|0xd4eb21209c4d6093f80b5b84f5c45cc093ea14a3",
   "robinhood|0xdac1904d823f7d6bcaaf431ceee40c934fed321b",

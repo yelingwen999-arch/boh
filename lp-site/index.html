@@ -315,6 +315,15 @@ tr.sus > td:first-child{box-shadow:inset 3px 0 0 var(--down)}
   vertical-align:1px;cursor:help;
 }
 
+/* 标的价格走势 */
+.px{display:inline-flex;align-items:center;gap:7px;white-space:nowrap;cursor:help}
+.px-n{font:500 11.5px 'IBM Plex Mono';min-width:52px}
+.px-up .px-n{color:var(--up)}
+.px-down .px-n{color:var(--down)}
+.px-flat .px-n{color:var(--t3)}
+.px .mini{display:block;flex-shrink:0}
+.pxnd{color:var(--t3);font:400 11px 'IBM Plex Mono'}
+
 /* expand row */
 tr.sparkrow td{background:var(--bg-raised);padding:18px 26px;border-bottom:1px solid var(--line)}
 tr.sparkrow:hover{background:var(--bg-raised)}
@@ -491,6 +500,7 @@ tr.sparkrow:hover{background:var(--bg-raised)}
           <th data-k="dex" style="width:130px">去哪组</th>
           <th data-k="net">链</th>
           <th data-k="fee">费率</th>
+          <th data-k="px7" style="width:96px">标的走势</th>
           <th data-k="tvl">TVL</th>
           <th data-k="vol24">24h 量</th>
           <th data-k="turn">日换手</th>
@@ -779,6 +789,7 @@ function view(){
     return {...p,share_pct:share*100,day7,apr7:day7*365/CAP*100,
             apr30:p.v30*p.fee/100*share*365/CAP*100,turn:p.vol24/p.tvl,
             _health:h.level,_flags:h.flags,_trend:t,
+            px7:(p.px&&p.px.chg7d!=null)?p.px.chg7d:(p.px&&p.px.chg1d!=null?p.px.chg1d:null),
             trendKey:t.dir==='up'?2:t.dir==='flat'?1:0};
   });
   const k=SORT.k,dir=SORT.dir;
@@ -816,6 +827,20 @@ function scoreP(p){
   if(t.dir==='up')   s*=1.15;
   if(t.dir==='down') s*=0.7;
   return s;
+}
+
+/* 表格内联的迷你走势：只有线，没有填充，尺寸固定小 */
+function miniLine(v, w, h){
+  if(!v||v.length<2)return '';
+  const p=1.5;
+  const mx=Math.max(...v),mn=Math.min(...v);
+  const X=i=>p+i*(w-2*p)/(v.length-1);
+  const Y=q=>h-p-(q-mn)/(mx-mn||1)*(h-2*p);
+  const d='M'+v.map((q,i)=>X(i).toFixed(1)+' '+Y(q).toFixed(1)).join(' L');
+  const up=v[v.length-1]>=v[0];
+  const col=up?'var(--up)':'var(--down)';
+  return `<svg class="mini" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true">
+    <path d="${d}" fill="none" stroke="${col}" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 }
 
 function sparkSVG(v){
@@ -882,6 +907,29 @@ function aprWarn(p){
   return ` <span class="apr-note" title="30d 口径比 7d 高出 ${Math.round(gap*100)}%，成交量已明显下降">虚高</span>`;
 }
 
+/* ============ 标的价格走势 ============
+   手续费再高，标的在跌也是白搭。做 LP 的人最该先看的其实是这个：
+   拿到 130% APR，标的跌了 30%，净值还是亏的。
+   所以把标的的 7 日涨跌和走势直接放进列表。 */
+function pxCell(p){
+  const px=p.px||{};
+  const c7=px.chg7d, c1=px.chg1d;
+  if(c7==null && c1==null) return '<span class="pxnd">–</span>';
+
+  // 主数字用 7 日（3 日太少、30 日太长，7 日最贴合 LP 的调仓节奏）
+  const main=c7!=null?c7:c1;
+  const cls=main>0?'px-up':main<0?'px-down':'px-flat';
+  const arrow=main>0?'▲':main<0?'▼':'—';
+  const txt=(main>0?'+':'')+main.toFixed(1)+'%';
+
+  const title=`1 日 ${c1==null?'–':(c1>0?'+':'')+c1.toFixed(1)+'%'} · `+
+              `7 日 ${c7==null?'–':(c7>0?'+':'')+c7.toFixed(1)+'%'} · `+
+              `现价 $${px.last!=null?px.last.toFixed(2):'–'}`;
+
+  return `<span class="px ${cls}" title="${esc(title)}">
+    <span class="px-n">${arrow}${txt}</span>${miniLine(px.series,44,15)}</span>`;
+}
+
 function pairRowsHTML(p,i,isBest){
   const pills=statusPills(p);
   const a30=p.apr30>=100?'hot':p.apr30>=50?'mid':'low';
@@ -889,6 +937,7 @@ function pairRowsHTML(p,i,isBest){
     <td class="poolname">${isBest?'<span class="best-mark">★ </span>':''}${p.fee!=null?p.fee+'%':'?'} 档
       <a class="addr2" href="${poolURL(p)}" target="_blank" rel="noopener">${short(p.addr)}</a></td>
     <td><a class="dexb" href="${dexInfo(p).url}" target="_blank" rel="noopener" title="去 ${dexInfo(p).label} 加流动性"><span class="dexlogo ${dexInfo(p).icon}">${dexInfo(p).label[0]}</span>${dexInfo(p).label}<span class="go">↗</span></a></td>
+    <td>${pxCell(p)}</td>
     <td class="mono">$${fmtUSD(p.tvl)}</td>
     <td class="mono">$${fmtUSD(p.vol24)}</td>
     <td class="mono">${p.turn.toFixed(1)}×</td>
@@ -933,7 +982,7 @@ function renderPairView(rows,tb){
     const head=document.createElement('tr');
     head.className='pairhead';
     head.dataset.pair=k;
-    head.innerHTML=`<td colspan="13"><div class="ptitle">
+    head.innerHTML=`<td colspan="14"><div class="ptitle">
       ${stkChip(stock)}
       <span class="pn">${esc(stock)} / ${esc(stable)}</span>
       <span class="chainb"><span class="cdot ${net}"></span>${NETNAME[net]}</span>
@@ -949,8 +998,8 @@ function renderPairView(rows,tb){
     if(open){
       const pr=document.createElement('tr');
       pr.className='poolsrow'+(open?'':' hidden');
-      pr.innerHTML=`<td colspan="13"><table class="subtbl">
-        <tr><td style="width:190px">池子(费率档+地址)</td><td style="width:150px">去哪组</td><td>TVL</td><td>24h 量</td><td>日换手</td><td>日收入</td><td>APR 30d</td><td>量能</td><td>状态</td></tr>
+      pr.innerHTML=`<td colspan="14"><table class="subtbl">
+        <tr><td style="width:190px">池子(费率档+地址)</td><td style="width:150px">去哪组</td><td style="width:96px">标的走势</td><td>TVL</td><td>24h 量</td><td>日换手</td><td>日收入</td><td>APR 30d</td><td>量能</td><td>状态</td></tr>
         ${g.map((p,i)=>pairRowsHTML(p,i,i===0)).join('')}
       </table></td>`;
       tb.appendChild(pr);
@@ -1012,6 +1061,7 @@ function render(){
       <td><a class="dexb" href="${dexInfo(p).url}" target="_blank" rel="noopener" title="去 ${dexInfo(p).label} 加流动性"><span class="dexlogo ${dexInfo(p).icon}">${dexInfo(p).label[0]}</span>${dexInfo(p).label}<span class="go">↗</span></a></td>
       <td><span class="chainb"><span class="cdot ${p.net}"></span>${NETNAME[p.net]}</span></td>
       <td class="fee">${p.fee!=null?p.fee+'%':'?'}</td>
+      <td>${pxCell(p)}</td>
       <td class="mono">$${fmtUSD(p.tvl)}</td>
       <td class="mono">$${fmtUSD(p.vol24)}</td>
       <td class="mono mut">${p.turn.toFixed(1)}×</td>
@@ -1031,11 +1081,11 @@ function render(){
     if(sig.length){
       sig.forEach((p,i)=>renderRow(p,i+1));
     }else{
-      tb.insertAdjacentHTML('beforeend',`<tr><td colspan="13" style="padding:36px;text-align:center;color:var(--t3)">
+      tb.insertAdjacentHTML('beforeend',`<tr><td colspan="14" style="padding:36px;text-align:center;color:var(--t3)">
         当前没有同时满足五项筛选条件的池(占比≤5% · 量能不萎缩 · APR≥50% · TVL≥$50K · 数据可信)</td></tr>`);
     }
     if(flagged.length){
-      tb.insertAdjacentHTML('beforeend',`<tr><td colspan="13" style="padding:8px 10px;background:var(--bg-raised)">
+      tb.insertAdjacentHTML('beforeend',`<tr><td colspan="14" style="padding:8px 10px;background:var(--bg-raised)">
         <span class="fl" style="color:var(--t3)">以下 ${flagged.length} 个池存在预警(占比过高/量能萎缩/APR过低/池过小),已折叠展示——切到「全部池」看完整清单</span></td></tr>`);
       flagged.forEach((p,i)=>renderRow(p,i+1));
     }
@@ -1060,6 +1110,7 @@ function render(){
       <td><a class="dexb" href="${dexInfo(p).url}" target="_blank" rel="noopener" title="去 ${dexInfo(p).label} 加流动性"><span class="dexlogo ${dexInfo(p).icon}">${dexInfo(p).label[0]}</span>${dexInfo(p).label}<span class="go">↗</span></a></td>
       <td><span class="chainb"><span class="cdot ${p.net}"></span>${NETNAME[p.net]}</span></td>
       <td class="fee">${p.fee!=null?p.fee+'%':'?'}</td>
+      <td>${pxCell(p)}</td>
       <td class="mono">$${fmtUSD(p.tvl)}</td>
       <td class="mono">$${fmtUSD(p.vol24)}</td>
       <td class="mono mut">${p.turn.toFixed(1)}×</td>
@@ -1088,7 +1139,7 @@ function toggleExpand(p,tr){
 function appendSpark(tr,p){
   const row=document.createElement('tr');row.className='sparkrow';
   const up=p.spark&&p.spark.length>1?p.spark[p.spark.length-1]>=p.spark[0]:null;
-  row.innerHTML=`<td colspan="13"><div class="sbox">
+  row.innerHTML=`<td colspan="14"><div class="sbox">
     <div><div class="stitle">${esc(p.stock)} / ${esc(p.stable)} — 近 30 天日成交量 · ${p.ndays} 根日线</div>${sparkSVG(p.spark)}</div>
     <div class="smeta">7 天日均 <b>$${fmtUSD(p.v7)}</b><br>30 天日均 <b>$${fmtUSD(p.v30)}</b><br>
     ${up!=null?(up?'<b style="color:var(--up)">近期量能 ↑</b>':'<b style="color:var(--down)">近期量能 ↓</b>'):'数据不足'}</div>
