@@ -299,6 +299,22 @@ tr:hover .chainb{border-color:var(--t3)}
 .p-down{color:var(--down);background:var(--badge-down-bg)} .p-down::before{background:var(--down)}
 .p-mut{color:var(--t3);background:var(--bg-raised)} .p-mut::before{background:var(--t3)}
 
+/* 数据存疑的行：整体压暗 + 左侧红条，让人一眼知道「这行别当真」 */
+tr.sus > td{opacity:.62}
+tr.sus > td:first-child{box-shadow:inset 3px 0 0 var(--down)}
+
+/* 量能趋势 */
+.tv{font:500 11px 'IBM Plex Mono';white-space:nowrap}
+.tv-up{color:var(--up)}
+.tv-down{color:var(--down)}
+.tv-flat{color:var(--t3)}
+/* 「虚高」提示：30d 口径明显高于 7d 时挂在这个 APR 后面 */
+.apr-note{
+  font:500 9.5px 'Inter';color:var(--warn);margin-left:4px;
+  padding:1px 4px;border-radius:3px;background:var(--badge-warn-bg);
+  vertical-align:1px;cursor:help;
+}
+
 /* expand row */
 tr.sparkrow td{background:var(--bg-raised);padding:18px 26px;border-bottom:1px solid var(--line)}
 tr.sparkrow:hover{background:var(--bg-raised)}
@@ -410,7 +426,7 @@ tr.sparkrow:hover{background:var(--bg-raised)}
       <div class="st"><div class="l">监控池</div><div class="v" id="k-n">–</div></div>
       <div class="st"><div class="l">合计 TVL</div><div class="v" id="k-tvl">–</div></div>
       <div class="st"><div class="l">24h 交易量</div><div class="v" id="k-vol">–</div></div>
-      <div class="st"><div class="l">最高 APR · 30d</div><div class="v accent" id="k-best">–</div></div>
+      <div class="st"><div class="l">最佳收益池 · APR 7d</div><div class="v accent" id="k-best">–</div></div>
       <div class="st"><div class="l">净收益提示</div><div class="v" style="font-size:13px">≈ 表值 ÷ 2–3<small>LVR/IL 折扣</small></div></div>
     </div>
   </div>
@@ -445,11 +461,12 @@ tr.sparkrow:hover{background:var(--bg-raised)}
     <span class="fl" style="margin-left:auto;color:var(--t3)">点击表头排序 · 点击行展开 30 天量能</span>
   </div>
   <div class="criteria" id="criteria">
-    <b>「筛选后」的四个条件是</b>
+    <b>「筛选后」的五个条件是</b>
     <span class="cr">占比 ≤ 5%<i>你不是市场本身</i></span>
     <span class="cr">7d 日均量 ≥ 30d × 0.6<i>量能没有萎缩</i></span>
     <span class="cr">APR 30d ≥ 50%<i>高于迁移阈值</i></span>
     <span class="cr">TVL ≥ $50K<i>排除微型陷阱池</i></span>
+    <span class="cr">换手 ≤ 30× 且 ≥10 天数据<i>数据可信</i></span>
     <span class="cr-note">这是筛选条件，不是推荐</span>
   </div>
 
@@ -481,6 +498,7 @@ tr.sparkrow:hover{background:var(--bg-raised)}
           <th data-k="day7">日收入</th>
           <th data-k="apr7">APR 7d</th>
           <th data-k="apr30">APR 30d</th>
+          <th data-k="trendKey" style="width:74px">量能</th>
           <th style="width:168px">状态</th>
         </tr>
       </thead>
@@ -497,15 +515,15 @@ tr.sparkrow:hover{background:var(--bg-raised)}
   <section class="method">
     <div class="mc">
       <h3>口径</h3>
-      <p>APR = 手续费年化,按 <b>30 天日均成交量 × 费率 ÷ TVL</b>,未扣 LVR / 无常损失。按 Blockworks 实测,股票/稳定币池费收约 <b>2.9–3.3 倍</b>覆盖套利成本,净收益预期 ≈ 表值 ÷ 2–3。</p>
+      <p>APR = 手续费年化,按 <b>日均成交量 × 费率 ÷ TVL</b>,未扣 LVR / 无常损失。表里同时给 <b>7d</b> 和 <b>30d</b> 两个口径——量能变化大时两者会差很远,<b>7d 更接近现在能拿到的</b>。按 Blockworks 实测,股票/稳定币池费收约 <b>2.9–3.3 倍</b>覆盖套利成本,净收益预期 ≈ 表值 ÷ 2–3。</p>
     </div>
     <div class="mc">
       <h3>预警含义</h3>
-      <p><b>占比 &gt; 5%</b> —— 你即市场,慎入。<br><b>量能萎缩</b> —— 7d 日均量 &lt; 30d × 0.6。<br><b>APR &lt; 50%</b> —— 低于迁移阈值。</p>
+      <p><b>占比 &gt; 5%</b> —— 你即市场,慎入。<br><b>量能萎缩</b> —— 7d 日均量 &lt; 30d × 0.6,APR 30d 会偏高。<br><b>APR &lt; 50%</b> —— 低于迁移阈值。<br><b>换手异常</b> —— 换手 &gt; 30×,可能是刷量或 TVL 抓错,APR 不可信。</p>
     </div>
     <div class="mc">
       <h3>数据来源</h3>
-      <p>GeckoTerminal API,每日抓取、静态托管。<br><b>Fables / Metric</b> 动态费率池不在收录范围,数据看官方前端。</p>
+      <p>GeckoTerminal API,每小时抓取、静态托管。<br><b>Fables / Metric</b> 动态费率池不在收录范围,数据看官方前端。</p>
     </div>
   </section>
 
@@ -601,6 +619,76 @@ function depositURL(p){
   return dexInfo(p).url;
 }
 
+/* ============ 数据可信度判定 ============
+   为什么需要这个：有些池子 TVL 极小但成交量巨大，换手率能到 2000×，
+   真实流动性不可能支撑这种成交——要么是刷量，要么是 TVL 抓错。
+   照 APR 排序时它们会排在最前面，而实际上一放钱进去就是深渊。
+
+   判定分两级：
+     suspicious  数据存疑，APR 加问号，不许进「最高 APR」，默认排在后面
+     thin        池子太小 / 数据天数太少，标注提醒但不强制降权
+*/
+const TURN_LIMIT = 30;      // 换手率超过这个倍数视为异常
+const MIN_DAYS = 10;        // 少于这么多天日线，APR 样本不足
+const THIN_TVL = 50000;     // 低于这个 TVL 算薄池
+
+function health(p){
+  const turn = (p.tvl>0) ? p.vol24/p.tvl : 0;
+  const ndays = p.ndays||0;
+  const tvl = p.tvl||0;
+  const flags = [];
+  let level = 'ok';
+
+  // 换手率异常：这是最硬的信号
+  if(turn >= TURN_LIMIT){
+    flags.push('换手异常');
+    level = 'suspicious';
+  }
+  // 样本不足
+  if(ndays>0 && ndays < MIN_DAYS){
+    flags.push('样本不足');
+    if(level === 'ok') level = 'thin';
+  }
+  // 薄池
+  if(tvl < THIN_TVL){
+    flags.push('薄池');
+    if(level === 'ok') level = 'thin';
+  }
+
+  return {level, turn, ndays, tvl, flags};
+}
+// 允许参与「最高 APR」和默认排序的池子
+const isTrusted = p => health(p).level === 'ok';
+
+/* ============ 量能趋势 ============
+   APR 30d 是「过去 30 天的平均」，反映不了现在。一个池子如果 7 日量只有
+   30 日均量的 18%，那 270% 的 APR 是拿早已消失的成交算出来的——真进去
+   大概率拿不到。反过来，量能在涨的池子，30d 口径会低估它。
+   所以除了看 APR，还要看它往哪个方向走。 */
+const TREND_UP = 1.15;     // 7d 日均量 ≥ 30d 的 115% 算放量
+const TREND_DOWN = 0.8;    // ≤ 80% 算萎缩
+
+function trend(p){
+  const v7=p.v7||0, v30=p.v30||0;
+  if(v30<=0) return {dir:'flat', ratio:1, label:'数据不足'};
+  const r=v7/v30;
+  if(r>=TREND_UP)   return {dir:'up',   ratio:r, label:'放量'};
+  if(r<=TREND_DOWN) return {dir:'down', ratio:r, label:'萎缩'};
+  return {dir:'flat', ratio:r, label:'平稳'};
+}
+
+/* APR 可信度：30d 口径在量能萎缩时严重高估，用 7d 做参照。
+   返回 {score, gap}  score 越小越可信。 */
+function aprGap(p){
+  const a30=p.apr30||0;
+  if(!a30) return {gap:0, est:0};
+  // v7 口径的 APR（与 apr30 同一套本金占比公式）
+  const share=CAP/(p.tvl+CAP);
+  const day7=(p.v7||0)*(p.fee||0)/100*share;
+  const est=day7*365/CAP*100;
+  return {gap:(a30-est)/a30, est};
+}
+
 /* theme — set on <html> so html{background} also follows (body-scoped vars
    leave :root at dark defaults and the black html bg bleeds through) */
 const tbtn=$('#theme');
@@ -620,17 +708,35 @@ window.addEventListener('resize',setHdrTop);
 window.addEventListener('load',setHdrTop);
 setHdrTop();
 
-/* 顶部「最高 APR」只在够格的池子里取：占比 ≤5%、TVL ≥ $50K。
-   否则像 AAPLB 那种 TVL 只剩几千刀、占比 50%+ 的微型池，会用 900%+
-   的虚高 APR 霸占这个位置。本金变化时要跟着重算。 */
+/* 顶部「最高 APR」只在够格的池子里取：
+     占比 ≤5% · TVL ≥ $50K · 且数据可信（无换手异常 / 样本不足）
+   否则像 AAPLB 那种 TVL 一千刀、换手 2221× 的池子会用虚高的 APR
+   霸占这个位置，而它根本不是能放钱的地方。本金变化时要跟着重算。 */
+/* 顶部「最佳收益池」只在够格的池子里取：
+     占比 ≤5% · TVL ≥ $50K · 且数据可信（无换手异常 / 样本不足）
+   否则像 AAPLB 那种 TVL 一千刀、换手 2221× 的池子会用虚高的 APR
+   霸占这个位置，而它根本不是能放钱的地方。
+
+   选池用趋势加权分（scoreP）而不是 APR 30d —— 否则一个「30 天平均 270%
+   但现在量能只剩 18%、实际只有 48%」的池会误导人。显示也用 7d 值。 */
 function updateBest(){
   const capNow=parseFloat($('#f-cap').value)||10000;
   const solid=POOLS.filter(p=>{
     const sh=capNow/(p.tvl+capNow)*100;
-    return sh<=5 && p.tvl>=50000;
+    return sh<=5 && p.tvl>=50000 && isTrusted(p);
   });
-  const best=solid.length?solid.reduce((a,b)=>(a.apr30??0)>(b.apr30??0)?a:b):null;
-  $('#k-best').textContent=best?fmtPct(best.apr30):'–';
+  if(!solid.length){ $('#k-best').textContent='–'; return; }
+  // 复用 view() 的收益口径
+  const save=CAP; CAP=capNow;
+  const scored=solid.map(p=>{
+    const share=capNow/(p.tvl+capNow);
+    const day7=p.v7*p.fee/100*share;
+    return {...p, apr7:day7*365/capNow*100, share_pct:share*100};
+  });
+  CAP=save;
+  const best=scored.reduce((a,b)=>scoreP(a)>scoreP(b)?a:b);
+  $('#k-best').textContent=fmtPct(best.apr7);
+  $('#k-best').title=`${best.stock}/${best.stable} · ${NETNAME[best.net]} · APR 7d`;
 }
 
 async function load(){
@@ -668,18 +774,29 @@ function view(){
   rows=rows.map(p=>{
     const share=CAP/(p.tvl+CAP);
     const day7=p.v7*p.fee/100*share;
+    const h=health(p);
+    const t=trend(p);
     return {...p,share_pct:share*100,day7,apr7:day7*365/CAP*100,
-            apr30:p.v30*p.fee/100*share*365/CAP*100,turn:p.vol24/p.tvl};
+            apr30:p.v30*p.fee/100*share*365/CAP*100,turn:p.vol24/p.tvl,
+            _health:h.level,_flags:h.flags,_trend:t,
+            trendKey:t.dir==='up'?2:t.dir==='flat'?1:0};
   });
   const k=SORT.k,dir=SORT.dir;
+  // 可信度优先于一切：数据存疑的池子永远沉底，不管按哪列排。
+  // 否则「按 APR 降序」一开，那个换手 2221× 的池子就霸屏了。
+  const rank = p => p._health==='suspicious' ? 2 : p._health==='thin' ? 1 : 0;
   rows.sort((a,b)=>{
+    const ra=rank(a), rb=rank(b);
+    if(ra!==rb) return ra-rb;
     if(k==='rank')return 0;
-    // default view sort: cluster by underlying ticker (NVDA+NVDAB adjacent),
-    // then chain, then APR30 desc within the cluster
+    // 默认视图：趋势加权分。
+    // 光按 APR30d 排，会把「量能已萎缩、APR 虚高」的池顶到最前；
+    // 这里把 7d 实际能拿到的收益当主项，30d 只当辅助。
     if(k==='stockGroup'){
+      const sa=scoreP(a), sb=scoreP(b);
+      if(Math.abs(sa-sb)>1) return sb-sa;
       const ca=canon(a.stock),cb=canon(b.stock);
       if(ca!==cb)return ca.localeCompare(cb);
-      if(a.net!==b.net)return a.net.localeCompare(b.net);
       return (b.apr30??0)-(a.apr30??0);
     }
     if(k==='name')return dir*a.name.localeCompare(b.name);
@@ -688,6 +805,17 @@ function view(){
     return dir*((a[k]??-1e18)-(b[k]??-1e18));
   });
   return rows;
+}
+
+/* 趋势加权分：APR 7d 为主（这才是现在能拿到的），30d 为辅。
+   放量的池子额外加分，萎缩的扣分——量化成可排序的单一数字。 */
+function scoreP(p){
+  const t=trend(p);
+  const apr7=p.apr7||0, apr30=p.apr30||0;
+  let s=apr7*0.7 + apr30*0.3;
+  if(t.dir==='up')   s*=1.15;
+  if(t.dir==='down') s*=0.7;
+  return s;
 }
 
 function sparkSVG(v){
@@ -715,14 +843,49 @@ document.querySelectorAll('#viewseg .seg-btn').forEach(b=>{
   });
 });
 
-function pairRowsHTML(p,i,isBest){
+/* 统一的状态标签。先报数据可信度问题——它们比「APR 低」严重得多：
+   APR 低只是不划算，数据存疑是会把你本金吃掉的。 */
+function statusPills(p){
   const pills=[];
+  const h=p._health||health(p).level;
+  const flags=p._flags||health(p).flags;
+
+  if(h==='suspicious'){
+    pills.push(`<span class="pill p-down" title="换手率 ${(p.turn||0).toFixed(0)}× —— 远超正常范围，可能是刷量或 TVL 抓取错误">⚠ ${flags.join('·')}</span>`);
+  }else if(h==='thin'){
+    pills.push(`<span class="pill p-warn">${flags.join('·')}</span>`);
+  }
+
   if(p.share_pct>5)pills.push(`<span class="pill p-warn">占比 ${p.share_pct.toFixed(1)}%</span>`);
   if(p.v7<p.v30*0.6)pills.push('<span class="pill p-down">量能萎缩</span>');
   if(p.apr30<50)pills.push('<span class="pill p-mut">APR<50%</span>');
   if(!pills.length)pills.push('<span class="pill p-ok">健康</span>');
+  return pills;
+}
+/* APR 显示：数据存疑时加问号，避免被当成确切收益 */
+function aprText(p){
+  const h=p._health||health(p).level;
+  return fmtPct(p.apr30)+(h==='suspicious'?'?':'');
+}
+/* 量能趋势单元格：箭头 + 倍数，斜率越大越刺眼 */
+function trendCell(p){
+  const t=p._trend||trend(p);
+  const cls=t.dir==='up'?'tv-up':t.dir==='down'?'tv-down':'tv-flat';
+  const arrow=t.dir==='up'?'↑':t.dir==='down'?'↓':'→';
+  return `<span class="tv ${cls}" title="7 日均量 / 30 日均量 = ${t.ratio.toFixed(2)}×">${arrow}${t.ratio.toFixed(2)}×</span>`;
+ }
+/* APR 30d 与 7d 差得太多时提示：说明 30d 口径已经不代表现在 */
+function aprWarn(p){
+  if(!p.apr7||!p.apr30) return '';
+  const gap=(p.apr30-p.apr7)/p.apr30;
+  if(gap<0.3) return '';
+  return ` <span class="apr-note" title="30d 口径比 7d 高出 ${Math.round(gap*100)}%，成交量已明显下降">虚高</span>`;
+}
+
+function pairRowsHTML(p,i,isBest){
+  const pills=statusPills(p);
   const a30=p.apr30>=100?'hot':p.apr30>=50?'mid':'low';
-  return `<tr>
+  return `<tr${p._health==='suspicious'?' class="sus"':''}>
     <td class="poolname">${isBest?'<span class="best-mark">★ </span>':''}${p.fee!=null?p.fee+'%':'?'} 档
       <a class="addr2" href="${poolURL(p)}" target="_blank" rel="noopener">${short(p.addr)}</a></td>
     <td><a class="dexb" href="${dexInfo(p).url}" target="_blank" rel="noopener" title="去 ${dexInfo(p).label} 加流动性"><span class="dexlogo ${dexInfo(p).icon}">${dexInfo(p).label[0]}</span>${dexInfo(p).label}<span class="go">↗</span></a></td>
@@ -730,7 +893,8 @@ function pairRowsHTML(p,i,isBest){
     <td class="mono">$${fmtUSD(p.vol24)}</td>
     <td class="mono">${p.turn.toFixed(1)}×</td>
     <td class="mono $">${p.day7.toFixed(2)}</td>
-    <td class="apr ${a30}" style="font:600 12px 'IBM Plex Mono'">${fmtPct(p.apr30)}</td>
+    <td class="apr ${a30}" style="font:600 12px 'IBM Plex Mono'">${aprText(p)}</td>
+    <td>${trendCell(p)}</td>
     <td><div class="pills">${pills.join('')}</div></td>
   </tr>`;
 }
@@ -769,7 +933,7 @@ function renderPairView(rows,tb){
     const head=document.createElement('tr');
     head.className='pairhead';
     head.dataset.pair=k;
-    head.innerHTML=`<td colspan="12"><div class="ptitle">
+    head.innerHTML=`<td colspan="13"><div class="ptitle">
       ${stkChip(stock)}
       <span class="pn">${esc(stock)} / ${esc(stable)}</span>
       <span class="chainb"><span class="cdot ${net}"></span>${NETNAME[net]}</span>
@@ -785,8 +949,8 @@ function renderPairView(rows,tb){
     if(open){
       const pr=document.createElement('tr');
       pr.className='poolsrow'+(open?'':' hidden');
-      pr.innerHTML=`<td colspan="12"><table class="subtbl">
-        <tr><td style="width:190px">池子(费率档+地址)</td><td style="width:150px">去哪组</td><td>TVL</td><td>24h 量</td><td>日换手</td><td>日收入</td><td>APR 30d</td><td>状态</td></tr>
+      pr.innerHTML=`<td colspan="13"><table class="subtbl">
+        <tr><td style="width:190px">池子(费率档+地址)</td><td style="width:150px">去哪组</td><td>TVL</td><td>24h 量</td><td>日换手</td><td>日收入</td><td>APR 30d</td><td>量能</td><td>状态</td></tr>
         ${g.map((p,i)=>pairRowsHTML(p,i,i===0)).join('')}
       </table></td>`;
       tb.appendChild(pr);
@@ -818,13 +982,16 @@ function render(){
     return;
   }
   if(VIEW==='rank'){
-    // 筛选后：按四项客观条件过滤（占比≤5% · 量能不萎缩 · APR≥50% · TVL≥$50K）
+    // 筛选后：按五项客观条件过滤
+    //   占比≤5% · 量能不萎缩 · APR≥50% · TVL≥$50K · 数据可信
+    // 最后一条是关键：数据存疑的池（换手异常/样本不足）即使 APR 再高也进不来。
     // 这只是筛选条件，不构成推荐 —— 见 /about.html
     const sig=rows.filter(p=>
       p.share_pct<=5 &&            // you're not the market
       p.v7>=p.v30*0.6 &&           // volume not shrinking
       p.apr30>=50 &&               // above migration threshold
-      p.tvl>=50000                 // not a micro-trap
+      p.tvl>=50000 &&              // not a micro-trap
+      p._health==='ok'             // 数据可信度过关
     );
     const flagged=rows.filter(p=>!sig.includes(p));
     const renderRow=(p,i,cls)=>{
@@ -833,13 +1000,10 @@ function render(){
     const key2=p.net+'|'+p.stock+'|'+p.stable+'|'+p.fee;
     const dt=counts[key2]>1&&p._dupTotal?' <span class="pooltag">池'+('ABCDEF'[p._dupTotal-1]||p._dupTotal)+'</span>':'';
     const dex=dexOf(p);
-    const pills=[];
-    if(p.share_pct>5)pills.push(`<span class="pill p-warn">占比 ${p.share_pct.toFixed(1)}%</span>`);
-    if(p.v7<p.v30*0.6)pills.push('<span class="pill p-down">量能萎缩</span>');
-    if(p.apr30<50)pills.push('<span class="pill p-mut">APR<50%</span>');
-    if(!pills.length)pills.push('<span class="pill p-ok">健康</span>');
+    const pills=statusPills(p);
     const a7=p.apr7>=100?'hot':p.apr7>=50?'mid':'low';
     const a30=p.apr30>=100?'hot':p.apr30>=50?'mid':'low';
+    tr.className=p._health==='suspicious'?'sus':'';
     tr.innerHTML=`
       <td class="rk">${i+1}</td>
       <td><div class="stkrow">${stkChip(p.stock)}<div><span class="pname"><span class="stk">${esc(p.stock)}</span> / ${esc(p.stable)}${dt}</span>
@@ -854,7 +1018,8 @@ function render(){
       <td class="shareN ${p.share_pct>5?'risk':''}">${p.share_pct.toFixed(2)}%</td>
       <td class="mono">$${p.day7.toFixed(2)}</td>
       <td class="apr7">${fmtPct(p.apr7)}</td>
-      <td class="apr ${a30}">${fmtPct(p.apr30)}</td>
+      <td class="apr ${a30}">${aprText(p)}${aprWarn(p)}</td>
+      <td>${trendCell(p)}</td>
       <td><div class="pills">${pills.join('')}</div></td>`;
     tr.addEventListener('click',e=>{
       if(e.target.closest('a'))return;   // don't toggle when clicking the address link
@@ -866,11 +1031,11 @@ function render(){
     if(sig.length){
       sig.forEach((p,i)=>renderRow(p,i+1));
     }else{
-      tb.insertAdjacentHTML('beforeend',`<tr><td colspan="12" style="padding:36px;text-align:center;color:var(--t3)">
-        当前没有同时满足四项筛选条件的池(占比≤5% · 量能不萎缩 · APR≥50% · TVL≥$50K)</td></tr>`);
+      tb.insertAdjacentHTML('beforeend',`<tr><td colspan="13" style="padding:36px;text-align:center;color:var(--t3)">
+        当前没有同时满足五项筛选条件的池(占比≤5% · 量能不萎缩 · APR≥50% · TVL≥$50K · 数据可信)</td></tr>`);
     }
     if(flagged.length){
-      tb.insertAdjacentHTML('beforeend',`<tr><td colspan="12" style="padding:8px 10px;background:var(--bg-raised)">
+      tb.insertAdjacentHTML('beforeend',`<tr><td colspan="13" style="padding:8px 10px;background:var(--bg-raised)">
         <span class="fl" style="color:var(--t3)">以下 ${flagged.length} 个池存在预警(占比过高/量能萎缩/APR过低/池过小),已折叠展示——切到「全部池」看完整清单</span></td></tr>`);
       flagged.forEach((p,i)=>renderRow(p,i+1));
     }
@@ -883,13 +1048,10 @@ function render(){
     const key2=p.net+'|'+p.stock+'|'+p.stable+'|'+p.fee;
     const dt=counts[key2]>1&&p._dupTotal?' <span class="pooltag">池'+('ABCDEF'[p._dupTotal-1]||p._dupTotal)+'</span>':'';
     const dex=dexOf(p);
-    const pills=[];
-    if(p.share_pct>5)pills.push(`<span class="pill p-warn">占比 ${p.share_pct.toFixed(1)}%</span>`);
-    if(p.v7<p.v30*0.6)pills.push('<span class="pill p-down">量能萎缩</span>');
-    if(p.apr30<50)pills.push('<span class="pill p-mut">APR<50%</span>');
-    if(!pills.length)pills.push('<span class="pill p-ok">健康</span>');
+    const pills=statusPills(p);
     const a7=p.apr7>=100?'hot':p.apr7>=50?'mid':'low';
     const a30=p.apr30>=100?'hot':p.apr30>=50?'mid':'low';
+    tr.className=p._health==='suspicious'?'sus':'';
     tr.innerHTML=`
       <td class="rk">${i+1}</td>
       <td><div class="stkrow">${stkChip(p.stock)}<div><span class="pname"><span class="stk">${esc(p.stock)}</span> / ${esc(p.stable)}${dt}</span>
@@ -904,7 +1066,8 @@ function render(){
       <td class="shareN ${p.share_pct>5?'risk':''}">${p.share_pct.toFixed(2)}%</td>
       <td class="mono">$${p.day7.toFixed(2)}</td>
       <td class="apr7">${fmtPct(p.apr7)}</td>
-      <td class="apr ${a30}">${fmtPct(p.apr30)}</td>
+      <td class="apr ${a30}">${aprText(p)}${aprWarn(p)}</td>
+      <td>${trendCell(p)}</td>
       <td><div class="pills">${pills.join('')}</div></td>`;
     tr.addEventListener('click',e=>{
       if(e.target.closest('a'))return;
@@ -925,7 +1088,7 @@ function toggleExpand(p,tr){
 function appendSpark(tr,p){
   const row=document.createElement('tr');row.className='sparkrow';
   const up=p.spark&&p.spark.length>1?p.spark[p.spark.length-1]>=p.spark[0]:null;
-  row.innerHTML=`<td colspan="12"><div class="sbox">
+  row.innerHTML=`<td colspan="13"><div class="sbox">
     <div><div class="stitle">${esc(p.stock)} / ${esc(p.stable)} — 近 30 天日成交量 · ${p.ndays} 根日线</div>${sparkSVG(p.spark)}</div>
     <div class="smeta">7 天日均 <b>$${fmtUSD(p.v7)}</b><br>30 天日均 <b>$${fmtUSD(p.v30)}</b><br>
     ${up!=null?(up?'<b style="color:var(--up)">近期量能 ↑</b>':'<b style="color:var(--down)">近期量能 ↓</b>'):'数据不足'}</div>
