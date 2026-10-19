@@ -40,6 +40,7 @@ BUDGET_S = int(os.environ.get("FETCH_BUDGET_S", "1500"))
 SCAN_RESERVE_S = int(os.environ.get("FETCH_SCAN_RESERVE_S", "420"))
 MIN_POOLS = 5           # 少于这个数量视为本轮抓取失败，不覆盖线上
 MAX_POOLS = 24          # 补全阶段最多处理多少个（按 24h 量降序取前 N）
+HOURLY_LIMIT = 720      # 小时线根数（720 = 30 天，GeckoTerminal 一次上限）
 CHAINS = {"solana", "bsc", "base", "robinhood"}
 STABLES = {"USDG", "USDC", "USDT", "FRXUSD", "AUSD"}
 
@@ -107,25 +108,43 @@ def gt_pool(net, addr):
     return get(f"https://api.geckoterminal.com/api/v2/networks/{net}/pools/{addr}")
 
 
-def gt_daily(net, addr):
-    """返回 (成交量 list, 收盘价 list)，都按时间正序（最新在后）。
+def gt_ohlcv(net, addr, timeframe="day", limit=30):
+    """抓 OHLCV，返回正序（最新在后）的 K 线列表。
 
-    OHLCV 每行是 [ts, open, high, low, close, volume]，一次请求两样都拿到，
-    不用为价格多发一次 —— GeckoTerminal 的额度很紧。
+    每根是 {t, o, h, l, c, v}。OHLCV 一次请求就把开高低收和成交量都给了，
+    所以日线和小时线各只需要一个请求。
     """
     d = get(
         f"https://api.geckoterminal.com/api/v2/networks/{net}/pools/{addr}"
-        f"/ohlcv/day?aggregate=1&limit=30&currency=usd"
+        f"/ohlcv/{timeframe}?aggregate=1&limit={limit}&currency=usd"
     )
     rows = None
     if d and "data" in d:
         rows = d["data"].get("attributes", {}).get("ohlcv_list")
     if not rows:
-        return [], []
-    rows = list(reversed(rows))          # API 是倒序（最新在前），翻成正序
-    vols = [float(b[5]) for b in rows if b[5]]
-    closes = [float(b[4]) for b in rows if b[4]]
-    return vols, closes
+        return []
+    out = []
+    for b in reversed(rows):        # API 是倒序（最新在前），翻成正序
+        try:
+            out.append({
+                "t": int(b[0]),
+                "o": float(b[1]),
+                "h": float(b[2]),
+                "l": float(b[3]),
+                "c": float(b[4]),
+                "v": float(b[5]),
+            })
+        except (TypeError, ValueError, IndexError):
+            continue
+    return out
+
+
+def gt_daily(net, addr, limit=30):
+    """兼容旧调用：返回 (成交量 list, 收盘价 list, 完整日线 list)。"""
+    bars = gt_ohlcv(net, addr, "day", limit)
+    vols = [b["v"] for b in bars if b["v"]]
+    closes = [b["c"] for b in bars if b["c"]]
+    return vols, closes, bars
 
 
 def scan_stock_pools():
@@ -216,10 +235,18 @@ def enrich(pool):
     vol24 = float((a.get("volume_usd") or {}).get("h24") or 0) or pool["vol"]
 
     time.sleep(GT_GAP)          # 两个请求之间限速，避免 429
-    vols, closes = gt_daily(pool["net"], pool["addr"])
+    # 日线要 30 天算均量；同时留 90 根给前端 K 线（池子通常没那么多天）
+    vols, closes, day_bars = gt_daily(pool["net"], pool["addr"], limit=90)
 
     if not tvl or fee is None:
         return None
+
+    # 小时线单独再发一个请求。K 线研究需要更细的粒度，
+    # 但额度紧，只给「会被点开看」的池子抓（都是候选里量最大的那些）。
+    hour_bars = []
+    if budget_left() > 120:
+        time.sleep(GT_GAP)
+        hour_bars = gt_ohlcv(pool["net"], pool["addr"], "hour", HOURLY_LIMIT)
 
     # 没有日线时退回 24h 量：不假装有 7/30 天数据
     if len(vols) >= 10:
@@ -244,6 +271,11 @@ def enrich(pool):
         "chg7d": None,
         "chg30d": None,
         "series": closes[-30:],
+        # K 线：日线最多 90 根（池子实际只有几十天）、小时线 720 根（30 天）
+        "k": {
+            "d": day_bars,
+            "h": hour_bars,
+        },
     }
     if closes:
         if len(closes) >= 2:

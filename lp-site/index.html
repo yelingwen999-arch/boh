@@ -405,6 +405,44 @@ tr.sparkrow:hover{background:var(--bg-raised)}
 .stk-chg.flat{color:var(--t3)}
 .stk-meta{font:400 10.5px 'Inter';color:var(--t3);display:flex;gap:6px;align-items:center}
 
+/* ============ K 线展开面板 ============ */
+.kp{margin:0 0 14px;border:1px solid var(--line);border-radius:10px;background:var(--bg-raised)}
+.kp[hidden]{display:none}
+.kp-head{
+  display:flex;align-items:center;gap:12px;padding:11px 14px;
+  border-bottom:1px solid var(--line);flex-wrap:wrap;
+}
+.kp-tk{font:600 14px 'IBM Plex Mono';color:var(--t1);letter-spacing:-.2px}
+.kp-px{font:500 12px 'IBM Plex Mono';color:var(--t2)}
+.kp-info{font:400 11px 'IBM Plex Mono';color:var(--t3)}
+.kp-close{
+  margin-left:auto;background:none;border:none;color:var(--t3);cursor:pointer;
+  font-size:13px;padding:4px 8px;border-radius:6px;line-height:1;
+}
+.kp-close:hover{background:var(--hover);color:var(--t1)}
+
+.kp-chart{position:relative;padding:6px 2px 0;cursor:crosshair;user-select:none}
+.kp-chart svg.kline{display:block}
+/* 十字线 */
+.kp-cursor{position:absolute;pointer-events:none;opacity:0;transition:opacity .08s}
+.kp-cursor.on{opacity:1}
+.kp-cursor .v{position:absolute;top:0;bottom:20px;width:1px;background:var(--line-strong)}
+.kp-cursor .h-line{position:absolute;left:0;right:0;height:1px;background:var(--line-strong)}
+
+.kp-foot{
+  display:flex;align-items:center;gap:14px;padding:8px 14px 10px;
+  border-top:1px solid var(--line);flex-wrap:wrap;
+}
+.kp-hint{font:400 10.5px 'Inter';color:var(--t3)}
+.kp-ohlc{
+  margin-left:auto;font:500 11px 'IBM Plex Mono';color:var(--t2);
+  display:flex;gap:12px;flex-wrap:wrap;
+}
+.kp-ohlc b{font-weight:600;margin-left:3px}
+.kp-ohlc b.up{color:var(--up)}
+.kp-ohlc b.down{color:var(--down)}
+.kp-empty{padding:44px;text-align:center;font:400 12px 'Inter';color:var(--t3)}
+
 /* 悬停展开的走势浮层 */
 .stk-pop{
   position:fixed;z-index:60;pointer-events:none;
@@ -526,10 +564,29 @@ tr.sparkrow:hover{background:var(--bg-raised)}
   <section class="stks" id="stks" hidden>
     <div class="stks-head">
       <span class="stks-title">标的</span>
-      <span class="stks-sub">点击筛选下方池子 · 悬停看 30 天走势</span>
+      <span class="stks-sub">点击卡片看 K 线并筛选池子 · 悬停看 30 天走势</span>
       <button class="stks-clear" id="stks-clear" type="button" hidden>清除筛选</button>
     </div>
     <div class="stks-grid" id="stks-grid"></div>
+
+    <!-- 展开的 K 线面板 -->
+    <div class="kp" id="kp" hidden>
+      <div class="kp-head">
+        <span class="kp-tk" id="kp-tk"></span>
+        <span class="kp-px" id="kp-px"></span>
+        <div class="seg" id="kp-tf">
+          <button class="seg-btn on" data-tf="d">日线</button>
+          <button class="seg-btn" data-tf="h">小时线</button>
+        </div>
+        <span class="kp-info" id="kp-info"></span>
+        <button class="kp-close" id="kp-close" type="button" aria-label="收起">✕</button>
+      </div>
+      <div class="kp-chart" id="kp-chart"></div>
+      <div class="kp-foot">
+        <span class="kp-hint">滚轮缩放 · 按住拖动平移 · 悬停看 OHLC</span>
+        <span class="kp-ohlc" id="kp-ohlc"></span>
+      </div>
+    </div>
   </section>
 
   <!-- ═══════════ filters (custom dropdowns: native <select> popup
@@ -1527,6 +1584,311 @@ function priceSVG(v, W, H){
   </svg>`;
 }
 
+/* ============ K 线图 ============
+   卡片点开后展开的蜡烛图。支持日/时切换、滚轮缩放、拖动平移、悬停看 OHLC。
+
+   数据来自 fetch_pools.py 抓的 px.k.d（日线，最多 90 根）和 px.k.h
+   （小时线，720 根 = 30 天）。GeckoTerminal 的日线受池子年龄限制，
+   新池可能只有几十根。
+
+   为什么自己画不引库：整个站点是零依赖的静态页，引一个图表库要多几百 KB，
+   而且要处理主题变量。这里只需要蜡烛 + 均线，几十行够了。 */
+const KC = {
+  up:'var(--up)', down:'var(--down)',
+  grid:'var(--line)', axis:'var(--t3)',
+};
+
+/* 计算 K 线视图范围：view = {start, count}，start 是左端索引 */
+function kRange(total, view){
+  const n=Math.max(10, Math.min(view.count||60, total));
+  let s=Math.max(0, Math.min(view.start!=null?view.start:total-n, total-n));
+  return {start:s, count:n};
+}
+
+/* 把 K 线画成 SVG。W/H 是像素尺寸。 */
+function klineSVG(bars, W, H, view, opts){
+  const {start,count}=kRange(bars.length, view);
+  const slice=bars.slice(start, start+count);
+  if(!slice.length) return '';
+
+  const pad={t:10,r:56,b:22,l:8};
+  const w=W-pad.l-pad.r, h=H-pad.t-pad.b;
+
+  // 价格范围：留 6% 余量，别让最高最低贴着边
+  let hi=-Infinity, lo=Infinity;
+  for(const b of slice){ if(b.h>hi)hi=b.h; if(b.l<lo)lo=b.l; }
+  const padY=(hi-lo||hi*0.01)*0.06;
+  hi+=padY; lo-=padY;
+
+  const Y=p=>pad.t+h-(p-lo)/(hi-lo||1)*h;
+  const colW=w/slice.length;
+  const bodyW=Math.max(1, Math.min(colW*0.68, 14));
+
+  // 网格 + 右侧价格刻度
+  let grid='';
+  for(let i=0;i<=4;i++){
+    const p=lo+(hi-lo)*i/4;
+    const y=Y(p);
+    const lab=p>=1000?p.toFixed(0):p>=10?p.toFixed(2):p.toFixed(4);
+    grid+=`<line x1="${pad.l}" x2="${pad.l+w}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}"
+             stroke="${KC.grid}" stroke-dasharray="2 4"/>
+           <text x="${pad.l+w+6}" y="${(y+3.5).toFixed(1)}" fill="${KC.axis}"
+             font-size="9.5" font-family="IBM Plex Mono">${lab}</text>`;
+  }
+
+  // 蜡烛
+  let candles='';
+  slice.forEach((b,i)=>{
+    const cx=pad.l+colW*(i+0.5);
+    const up=b.c>=b.o;
+    const col=up?KC.up:KC.down;
+    const yo=Y(b.o), yc=Y(b.c);
+    const top=Math.min(yo,yc), bh=Math.max(1, Math.abs(yc-yo));
+    candles+=`<line x1="${cx.toFixed(1)}" x2="${cx.toFixed(1)}"
+                y1="${Y(b.h).toFixed(1)}" y2="${Y(b.l).toFixed(1)}"
+                stroke="${col}" stroke-width="1"/>`;
+    candles+=`<rect x="${(cx-bodyW/2).toFixed(1)}" y="${top.toFixed(1)}"
+                width="${bodyW.toFixed(1)}" height="${bh.toFixed(1)}"
+                fill="${col}" opacity="${up?0.85:0.85}"/>`;
+  });
+
+  // 均线（可选）：5 根均线，帮助看趋势
+  let ma='';
+  if(opts&&opts.ma&&slice.length>5){
+    const pts=[];
+    for(let i=0;i<slice.length;i++){
+      if(i<4) continue;
+      let sum=0;
+      for(let j=i-4;j<=i;j++) sum+=slice[j].c;
+      const cx=pad.l+colW*(i+0.5);
+      pts.push(`${cx.toFixed(1)} ${Y(sum/5).toFixed(1)}`);
+    }
+    if(pts.length>1){
+      ma=`<path d="M${pts.join(' L')}" fill="none" stroke="var(--accent)"
+            stroke-width="1.3" opacity="0.75" stroke-linejoin="round"/>`;
+    }
+  }
+
+  // 时间轴：只标首尾，中间太挤
+  const fmtTs=t=>{
+    const d=new Date(t*1000);
+    const mm=String(d.getMonth()+1).padStart(2,'0');
+    const dd=String(d.getDate()).padStart(2,'0');
+    const hh=String(d.getHours()).padStart(2,'0');
+    return opts&&opts.timeframe==='hour'?`${mm}-${dd} ${hh}:00`:`${mm}-${dd}`;
+  };
+  const firstTs=slice[0].t, lastTs=slice[slice.length-1].t;
+  const axis=`<text x="${pad.l}" y="${H-6}" fill="${KC.axis}" font-size="9"
+                font-family="IBM Plex Mono">${fmtTs(firstTs)}</text>
+              <text x="${pad.l+w}" y="${H-6}" fill="${KC.axis}" font-size="9"
+                text-anchor="end" font-family="IBM Plex Mono">${fmtTs(lastTs)}</text>`;
+
+  // 每根蜡烛的位置信息，交给外层做悬停提示
+  const meta=slice.map((b,i)=>({cx:pad.l+colW*(i+0.5), b}));
+
+  return {svg:`<svg class="kline" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"
+      data-colw="${colW}" data-padl="${pad.l}">
+    ${grid}${ma}${candles}${axis}
+  </svg>`, meta, slice, pad, colW, w};
+}
+
+/* ============ K 线面板控制器 ============
+   状态：打开的是哪个标的、哪个周期、看哪一段（start/count）。
+   点卡片 = 同时做两件事：展开它的 K 线 + 筛选下方池子。
+   再点同一张卡 = 收起 K 线并取消筛选。 */
+const KP_STATE={key:null, tf:'d', view:{start:null,count:60}, bars:[], meta:[]};
+
+function kpBarsOf(g, tf){
+  // 同一标的不同代币各自抓了 K 线，挑根数最多的那条（数据最全）
+  let best=[];
+  for(const p of g.pools){
+    const k=p.px&&p.px.k&&p.px.k[tf];
+    if(Array.isArray(k) && k.length>best.length) best=k;
+  }
+  return best;
+}
+
+function openKline(g, tf){
+  KP_STATE.key=g.key;
+  if(tf) KP_STATE.tf=tf;
+
+  const panel=$('#kp');
+  if(!panel) return;
+
+  const bars=kpBarsOf(g, KP_STATE.tf);
+  KP_STATE.bars=bars;
+
+  const px=g.px||{};
+  $('#kp-tk').textContent=g.key;
+  const last=px.last!=null?px.last:(bars.length?bars[bars.length-1].c:null);
+  $('#kp-px').textContent=last!=null?'$'+(last>=1000?last.toFixed(0):last.toFixed(2)):'–';
+
+  // 周期按钮状态 + 没数据时禁用
+  const hasD=kpBarsOf(g,'d').length>0;
+  const hasH=kpBarsOf(g,'h').length>0;
+  document.querySelectorAll('#kp-tf .seg-btn').forEach(b=>{
+    const on=b.dataset.tf===KP_STATE.tf;
+    b.classList.toggle('on',on);
+    const avail=b.dataset.tf==='d'?hasD:hasH;
+    b.disabled=!avail;
+    b.style.opacity=avail?'':'0.35';
+    b.style.cursor=avail?'':'not-allowed';
+  });
+
+  panel.hidden=false;
+  drawKline();
+}
+
+function closeKline(){
+  KP_STATE.key=null;
+  const panel=$('#kp');
+  if(panel) panel.hidden=true;
+}
+
+function drawKline(){
+  const chart=$('#kp-chart');
+  if(!chart) return;
+  const bars=KP_STATE.bars;
+
+  if(!bars.length){
+    chart.innerHTML='<div class="kp-empty">这个标的还没有 K 线数据（池子太新，或本轮未抓到）</div>';
+    $('#kp-info').textContent='';
+    $('#kp-ohlc').textContent='';
+    return;
+  }
+
+  // 用容器宽度画，保证满宽
+  const W=Math.max(320, chart.clientWidth-4);
+  const H=Math.max(220, Math.min(360, Math.round(W*0.34)));
+
+  const res=klineSVG(bars, W, H, KP_STATE.view, {timeframe:KP_STATE.tf, ma:true});
+  if(!res){ chart.innerHTML=''; return; }
+
+  chart.innerHTML=res.svg+'<div class="kp-cursor" id="kp-cursor"><div class="v"></div><div class="h-line"></div></div>';
+  KP_STATE.meta=res.meta;
+  KP_STATE.geom={pad:res.pad, colW:res.colW, w:res.w, W, H};
+
+  const r=kRange(bars.length, KP_STATE.view);
+  const period=KP_STATE.tf==='h'?'小时':'日';
+  $('#kp-info').textContent=`${bars.length} 根${period}线 · 显示 ${r.start+1}–${r.start+r.count}`;
+
+  wireKline(chart);
+}
+
+/* 悬停十字线 + OHLC 读数、滚轮缩放、拖动平移 */
+function wireKline(chart){
+  const svg=chart.querySelector('svg.kline');
+  if(!svg) return;
+  const cursor=chart.querySelector('#kp-cursor');
+  const g=KP_STATE.geom;
+  const bars=KP_STATE.bars;
+
+  const fmtT=t=>{
+    const d=new Date(t*1000);
+    const p=n=>String(n).padStart(2,'0');
+    return KP_STATE.tf==='hour'
+      ? `${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:00`
+      : `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
+  };
+  const fmtP=v=>v>=1000?v.toFixed(2):v>=1?v.toFixed(3):v.toFixed(5);
+
+  function showAt(idx){
+    const m=KP_STATE.meta[idx];
+    if(!m) return;
+    const b=m.b;
+    const up=b.c>=b.o;
+    const cls=up?'up':'down';
+    const chg=((b.c-b.o)/b.o*100);
+    $('#kp-ohlc').innerHTML=
+      `<span>${fmtT(b.t)}</span>`+
+      `<span>开<b>${fmtP(b.o)}</b></span>`+
+      `<span>高<b>${fmtP(b.h)}</b></span>`+
+      `<span>低<b>${fmtP(b.l)}</b></span>`+
+      `<span>收<b class="${cls}">${fmtP(b.c)}</b></span>`+
+      `<span>量<b>$${fmtUSD(b.v)}</b></span>`+
+      `<span>涨跌<b class="${cls}">${chg>=0?'+':''}${chg.toFixed(2)}%</b></span>`;
+
+    const rect=svg.getBoundingClientRect();
+    const chartRect=chart.getBoundingClientRect();
+    const x=m.cx, y=()=>{
+      // 用收盘价位置画横线
+      const r=kRange(bars.length,KP_STATE.view);
+      const slice=bars.slice(r.start,r.start+r.count);
+      let hi=-Infinity, lo=Infinity;
+      for(const q of slice){ if(q.h>hi)hi=q.h; if(q.l<lo)lo=q.l; }
+      const padY=(hi-lo||hi*0.01)*0.06; hi+=padY; lo-=padY;
+      const h=g.H-g.pad.t-g.pad.b;
+      return g.pad.t+h-(b.c-lo)/(hi-lo||1)*h;
+    };
+    if(cursor){
+      cursor.classList.add('on');
+      const vx=x+(rect.left-chartRect.left), vy=y()+(rect.top-chartRect.top);
+      cursor.querySelector('.v').style.left=vx+'px';
+      cursor.querySelector('.v').style.top=(rect.top-chartRect.top)+'px';
+      cursor.querySelector('.v').style.bottom='';
+      cursor.querySelector('.v').style.height=(g.H-g.pad.b)+'px';
+      cursor.querySelector('.h-line').style.left=0;
+      cursor.querySelector('.h-line').style.right=0;
+      cursor.querySelector('.h-line').style.top=vy+'px';
+    }
+  }
+
+  function hideCursor(){
+    if(cursor) cursor.classList.remove('on');
+  }
+
+  // 悬停：定位到最近的一根
+  chart.addEventListener('mousemove',e=>{
+    if(dragging) return;
+    const rect=svg.getBoundingClientRect();
+    const x=e.clientX-rect.left-g.pad.l;
+    const idx=Math.floor(x/g.colW);
+    if(idx<0||idx>=KP_STATE.meta.length){ hideCursor(); return; }
+    showAt(idx);
+  });
+  chart.addEventListener('mouseleave',hideCursor);
+
+  // 滚轮缩放：以鼠标位置为锚点
+  chart.addEventListener('wheel',e=>{
+    e.preventDefault();
+    const total=bars.length;
+    const cur=kRange(total,KP_STATE.view);
+    const rect=svg.getBoundingClientRect();
+    const x=e.clientX-rect.left-g.pad.l;
+    const frac=Math.max(0,Math.min(1,x/g.w));
+    const anchor=cur.start+frac*cur.count;
+
+    const factor=e.deltaY>0?1.25:0.8;
+    let count=Math.round(cur.count*factor);
+    count=Math.max(12, Math.min(total, count));
+    let start=Math.round(anchor-frac*count);
+    KP_STATE.view={start,count};
+    drawKline();
+  },{passive:false});
+
+  // 拖动平移
+  let dragging=false, dragStartX=0, dragStartView=null;
+  chart.addEventListener('mousedown',e=>{
+    dragging=true;
+    dragStartX=e.clientX;
+    dragStartView=kRange(bars.length,KP_STATE.view);
+    chart.style.cursor='grabbing';
+  });
+  window.addEventListener('mouseup',()=>{
+    if(dragging){
+      dragging=false;
+      chart.style.cursor='crosshair';
+    }
+  });
+  chart.addEventListener('mousemove',e=>{
+    if(!dragging) return;
+    const dx=e.clientX-dragStartX;
+    const shift=Math.round(-dx/g.colW);
+    KP_STATE.view={start:dragStartView.start+shift, count:dragStartView.count};
+    drawKline();
+  });
+}
+
 /* 卡片交互：点击筛选 / 悬停看图 */
 function wireStockCards(){
   const grid=$('#stks-grid');
@@ -1539,12 +1901,18 @@ function wireStockCards(){
     const g=byKey[key];
 
     card.addEventListener('click',()=>{
-      // 再点一次取消筛选
-      if(DDSTATE.stock && canon(DDSTATE.stock)===key){
+      const same = DDSTATE.stock && canon(DDSTATE.stock)===key;
+
+      if(same){
+        // 再点一次：收起 K 线 + 取消筛选
         DDSTATE.stock='';
+        closeKline();
       }else{
         // 选这个标的里的第一个代币代号（下拉框是按具体代号筛的）
         DDSTATE.stock=[...g.tokens][0];
+        // 重置视图并展开 K 线
+        KP_STATE.view={start:null,count:60};
+        openKline(g);
       }
       syncStockFilter();
       buildStockCards();
@@ -1649,6 +2017,34 @@ wireDD('dd-stock','stock',it=>{
 
 /* 本金档位初始化（放在最后，确保 DOM 与 render 都已就绪） */
 initCap();
+
+/* ============ K 线面板的全局接线 ============ */
+(function wireKlinePanel(){
+  // 周期切换
+  document.querySelectorAll('#kp-tf .seg-btn').forEach(b=>{
+    b.addEventListener('click',()=>{
+      if(!KP_STATE.key) return;
+      const g=stockGroups().find(x=>x.key===KP_STATE.key);
+      if(!g) return;
+      KP_STATE.view={start:null,count:60};   // 换周期时重置视图
+      openKline(g, b.dataset.tf);
+    });
+  });
+
+  // 收起
+  $('#kp-close')?.addEventListener('click',()=>{
+    closeKline();
+    // 收起 K 线不等同于取消筛选：保留标的筛选，只关面板
+  });
+
+  // 窗口尺寸变了要重画（SVG 是按像素宽度算的）
+  let rzTimer=null;
+  window.addEventListener('resize',()=>{
+    if(!KP_STATE.key) return;
+    clearTimeout(rzTimer);
+    rzTimer=setTimeout(()=>{ if(KP_STATE.key) drawKline(); },150);
+  });
+})();
 
 /* ============ 异动播报 ============ */
 const AL_TYPE={

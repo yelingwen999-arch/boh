@@ -1,60 +1,76 @@
 {
- "generatedAt": "2026-10-19T07:32:02+00:00",
+ "generatedAt": "2026-10-19T08:32:34+00:00",
  "baseline": true,
- "prevUpdated": "2026-10-19T01:26:03+00:00",
- "nowUpdated": "2026-10-19T15:31:51+08:00",
- "n": 4,
+ "prevUpdated": "2026-10-19T15:31:51+08:00",
+ "nowUpdated": "2026-10-19T16:31:21+08:00",
+ "n": 5,
  "alerts": [
+  {
+   "type": "share_risk",
+   "level": "warn",
+   "title": "占比过高 · NVDA/USDG · Robinhood · 0.3%",
+   "detail": "按本金 $10,000 算，占池子 9.1%（TVL $99.5K）— 你即市场",
+   "pool": "robinhood|0x18a5af4e442f8be68968cc1f00d537f8af2d12cd",
+   "prev": {
+    "share": 0
+   },
+   "now": {
+    "share": 9.13
+   }
+  },
+  {
+   "type": "share_risk",
+   "level": "warn",
+   "title": "占比过高 · AAPLB/USDT · BNB Chain · 0.01%",
+   "detail": "按本金 $10,000 算，占池子 11.1%（TVL $79.7K）— 你即市场",
+   "pool": "bsc|0x0905edec2928b701fb6c6354e4eee4960895a82f",
+   "prev": {
+    "share": 9.43
+   },
+   "now": {
+    "share": 11.15
+   }
+  },
   {
    "type": "volume_dry",
    "level": "warn",
-   "title": "量能萎缩 · QQQB/USDT · BNB Chain · 0.01%",
-   "detail": "7 日均量 / 30 日均量 = 38%（$1.84M / $4.85M）",
-   "pool": "bsc|0xe531fcb1f5a195de7608b9f4f9518544c2cdb693",
+   "title": "量能萎缩 · SPY/USDG · Robinhood · 0.01%",
+   "detail": "7 日均量 / 30 日均量 = 38%（$1.49M / $3.93M）",
+   "pool": "robinhood|0x38453c115607463ac284820ce959831042f3df4e",
    "prev": {
-    "ratio": 149.7
+    "ratio": 75.1
    },
    "now": {
     "ratio": 37.9
    }
   },
   {
-   "type": "new_pool",
+   "type": "apr_jump",
    "level": "info",
-   "title": "新池上线 · GLD/USDG · Robinhood · 0.05%",
-   "detail": "TVL $1.56M · APR30 24%",
-   "pool": "robinhood|0xba2f1ed4ceb2169d538d1e614d847e83c5a55913",
-   "prev": null,
+   "title": "APR 飙升 · QQQB/USDT · BNB Chain · 0.01%",
+   "detail": "55% → 283%（+416%） · TVL $328.2K",
+   "pool": "bsc|0xe531fcb1f5a195de7608b9f4f9518544c2cdb693",
+   "prev": {
+    "apr30": 54.70523613915796,
+    "tvl": 313366.0003
+   },
    "now": {
-    "tvl": 1561104.3818,
-    "apr30": 23.682360060720068
+    "apr30": 282.52100537605185,
+    "tvl": 328167.7329
    }
   },
   {
    "type": "top_rank",
    "level": "info",
-   "title": "新进 APR 前 5 · NVDAB/USDT · BNB Chain · 0.05%",
-   "detail": "上次第 6 名 → 当前第 5 名 · APR30 89%",
-   "pool": "bsc|0xdd9d5164ccbc57be377a964fc064135b03d06177",
+   "title": "新进 APR 前 5 · QQQB/USDT · BNB Chain · 0.01%",
+   "detail": "上次第 9 名 → 当前第 2 名 · APR30 283%",
+   "pool": "bsc|0xe531fcb1f5a195de7608b9f4f9518544c2cdb693",
    "prev": {
-    "rank": 6
+    "rank": 9
    },
    "now": {
-    "rank": 5,
-    "apr30": 88.87629698997642
-   }
-  },
-  {
-   "type": "tvl_swing",
-   "level": "info",
-   "title": "TVL 暴涨 · AAPLB/USDT · BNB Chain · 0.01%",
-   "detail": "$60.2K → $96.1K（+60%）",
-   "pool": "bsc|0x0905edec2928b701fb6c6354e4eee4960895a82f",
-   "prev": {
-    "tvl": 60176.9087
-   },
-   "now": {
-    "tvl": 96089.6999
+    "rank": 2,
+    "apr30": 282.52100537605185
    }
   }
  ]
