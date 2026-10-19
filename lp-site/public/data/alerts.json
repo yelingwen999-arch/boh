@@ -1,8 +1,105 @@
 {
- "generatedAt": "2026-10-19T11:32:37+00:00",
+ "generatedAt": "2026-10-19T15:55:49+00:00",
  "baseline": true,
  "prevUpdated": "2026-10-19T19:30:44+08:00",
- "nowUpdated": "2026-10-19T19:30:44+08:00",
- "n": 0,
- "alerts": []
+ "nowUpdated": "2026-10-19T15:55:49+00:00",
+ "n": 7,
+ "alerts": [
+  {
+   "type": "share_risk",
+   "level": "warn",
+   "title": "占比过高 · AAPL/USDT · BNB Chain · 0.01%",
+   "detail": "按本金 $10,000 算，占池子 15.3%（TVL $55.3K）— 你即市场",
+   "pool": "bsc|0x0905edec2928b701fb6c6354e4eee4960895a82f",
+   "prev": {
+    "share": 13.49
+   },
+   "now": {
+    "share": 15.32
+   }
+  },
+  {
+   "type": "tvl_swing",
+   "level": "warn",
+   "title": "TVL 骤降 · MSTR/USDC · Base · 0.05%",
+   "detail": "$1.79M → $1.09M（-39%）",
+   "pool": "base|0x8b27f626ab668197000bc722a1012022caed10e2",
+   "prev": {
+    "tvl": 1792174.7289
+   },
+   "now": {
+    "tvl": 1089711.5962
+   }
+  },
+  {
+   "type": "apr_jump",
+   "level": "info",
+   "title": "APR 飙升 · MSTR/USDC · Base · 0.05%",
+   "detail": "79% → 131%（+67%） · TVL $1.09M",
+   "pool": "base|0x8b27f626ab668197000bc722a1012022caed10e2",
+   "prev": {
+    "apr30": 78.73916457608624,
+    "tvl": 1792174.7289
+   },
+   "now": {
+    "apr30": 131.2854714036032,
+    "tvl": 1089711.5962
+   }
+  },
+  {
+   "type": "top_rank",
+   "level": "info",
+   "title": "新进 APR 前 5 · TSLA/USDC · Base · 0.13%",
+   "detail": "上次第 8 名 → 当前第 3 名 · APR30 267%",
+   "pool": "base|0x469337fdcc5e8f38e2e4b670b04f57865d13a7bb",
+   "prev": {
+    "rank": 8
+   },
+   "now": {
+    "rank": 3,
+    "apr30": 266.6716852657173
+   }
+  },
+  {
+   "type": "top_rank",
+   "level": "info",
+   "title": "新进 APR 前 5 · AAPL/USDT · BNB Chain · 0.01%",
+   "detail": "上次第 9 名 → 当前第 4 名 · APR30 263%",
+   "pool": "bsc|0x0905edec2928b701fb6c6354e4eee4960895a82f",
+   "prev": {
+    "rank": 9
+   },
+   "now": {
+    "rank": 4,
+    "apr30": 263.23311743549726
+   }
+  },
+  {
+   "type": "top_rank",
+   "level": "info",
+   "title": "新进 APR 前 5 · SPCX/WBNB · BNB Chain · 0.25%",
+   "detail": "上次第 10 名 → 当前第 5 名 · APR30 189%",
+   "pool": "bsc|0x66faad27cf481f82d0089ec8156b3aa3636010c7",
+   "prev": {
+    "rank": 10
+   },
+   "now": {
+    "rank": 5,
+    "apr30": 189.0358541538374
+   }
+  },
+  {
+   "type": "tvl_swing",
+   "level": "info",
+   "title": "TVL 暴涨 · SPCX/USDC · Base · ?",
+   "detail": "$512.5K → $738.2K（+44%）",
+   "pool": "base|0x0bf58fe0fac935ac69595c19b12ba0d75e3f8c0e",
+   "prev": {
+    "tvl": 512540.4352
+   },
+   "now": {
+    "tvl": 738195.0737
+   }
+  }
+ ]
 }
