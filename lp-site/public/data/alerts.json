@@ -1,47 +1,21 @@
 {
- "generatedAt": "2026-10-18T23:18:24+00:00",
+ "generatedAt": "2026-10-19T01:26:03+00:00",
  "baseline": true,
- "prevUpdated": "2026-10-18T20:51:35+00:00",
- "nowUpdated": "2026-10-18T23:18:24+00:00",
- "n": 3,
+ "prevUpdated": "2026-10-18T23:18:24+00:00",
+ "nowUpdated": "2026-10-19T01:26:03+00:00",
+ "n": 1,
  "alerts": [
   {
    "type": "share_risk",
    "level": "warn",
-   "title": "占比过高 · NVDA/USDG · Robinhood · 0.3%",
-   "detail": "按本金 $10,000 算，占池子 8.8%（TVL $103.2K）— 你即市场",
-   "pool": "robinhood|0x18a5af4e442f8be68968cc1f00d537f8af2d12cd",
+   "title": "占比过高 · AAPLB/USDT · BNB Chain · 0.01%",
+   "detail": "按本金 $10,000 算，占池子 14.2%（TVL $60.2K）— 你即市场",
+   "pool": "bsc|0x0905edec2928b701fb6c6354e4eee4960895a82f",
    "prev": {
-    "share": 7.55
+    "share": 11.4
    },
    "now": {
-    "share": 8.83
-   }
-  },
-  {
-   "type": "new_pool",
-   "level": "info",
-   "title": "新池上线 · CRCL/USDG · Robinhood · 0.3%",
-   "detail": "TVL $2.52M · APR30 70%",
-   "pool": "robinhood|0x654e4143e82a5824445ade0824351c2a9acd95a8",
-   "prev": null,
-   "now": {
-    "tvl": 2519078.2252,
-    "apr30": 70.43789667799538
-   }
-  },
-  {
-   "type": "top_rank",
-   "level": "info",
-   "title": "新进 APR 前 5 · TSLAB/USDT · BNB Chain · 0.05%",
-   "detail": "上次第 6 名 → 当前第 5 名 · APR30 95%",
-   "pool": "bsc|0x53c6291d0a5a02c76cedfa1b8f57a8ac3762f7a9",
-   "prev": {
-    "rank": 6
-   },
-   "now": {
-    "rank": 5,
-    "apr30": 94.8446757438104
+    "share": 14.25
    }
   }
  ]
