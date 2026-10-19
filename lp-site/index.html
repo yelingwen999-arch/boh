@@ -437,6 +437,12 @@ tr.sparkrow:hover{background:var(--bg-raised)}
   background:var(--badge-warn-bg);color:var(--warn);
 }
 .al-time{font:400 11px 'IBM Plex Mono';color:var(--t3)}
+/* 折叠时的一行摘要：最严重那条的标题，超出省略 */
+.al-summary{
+  font:400 11.5px 'Inter';color:var(--t2);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  max-width:520px;min-width:0;
+}
 .al-toggle{
   margin-left:auto;background:none;border:none;color:var(--t3);cursor:pointer;
   font:500 11px 'Inter';padding:3px 6px;border-radius:5px;
@@ -544,13 +550,12 @@ tr.sparkrow:hover{background:var(--bg-raised)}
     <span class="fl" style="margin-left:auto;color:var(--t3)">点击表头排序 · 点击行展开 30 天量能</span>
   </div>
   <div class="criteria" id="criteria">
-    <b>「筛选后」的五个条件是</b>
+    <b>「筛选后」的四个条件是</b>
     <span class="cr">占比 ≤ 5%<i>你不是市场本身</i></span>
     <span class="cr">7d 日均量 ≥ 30d × 0.6<i>量能没有萎缩</i></span>
-    <span class="cr">APR 30d ≥ 50%<i>高于迁移阈值</i></span>
     <span class="cr">TVL ≥ $50K<i>排除微型陷阱池</i></span>
     <span class="cr">换手 ≤ 30× 且 ≥10 天数据<i>数据可信</i></span>
-    <span class="cr-note">这是筛选条件，不是推荐</span>
+    <span class="cr-note">收益高低不设门槛，交给排序 · 这是筛选条件，不是推荐</span>
   </div>
 
   <!-- ═══════════ 异动播报（由 detect.py 生成 alerts.json） ═══════════ -->
@@ -558,6 +563,7 @@ tr.sparkrow:hover{background:var(--bg-raised)}
     <div class="al-head">
       <span class="al-title">本轮异动</span>
       <span class="al-count" id="al-count"></span>
+      <span class="al-summary" id="al-summary" hidden></span>
       <span class="al-time" id="al-time"></span>
       <button class="al-toggle" id="al-toggle" type="button" aria-expanded="true">收起</button>
     </div>
@@ -997,7 +1003,8 @@ function statusPills(p){
   if(drop!=null && drop<=PX_WARN){
     pills.push(`<span class="pill p-down" title="标的 7 日 ${drop.toFixed(1)}%，手续费收入很可能盖不住本金缩水">标的跌${Math.abs(drop).toFixed(0)}%</span>`);
   }
-  if(p.apr30<50)pills.push('<span class="pill p-mut">APR<50%</span>');
+  // APR 偏低只是提示，不再是筛选门槛。给个中性措辞，别像警告。
+  if(p.apr30<50)pills.push('<span class="pill p-mut" title="APR 30d 低于 50%，手续费收入相对有限">APR 偏低</span>');
   if(!pills.length)pills.push('<span class="pill p-ok">健康</span>');
   return pills;
 }
@@ -1157,14 +1164,15 @@ function render(){
     return;
   }
   if(VIEW==='rank'){
-    // 筛选后：按五项客观条件过滤
-    //   占比≤5% · 量能不萎缩 · APR≥50% · TVL≥$50K · 数据可信
-    // 最后一条是关键：数据存疑的池（换手异常/样本不足）即使 APR 再高也进不来。
+    // 筛选后：按四项条件过滤 —— 只筛「能不能投」，不筛「值不值得投」
+    //   占比≤5% · 量能不萎缩 · TVL≥$50K · 数据可信
+    // 不设 APR 门槛：收益高低是排序的事，不是准入门槛。
+    // 一个 APR 30% 但标的在涨、量大的池子，比 APR 150% 但标的在崩的池更值得看。
+    // 数据存疑的池（换手异常/样本不足）即使 APR 再高也进不来。
     // 这只是筛选条件，不构成推荐 —— 见 /about.html
     const sig=rows.filter(p=>
       p.share_pct<=5 &&            // you're not the market
       p.v7>=p.v30*0.6 &&           // volume not shrinking
-      p.apr30>=50 &&               // above migration threshold
       p.tvl>=50000 &&              // not a micro-trap
       p._health==='ok'             // 数据可信度过关
     );
@@ -1208,7 +1216,7 @@ function render(){
       sig.forEach((p,i)=>renderRow(p,i+1));
     }else{
       tb.insertAdjacentHTML('beforeend',`<tr><td colspan="14" style="padding:36px;text-align:center;color:var(--t3)">
-        当前没有同时满足五项筛选条件的池(占比≤5% · 量能不萎缩 · APR≥50% · TVL≥$50K · 数据可信)</td></tr>`);
+        当前没有同时满足四项筛选条件的池(占比≤5% · 量能不萎缩 · TVL≥$50K · 数据可信)</td></tr>`);
     }
     if(flagged.length){
       tb.insertAdjacentHTML('beforeend',`<tr><td colspan="14" style="padding:8px 10px;background:var(--bg-raised)">
@@ -1557,7 +1565,15 @@ const AL_TYPE={
   apr_jump:'APR 飙升', new_pool:'新池上线', top_rank:'进前五',
   tvl_swing:'TVL 变化', volume_dry:'量能萎缩', share_risk:'占比过高',
 };
-let AL_COLLAPSED=false;
+// 默认折叠：异动列表占地方，一般只想看个条数，需要时再点开。
+// 记住用户的选择，展开过就一直是展开的。
+const AL_KEY='lp-alerts-open';
+let AL_COLLAPSED;
+try{
+  AL_COLLAPSED = localStorage.getItem(AL_KEY)!=='1';
+}catch(e){
+  AL_COLLAPSED = true;
+}
 
 function renderAlerts(d){
   const box=$('#alerts'), list=$('#al-list');
@@ -1596,17 +1612,35 @@ function renderAlerts(d){
     </li>`;
   }).join('');
 
-  list.style.display=AL_COLLAPSED?'none':'';
-  $('#al-toggle').textContent=AL_COLLAPSED?'展开':'收起';
-  $('#al-toggle').setAttribute('aria-expanded',String(!AL_COLLAPSED));
+  applyAlertCollapsed();
+}
+
+/* 折叠状态统一在这里应用与保存，避免两处逻辑各写一遍走岔 */
+function applyAlertCollapsed(){
+  const list=$('#al-list');
+  const btn=$('#al-toggle');
+  const sum=$('#al-summary');
+  if(list) list.style.display=AL_COLLAPSED?'none':'';
+  if(btn){
+    btn.textContent=AL_COLLAPSED?'展开':'收起';
+    btn.setAttribute('aria-expanded',String(!AL_COLLAPSED));
+  }
+  // 折叠时才显示摘要，展开时列表本身就能看
+  if(sum){
+    if(AL_COLLAPSED){
+      const first=list&&list.querySelector('li .al-t');
+      sum.textContent=first?first.textContent:'';
+      sum.hidden=!first;
+    }else{
+      sum.hidden=true;
+    }
+  }
+  try{ localStorage.setItem(AL_KEY,AL_COLLAPSED?'0':'1'); }catch(e){}
 }
 
 $('#al-toggle')?.addEventListener('click',()=>{
   AL_COLLAPSED=!AL_COLLAPSED;
-  const list=$('#al-list');
-  list.style.display=AL_COLLAPSED?'none':'';
-  $('#al-toggle').textContent=AL_COLLAPSED?'展开':'收起';
-  $('#al-toggle').setAttribute('aria-expanded',String(!AL_COLLAPSED));
+  applyAlertCollapsed();
 });
 
 async function loadAlerts(){
