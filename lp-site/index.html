@@ -422,6 +422,11 @@ tr.sparkrow:hover{background:var(--bg-raised)}
 .kp-close:hover{background:var(--hover);color:var(--t1)}
 
 .kp-chart{position:relative;padding:6px 2px 0;cursor:crosshair;user-select:none}
+/* 右侧价格刻度区：表示这里能拖纵轴 */
+.kp-axis-zone{
+  position:absolute;top:6px;right:2px;width:56px;bottom:26px;
+  cursor:ns-resize;z-index:1;
+}
 .kp-chart svg.kline{display:block}
 /* 十字线 */
 .kp-cursor{position:absolute;pointer-events:none;opacity:0;transition:opacity .08s}
@@ -583,7 +588,7 @@ tr.sparkrow:hover{background:var(--bg-raised)}
       </div>
       <div class="kp-chart" id="kp-chart"></div>
       <div class="kp-foot">
-        <span class="kp-hint">滚轮缩放 · 按住拖动平移 · 悬停看 OHLC</span>
+        <span class="kp-hint">主体：滚轮缩放 / 拖动平移横轴 · 右侧价格区：滚轮缩放 / 拖动平移纵轴，双击重置</span>
         <span class="kp-ohlc" id="kp-ohlc"></span>
       </div>
     </div>
@@ -1615,11 +1620,31 @@ function klineSVG(bars, W, H, view, opts){
   const pad={t:10,r:56,b:26,l:8};
   const w=W-pad.l-pad.r, h=H-pad.t-pad.b;
 
-  // 价格范围：留 6% 余量，别让最高最低贴着边
+  // 价格范围：默认按可见区间的最高最低自动算，留 6% 余量。
+  // 手动缩放/平移过（view.yZoom / view.yPan）就用用户的值——允许蜡烛被裁掉，
+  // 这正是缩放的意义（放大看细节时本来就该有柱体出画）。
+  // 只做一个兜底：别让整屏一根蜡烛都看不到。
   let hi=-Infinity, lo=Infinity;
   for(const b of slice){ if(b.h>hi)hi=b.h; if(b.l<lo)lo=b.l; }
+  const autoHi=hi, autoLo=lo;
   const padY=(hi-lo||hi*0.01)*0.06;
   hi+=padY; lo-=padY;
+
+  const yz=view&&view.yZoom, ypRaw=view&&view.yPan;
+  const yp=Number.isFinite(ypRaw)?ypRaw:0;
+  if(yz && Number.isFinite(yz) && yz>0){
+    const mid=(hi+lo)/2;
+    const half=(hi-lo)/2/yz;
+    hi=mid+half; lo=mid-half;
+    const shift=(hi-lo)*yp;
+    hi+=shift; lo+=shift;
+
+    // 兜底：整个可见区间都落在数据范围之外时才拉回来
+    if(hi<autoLo || lo>autoHi){
+      const mid2=(autoHi+autoLo)/2, half2=(autoHi-autoLo)/2||1;
+      hi=mid2+half2; lo=mid2-half2;
+    }
+  }
 
   const Y=p=>pad.t+h-(p-lo)/(hi-lo||1)*h;
   const colW=w/slice.length;
@@ -1731,7 +1756,7 @@ function klineSVG(bars, W, H, view, opts){
   return {svg:`<svg class="kline" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"
       data-colw="${colW}" data-padl="${pad.l}">
     ${grid}${ma}${candles}${axis}
-  </svg>`, meta, slice, pad, colW, w};
+  </svg>`, meta, slice, pad, colW, w, hi, lo, h};
 }
 
 /* ============ K 线面板控制器 ============
@@ -1810,9 +1835,12 @@ function drawKline(){
   const res=klineSVG(bars, W, H, KP_STATE.view, {timeframe:KP_STATE.tf, ma:true});
   if(!res){ chart.innerHTML=''; return; }
 
-  chart.innerHTML=res.svg+'<div class="kp-cursor" id="kp-cursor"><div class="v"></div><div class="h-line"></div></div>';
+  chart.innerHTML=res.svg
+    +'<div class="kp-cursor" id="kp-cursor"><div class="v"></div><div class="h-line"></div></div>'
+    // 价格刻度区的透明覆盖层，给纵轴操作一个明确的可点击区域
+    +'<div class="kp-axis-zone" id="kp-axis-zone" title="滚轮缩放纵轴 · 上下拖动平移 · 双击重置"></div>';
   KP_STATE.meta=res.meta;
-  KP_STATE.geom={pad:res.pad, colW:res.colW, w:res.w, W, H};
+  KP_STATE.geom={pad:res.pad, colW:res.colW, w:res.w, W, H, hi:res.hi, lo:res.lo, h:res.h};
 
   const r=kRange(bars.length, KP_STATE.view);
   const period=KP_STATE.tf==='h'?'小时':'日';
@@ -1851,7 +1879,9 @@ function wireKline(chart){
   const fmtP=v=>v>=1000?v.toFixed(2):v>=1?v.toFixed(3):v.toFixed(5);
 
   // 拖动状态要提前声明：下面的悬停监听里会读它（TDZ 会直接抛错）
-  let dragging=false, dragStartX=0, dragStartView=null;
+  // dragAxis: 'x' 拖横轴 / 'y' 拖纵轴
+  let dragging=false, dragStartX=0, dragStartY=0, dragStartView=null;
+  let dragStartYPan=0, dragAxis=null;
 
   function showAt(idx){
     const m=KP_STATE.meta[idx];
@@ -1920,9 +1950,31 @@ function wireKline(chart){
     });
   }
 
-  // 滚轮缩放：以鼠标位置为锚点
+  /* 判断鼠标在哪个区：
+       价格刻度区（右侧 56px）= 纵轴操作
+       图表主体 = 横轴操作
+     这是交易软件的习惯，不用额外按钮。
+     覆盖层也在 svg 范围内，所以统一按 svg 坐标算，不区分事件源。 */
+  const inPriceAxis = e=>{
+    const rect=svg.getBoundingClientRect();
+    return (e.clientX-rect.left) > g.pad.l+g.w;
+  };
+
+  // 滚轮：在图表上缩放横轴，在价格刻度上缩放纵轴
   chart.addEventListener('wheel',e=>{
     e.preventDefault();
+
+    if(inPriceAxis(e)){
+      // ---- 纵轴缩放 ----
+      const cur=KP_STATE.view.yZoom||1;
+      const next=Math.max(0.15, Math.min(8, cur*(e.deltaY>0?0.88:1.14)));
+      KP_STATE.view={...KP_STATE.view, yZoom:next};
+      if(Math.abs(next-1)<0.02) delete KP_STATE.view.yZoom;
+      scheduleDraw();
+      return;
+    }
+
+    // ---- 横轴缩放：以鼠标位置为锚点 ----
     const total=bars.length;
     const cur=kRange(total,KP_STATE.view);
     const rect=svg.getBoundingClientRect();
@@ -1934,17 +1986,20 @@ function wireKline(chart){
     let count=Math.round(cur.count*factor);
     count=Math.max(12, Math.min(total, count));
     let start=Math.round(anchor-frac*count);
-    KP_STATE.view={start,count};
+    KP_STATE.view={...KP_STATE.view, start, count};
     scheduleDraw();
   },{passive:false,signal});
 
-  // 拖动平移（dragging 等变量已在函数开头声明）
+  // 拖动：主体拖横轴，价格刻度区拖纵轴
   chart.addEventListener('mousedown',e=>{
     if(e.button!==0) return;
     dragging=true;
     dragStartX=e.clientX;
+    dragStartY=e.clientY;
     dragStartView=kRange(bars.length,KP_STATE.view);
-    chart.style.cursor='grabbing';
+    dragStartYPan=KP_STATE.view.yPan||0;
+    dragAxis=inPriceAxis(e)?'y':'x';
+    chart.style.cursor=dragAxis==='y'?'ns-resize':'grabbing';
     hideCursor();
   },{signal});
   // 挂在 window 上是为了鼠标拖出图表外再松手也能正确结束；
@@ -1952,15 +2007,39 @@ function wireKline(chart){
   window.addEventListener('mouseup',()=>{
     if(dragging){
       dragging=false;
+      dragAxis=null;
       chart.style.cursor='crosshair';
     }
   },{signal});
   chart.addEventListener('mousemove',e=>{
     if(!dragging) return;
-    const dx=e.clientX-dragStartX;
-    const shift=Math.round(-dx/g.colW);
-    KP_STATE.view={start:dragStartView.start+shift, count:dragStartView.count};
+    if(dragAxis==='y'){
+      // 纵轴平移：往上拖 = 看更低的价格区间
+      const dy=e.clientY-dragStartY;
+      const hh=g.h||1;
+      KP_STATE.view={...KP_STATE.view, yPan:dragStartYPan+dy/hh};
+    }else{
+      const dx=e.clientX-dragStartX;
+      const shift=Math.round(-dx/g.colW);
+      KP_STATE.view={...KP_STATE.view, start:dragStartView.start+shift, count:dragStartView.count};
+    }
     scheduleDraw();
+  },{signal});
+
+  // 双击价格刻度 = 重置纵轴（回到自动适配）
+  chart.addEventListener('dblclick',e=>{
+    if(!inPriceAxis(e)) return;
+    e.preventDefault();
+    const v={...KP_STATE.view};
+    delete v.yZoom; delete v.yPan;
+    KP_STATE.view=v;
+    drawKline();
+  },{signal});
+
+  // 悬停时给出光标提示，让人知道这儿能操作纵轴
+  chart.addEventListener('mousemove',e=>{
+    if(dragging) return;
+    chart.style.cursor=inPriceAxis(e)?'ns-resize':'crosshair';
   },{signal});
 }
 
@@ -1986,6 +2065,7 @@ function wireStockCards(){
         // 选这个标的里的第一个代币代号（下拉框是按具体代号筛的）
         DDSTATE.stock=[...g.tokens][0];
         // 重置视图并展开 K 线
+        // 重置视图（含纵轴），换标的时不该沿用上一个的缩放
         KP_STATE.view={start:null,count:60};
         openKline(g);
       }
@@ -2101,7 +2181,7 @@ initCap();
       if(!KP_STATE.key) return;
       const g=stockGroups().find(x=>x.key===KP_STATE.key);
       if(!g) return;
-      KP_STATE.view={start:null,count:60};   // 换周期时重置视图
+      KP_STATE.view={start:null,count:60};   // 换周期时重置视图（含纵轴）
       openKline(g, b.dataset.tf);
     });
   });
