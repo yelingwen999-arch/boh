@@ -352,6 +352,70 @@ tr.sparkrow:hover{background:var(--bg-raised)}
 .empty .small{font-size:12px;line-height:2}
 .empty code{font:500 11.5px 'IBM Plex Mono';color:var(--accent)}
 
+/* ============ 标的概览网格 ============ */
+.stks{padding:16px 36px 4px;border-bottom:1px solid var(--line)}
+.stks-head{display:flex;align-items:baseline;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.stks-title{font:600 12px 'Inter';letter-spacing:.6px;color:var(--t1)}
+.stks-sub{font:400 11px 'Inter';color:var(--t3)}
+.stks-clear{
+  margin-left:auto;background:none;border:1px solid var(--line-strong);
+  color:var(--t2);cursor:pointer;font:500 11px 'Inter';
+  padding:3px 9px;border-radius:6px;transition:background .12s,color .12s;
+}
+.stks-clear:hover{background:var(--hover);color:var(--t1)}
+
+/* 自动网格：屏越宽放越多，卡片不拉伸变丑 */
+.stks-grid{
+  display:grid;gap:8px;padding-bottom:14px;
+  grid-template-columns:repeat(auto-fill,minmax(132px,1fr));
+}
+
+.stk-card{
+  position:relative;text-align:left;cursor:pointer;
+  background:var(--bg-raised);border:1px solid var(--line);
+  border-radius:9px;padding:9px 10px 8px;
+  transition:border-color .12s,background .12s,transform .12s;
+  color:inherit;font:inherit;
+}
+.stk-card:hover{border-color:var(--line-strong);background:var(--hover)}
+.stk-card.on{border-color:var(--accent);background:var(--hover)}
+/* 选中时左上角点一下，跟下拉框的选中态呼应 */
+.stk-card.on::after{
+  content:'';position:absolute;top:7px;right:8px;
+  width:6px;height:6px;border-radius:50%;background:var(--accent);
+}
+
+.stk-top{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.stk-tk{font:600 12.5px 'IBM Plex Mono';letter-spacing:-.2px;color:var(--t1)}
+.stk-chg{font:600 12px 'IBM Plex Mono';margin-left:auto}
+.stk-chg.up{color:var(--up)}
+.stk-chg.down{color:var(--down)}
+.stk-chg.flat{color:var(--t3)}
+.stk-meta{font:400 10.5px 'Inter';color:var(--t3);display:flex;gap:6px;align-items:center}
+
+/* 悬停展开的走势浮层 */
+.stk-pop{
+  position:fixed;z-index:60;pointer-events:none;
+  background:var(--bg-pop);border:1px solid var(--line-strong);
+  border-radius:10px;padding:12px 14px;
+  box-shadow:0 18px 44px -14px rgba(0,0,0,.55);
+  opacity:0;transform:translateY(4px);
+  transition:opacity .13s,transform .13s;
+}
+.stk-pop.on{opacity:1;transform:translateY(0)}
+.stk-pop .pop-hd{
+  display:flex;align-items:baseline;gap:8px;margin-bottom:8px;
+}
+.stk-pop .pop-tk{font:600 13px 'IBM Plex Mono';color:var(--t1)}
+.stk-pop .pop-px{font:500 11px 'IBM Plex Mono';color:var(--t2);margin-left:auto}
+.stk-pop .pop-chg{display:flex;gap:14px;margin-top:9px;font:500 10.5px 'IBM Plex Mono'}
+.stk-pop .pop-chg span{color:var(--t3)}
+.stk-pop .pop-chg b{font-weight:600;margin-left:3px}
+.stk-pop .pop-chg b.up{color:var(--up)}
+.stk-pop .pop-chg b.down{color:var(--down)}
+.stk-pop .pop-chg b.flat{color:var(--t2)}
+.stk-pop svg{display:block}
+
 /* 筛选条件说明条 */
 .criteria{
   display:flex;gap:20px;align-items:baseline;flex-wrap:wrap;
@@ -439,6 +503,16 @@ tr.sparkrow:hover{background:var(--bg-raised)}
       <div class="st"><div class="l">净收益提示</div><div class="v" style="font-size:13px">≈ 表值 ÷ 2–3<small>LVR/IL 折扣</small></div></div>
     </div>
   </div>
+
+  <!-- ═══════════ 标的概览：先选标的，再看池子 ═══════════ -->
+  <section class="stks" id="stks" hidden>
+    <div class="stks-head">
+      <span class="stks-title">标的</span>
+      <span class="stks-sub">点击筛选下方池子 · 悬停看 30 天走势</span>
+      <button class="stks-clear" id="stks-clear" type="button" hidden>清除筛选</button>
+    </div>
+    <div class="stks-grid" id="stks-grid"></div>
+  </section>
 
   <!-- ═══════════ filters (custom dropdowns: native <select> popup
        mispositions on Windows within backdrop-filter layers) ═══════════ -->
@@ -771,6 +845,8 @@ async function load(){
       $('#k-vol').textContent='$'+fmtUSD(POOLS.reduce((s,p)=>s+p.vol24,0));
       updateBest();
       buildStockMenu();
+      buildStockCards();
+      wireStockCards();
       render();
     }else{showEmpty('暂无数据','数据文件为空，等待下一次抓取。');}
   }catch(e){
@@ -1205,6 +1281,220 @@ document.querySelectorAll('thead th[data-k]').forEach(th=>{
 });
 /* custom dropdown state + wiring */
 const DDSTATE={net:'',stock:''};
+
+/* ============ 标的概览网格 ============
+   做 LP 的顺序其实是「先看这个标的在不在涨，再看哪个池子给的钱多」。
+   所以把标的单独抽成一组卡片放在视图切换上方：
+     - 每张卡只放股价信息（7 日涨跌 + 现价 + 池子数），不掺 APR
+     - 悬停出大图看 30 天走势
+     - 点一下就把下方表格过滤到这个标的
+   同一只股票可能有多个代币（NVDA / NVDAB / NVDAc），按 canon 合并。 */
+let STK_POPERS=[];
+
+function stockGroups(){
+  // canon(ticker) -> {tokens:Set, pools:[], px}
+  const g={};
+  POOLS.forEach(p=>{
+    const c=canon(p.stock);
+    if(!g[c]) g[c]={key:c, tokens:new Set(), pools:[], px:null};
+    g[c].tokens.add(p.stock);
+    g[c].pools.push(p);
+    // 同一标的的不同代币价格应该一致，但数据完整度不同：
+    // 新池可能只有 3-6 个点，导致 7 日涨跌为空。
+    // 所以选「走势点数最多」的那个，而不是第一个遇到的。
+    const px=p.px;
+    if(px && (px.chg7d!=null || px.chg1d!=null)){
+      const cur=g[c].px;
+      const n=(px.series||[]).length;
+      const curN=cur?((cur.series||[]).length):-1;
+      if(n>curN) g[c].px=px;
+    }
+  });
+  return Object.values(g).sort((a,b)=>{
+    // 跌得多的排前面——先看风险
+    const av=a.px?((a.px.chg7d!=null)?a.px.chg7d:(a.px.chg1d??0)):0;
+    const bv=b.px?((b.px.chg7d!=null)?b.px.chg7d:(b.px.chg1d??0)):0;
+    return av-bv;
+  });
+}
+
+function buildStockCards(){
+  const box=$('#stks');
+  const grid=$('#stks-grid');
+  if(!box||!grid)return;
+  const groups=stockGroups();
+  if(!groups.length){ box.hidden=true; return; }
+  box.hidden=false;
+
+  grid.innerHTML=groups.map(g=>{
+    const px=g.px||{};
+    const chg=(px.chg7d!=null)?px.chg7d:(px.chg1d!=null?px.chg1d:null);
+    const cls=chg==null?'flat':chg>0?'up':chg<0?'down':'flat';
+    const arrow=chg==null?'':chg>0?'▲':chg<0?'▼':'—';
+    const chgTxt=chg==null?'–':`${arrow}${Math.abs(chg).toFixed(1)}%`;
+    const pxTxt=px.last!=null?'$'+(px.last>=1000?px.last.toFixed(0):px.last.toFixed(2)):'–';
+    const on=DDSTATE.stock && canon(DDSTATE.stock)===g.key;
+    return `<button class="stk-card${on?' on':''}" type="button"
+        data-stk="${esc(g.key)}"
+        aria-pressed="${on?'true':'false'}">
+      <div class="stk-top">
+        <span class="stk-tk">${esc(g.key)}</span>
+        <span class="stk-chg ${cls}">${chgTxt}</span>
+      </div>
+      <div class="stk-meta">
+        <span>${pxTxt}</span>
+        <span>·</span>
+        <span>${g.pools.length} 池</span>
+      </div>
+    </button>`;
+  }).join('');
+}
+
+/* 悬停浮层：30 天价格曲线（比列表里那个 44×15 的细线能看出东西） */
+function buildStockPop(){
+  let pop=$('#stk-pop');
+  if(!pop){
+    pop=document.createElement('div');
+    pop.id='stk-pop';
+    pop.className='stk-pop';
+    document.body.appendChild(pop);
+  }
+  return pop;
+}
+
+function showStockPop(card, g){
+  const pop=buildStockPop();
+  const px=g.px||{};
+  const series=px.series||[];
+  const chg=(k)=>(px[k]==null?'–':(px[k]>0?'+':'')+px[k].toFixed(1)+'%');
+  const cls=(k)=>(px[k]==null?'flat':px[k]>0?'up':px[k]<0?'down':'flat');
+
+  pop.innerHTML=`
+    <div class="pop-hd">
+      <span class="pop-tk">${esc(g.key)}</span>
+      <span class="pop-px">$${px.last!=null?px.last.toFixed(2):'–'}</span>
+    </div>
+    ${priceSVG(series, 300, 96)}
+    <div class="pop-chg">
+      <span>1日<b class="${cls('chg1d')}">${chg('chg1d')}</b></span>
+      <span>7日<b class="${cls('chg7d')}">${chg('chg7d')}</b></span>
+      <span>30日<b class="${cls('chg30d')}">${chg('chg30d')}</b></span>
+    </div>`;
+  pop.classList.add('on');
+
+  // 定位：默认在卡片下方，贴右边缘时往左收，避免出屏
+  const r=card.getBoundingClientRect();
+  const pw=pop.offsetWidth, ph=pop.offsetHeight;
+  let left=r.left;
+  if(left+pw>window.innerWidth-12) left=window.innerWidth-pw-12;
+  if(left<8) left=8;
+  let top=r.bottom+8;
+  if(top+ph>window.innerHeight-12) top=Math.max(8, r.top-ph-8);
+  pop.style.left=left+'px';
+  pop.style.top=top+'px';
+}
+
+function hideStockPop(){
+  const pop=$('#stk-pop');
+  if(pop) pop.classList.remove('on');
+}
+
+/* 带坐标轴的价格图（浮层用，比 miniLine 细致） */
+function priceSVG(v, W, H){
+  if(!v||v.length<2){
+    return `<svg width="${W}" height="${H}"><text x="${W/2}" y="${H/2}" fill="var(--t3)"
+      font-size="11" text-anchor="middle">数据不足</text></svg>`;
+  }
+  const pad={t:8,r:8,b:16,l:8};
+  const w=W-pad.l-pad.r, h=H-pad.t-pad.b;
+  const mx=Math.max(...v), mn=Math.min(...v);
+  const X=i=>pad.l+i*w/(v.length-1);
+  const Y=q=>pad.t+h-(q-mn)/(mx-mn||1)*h;
+  const d='M'+v.map((q,i)=>X(i).toFixed(1)+' '+Y(q).toFixed(1)).join(' L');
+  const up=v[v.length-1]>=v[0];
+  const col=up?'var(--up)':'var(--down)';
+
+  // 首尾两根基准线，方便判断相对位置
+  const hi=Y(mx), lo=Y(mn);
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+    <line x1="${pad.l}" x2="${W-pad.r}" y1="${hi}" y2="${hi}" stroke="var(--line)" stroke-dasharray="2 3"/>
+    <line x1="${pad.l}" x2="${W-pad.r}" y1="${lo}" y2="${lo}" stroke="var(--line)" stroke-dasharray="2 3"/>
+    <path d="${d} L${X(v.length-1)} ${pad.t+h} L${X(0)} ${pad.t+h} Z"
+          fill="${up?'var(--badge-up-bg)':'var(--badge-down-bg)'}"/>
+    <path d="${d}" fill="none" stroke="${col}" stroke-width="1.7"
+          stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="${X(v.length-1)}" cy="${Y(v[v.length-1])}" r="2.8" fill="${col}"/>
+    <text x="${pad.l}" y="${H-4}" fill="var(--t3)" font-size="9"
+          font-family="IBM Plex Mono">${v.length} 天前</text>
+    <text x="${W-pad.r}" y="${H-4}" fill="var(--t3)" font-size="9"
+          text-anchor="end" font-family="IBM Plex Mono">今天</text>
+  </svg>`;
+}
+
+/* 卡片交互：点击筛选 / 悬停看图 */
+function wireStockCards(){
+  const grid=$('#stks-grid');
+  if(!grid)return;
+  const groups=stockGroups();
+  const byKey={}; groups.forEach(g=>byKey[g.key]=g);
+
+  grid.querySelectorAll('.stk-card').forEach(card=>{
+    const key=card.dataset.stk;
+    const g=byKey[key];
+
+    card.addEventListener('click',()=>{
+      // 再点一次取消筛选
+      if(DDSTATE.stock && canon(DDSTATE.stock)===key){
+        DDSTATE.stock='';
+      }else{
+        // 选这个标的里的第一个代币代号（下拉框是按具体代号筛的）
+        DDSTATE.stock=[...g.tokens][0];
+      }
+      syncStockFilter();
+      buildStockCards();
+      wireStockCards();
+      render();
+    });
+
+    card.addEventListener('mouseenter',()=>showStockPop(card, g));
+    card.addEventListener('mouseleave',hideStockPop);
+    card.addEventListener('focus',()=>showStockPop(card, g));
+    card.addEventListener('blur',hideStockPop);
+  });
+
+  const clear=$('#stks-clear');
+  if(clear){
+    clear.hidden=!DDSTATE.stock;
+    clear.onclick=()=>{
+      DDSTATE.stock='';
+      syncStockFilter();
+      buildStockCards();
+      wireStockCards();
+      render();
+    };
+  }
+}
+
+/* 把 DDSTATE.stock 的变化同步到下拉框的显示 */
+function syncStockFilter(){
+  const lbl=$('#dd-stock-lbl');
+  const ico=$('#dd-stock-ico');
+  const m=$('#dd-stock-menu');
+  if(!lbl)return;
+  if(DDSTATE.stock){
+    lbl.textContent=DDSTATE.stock;
+    if(ico) ico.innerHTML=stkChip(DDSTATE.stock);
+  }else{
+    lbl.textContent='全部标的';
+    if(ico) ico.innerHTML='';
+  }
+  if(m){
+    m.querySelectorAll('.dd-item').forEach(x=>{
+      x.classList.toggle('on', (x.dataset.v||'')===DDSTATE.stock);
+    });
+  }
+}
+
 function buildStockMenu(){
   const stocks=[...new Set(POOLS.map(p=>p.stock))].sort();
   const m=$('#dd-stock-menu');
@@ -1256,6 +1546,9 @@ wireDD('dd-net','net',it=>{
 wireDD('dd-stock','stock',it=>{
   $('#dd-stock-lbl').textContent=it.dataset.v||'全部标的';
   $('#dd-stock-ico').innerHTML=it.dataset.v?stkChip(it.dataset.v):'';
+  // 下拉框和上方卡片是同一份状态，选了要对齐
+  buildStockCards();
+  wireStockCards();
 });
 $('#f-cap').addEventListener('input',()=>{updateBest();render();});
 
