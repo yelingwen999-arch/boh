@@ -727,13 +727,16 @@ setHdrTop();
    否则像 AAPLB 那种 TVL 一千刀、换手 2221× 的池子会用虚高的 APR
    霸占这个位置，而它根本不是能放钱的地方。
 
-   选池用趋势加权分（scoreP）而不是 APR 30d —— 否则一个「30 天平均 270%
-   但现在量能只剩 18%、实际只有 48%」的池会误导人。显示也用 7d 值。 */
+   选池用综合分（scoreP）：收益侧按趋势加权，再扣掉标的 7 日跌幅——
+   否则一个「30 天平均 270% 但现在量能只剩 18%」或者「APR 147% 但标的
+   7 日跌 12%」的池会误导人。显示仍用它的 APR 7d，说明收益水平。 */
 function updateBest(){
   const capNow=parseFloat($('#f-cap').value)||10000;
   const solid=POOLS.filter(p=>{
     const sh=capNow/(p.tvl+capNow)*100;
-    return sh<=5 && p.tvl>=50000 && isTrusted(p);
+    // 还要求有标的价格数据——没有价格的池子无法判断本金风险，不能当「最佳」
+    const hasPx=p.px&&(p.px.chg7d!=null||p.px.chg1d!=null);
+    return sh<=5 && p.tvl>=50000 && isTrusted(p) && hasPx;
   });
   if(!solid.length){ $('#k-best').textContent='–'; return; }
   // 复用 view() 的收益口径
@@ -745,8 +748,12 @@ function updateBest(){
   });
   CAP=save;
   const best=scored.reduce((a,b)=>scoreP(a)>scoreP(b)?a:b);
+  const sp=scoreParts(best);
+  const px=(best.px&&best.px.chg7d!=null)?best.px.chg7d:null;
   $('#k-best').textContent=fmtPct(best.apr7);
-  $('#k-best').title=`${best.stock}/${best.stable} · ${NETNAME[best.net]} · APR 7d`;
+  $('#k-best').title=`${best.stock}/${best.stable} · ${NETNAME[best.net]}\n`+
+    `APR 7d ${fmtPct(best.apr7)} · 综合分 ${sp.total.toFixed(0)}\n`+
+    `标的 7 日 ${px==null?'–':(px>0?'+':'')+px.toFixed(1)+'%'}`;
 }
 
 async function load(){
@@ -818,15 +825,41 @@ function view(){
   return rows;
 }
 
-/* 趋势加权分：APR 7d 为主（这才是现在能拿到的），30d 为辅。
-   放量的池子额外加分，萎缩的扣分——量化成可排序的单一数字。 */
+/* ============ 综合排序分 ============
+   做 LP 的实际收益 = 手续费收入 − 标的贬值。
+   拿到 147% 手续费但标的在跌，净值亏得比手续费多——这种池不该排前面。
+
+   算法：
+     1. 收益侧  apr7×0.7 + apr30×0.3（量能放量 ×1.15、萎缩 ×0.7）
+     2. 价格侧  7 日涨跌 × 1.0 + 30 日涨跌 × 0.5（近期跌幅更该被重罚）
+
+   PRICE_WEIGHT 为什么是 2.0 而不是 1.0：
+     标的跌 10%，LP 的损失不止 10%。除了代币本身贬值，还叠加无常损失——
+     价格单向偏离时，做市商必然跑输单纯持有。所以 7 日跌幅按 2 倍计，
+     相当于粗略地把无常损失算进去。这是保守取向：宁可低估高波动的池子。
+
+   为什么不只看 7 日：SKHYB 这类池子 7 日跌 12%、30 日跌 25%，
+   只看 7 日会因为它当期 APR 特别高而排到第一。30 日也纳入，
+   才能反映「这标的在持续下跌」这个事实。 */
+const PRICE_W_7D = 2.0;
+const PRICE_W_30D = 0.5;
+
 function scoreP(p){
+  return scoreParts(p).total;
+}
+/* 分开给 UI 用：收益侧 / 价格侧，方便展示「为什么它排这里」 */
+function scoreParts(p){
   const t=trend(p);
   const apr7=p.apr7||0, apr30=p.apr30||0;
-  let s=apr7*0.7 + apr30*0.3;
-  if(t.dir==='up')   s*=1.15;
-  if(t.dir==='down') s*=0.7;
-  return s;
+  let base=apr7*0.7 + apr30*0.3;
+  if(t.dir==='up')   base*=1.15;
+  if(t.dir==='down') base*=0.7;
+
+  const px=p.px||{};
+  const c7 = (px.chg7d!=null)?px.chg7d:(px.chg1d!=null?px.chg1d:0);
+  const c30 = (px.chg30d!=null)?px.chg30d:0;
+  const pen = c7*PRICE_W_7D + c30*PRICE_W_30D;
+  return {yield:base, price:pen, total:base+pen, hasPx:(px.chg7d!=null||px.chg1d!=null)};
 }
 
 /* 表格内联的迷你走势：只有线，没有填充，尺寸固定小 */
@@ -883,6 +916,11 @@ function statusPills(p){
 
   if(p.share_pct>5)pills.push(`<span class="pill p-warn">占比 ${p.share_pct.toFixed(1)}%</span>`);
   if(p.v7<p.v30*0.6)pills.push('<span class="pill p-down">量能萎缩</span>');
+  // 标的下跌优先于 APR 低的提示——APR 低只是不划算，标的跌是直接亏本金
+  const drop=pxDrop(p);
+  if(drop!=null && drop<=PX_WARN){
+    pills.push(`<span class="pill p-down" title="标的 7 日 ${drop.toFixed(1)}%，手续费收入很可能盖不住本金缩水">标的跌${Math.abs(drop).toFixed(0)}%</span>`);
+  }
   if(p.apr30<50)pills.push('<span class="pill p-mut">APR<50%</span>');
   if(!pills.length)pills.push('<span class="pill p-ok">健康</span>');
   return pills;
@@ -911,6 +949,10 @@ function aprWarn(p){
    手续费再高，标的在跌也是白搭。做 LP 的人最该先看的其实是这个：
    拿到 130% APR，标的跌了 30%，净值还是亏的。
    所以把标的的 7 日涨跌和走势直接放进列表。 */
+
+// 标的跌到这个幅度，状态栏要报警——这比 APR 低严重得多
+const PX_WARN = -8;
+
 function pxCell(p){
   const px=p.px||{};
   const c7=px.chg7d, c1=px.chg1d;
@@ -924,10 +966,18 @@ function pxCell(p){
 
   const title=`1 日 ${c1==null?'–':(c1>0?'+':'')+c1.toFixed(1)+'%'} · `+
               `7 日 ${c7==null?'–':(c7>0?'+':'')+c7.toFixed(1)+'%'} · `+
+              `30 日 ${px.chg30d==null?'–':(px.chg30d>0?'+':'')+px.chg30d.toFixed(1)+'%'} · `+
               `现价 $${px.last!=null?px.last.toFixed(2):'–'}`;
 
   return `<span class="px ${cls}" title="${esc(title)}">
     <span class="px-n">${arrow}${txt}</span>${miniLine(px.series,44,15)}</span>`;
+}
+
+/* 标的跌幅评分：跌得越狠扣分越多，给状态栏用 */
+function pxDrop(p){
+  const px=p.px||{};
+  const v=(px.chg7d!=null)?px.chg7d:(px.chg1d!=null?px.chg1d:null);
+  return v;
 }
 
 function pairRowsHTML(p,i,isBest){
