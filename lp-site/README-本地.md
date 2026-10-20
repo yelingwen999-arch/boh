@@ -22,9 +22,33 @@ node scripts/build.mjs      # 构建
 
 ```bash
 cd scripts
-python fetch_pools.py       # 抓取（约 6-15 分钟，有 25 分钟总预算）
-python detect.py            # 异动检测，写 alerts.json
+python fetch_pools.py           # 抓取（约 15-25 分钟，有 25 分钟总预算）
+python check_yield_coverage.py  # 校验官方收益率覆盖率
+python detect.py                # 异动检测，写 alerts.json
 ```
+
+## 收益率口径（重要）
+
+**APY 来自 DefiLlama，不是自己算的。**
+
+早期版本用 `成交量 × 费率 ÷ TVL` 推算 APR。实测和 DApp 官方页面的数字
+差 **0.02 倍到 11 倍，且没有规律**——根本不能用。原因不止一个：费率里有多少
+真正分给 LP、流动性集中在多窄的价格区间、成交量归属哪一档，公开数据还原不了。
+
+现在 `yield_source.py` 按「链 + 两个代币的合约地址」去 DefiLlama 匹配：
+
+- `apyBase` → 手续费收益
+- `apyReward` → 激励收益（AERO / CAKE 等代币奖励）
+- `apy` → 两者合计，就是 DApp 上显示的那个数
+
+数据字段：`apr`（总）/ `apr_base`（手续费）/ `apr_reward`（激励）/ `apr_src`。
+`apr_calc` 是旧算法的结果，**只作对照，不要拿来显示**。
+
+匹配不上时 `apr` 为 `null`，页面显示「官方未收录」，**不会填一个猜的数字**。
+
+覆盖率参考（2026-10 实测）：Base 92%、Solana 95%、BSC 15%、Robinhood 0%。
+BSC 的 PancakeSwap v3 和 Robinhood 的 Uniswap 池 DefiLlama 收录得很少，
+这是数据源的覆盖问题，不是匹配逻辑的问题。
 
 ## 常见问题
 

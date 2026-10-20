@@ -27,6 +27,9 @@ from datetime import datetime, timezone
 sys.stdout.reconfigure(encoding="utf-8")
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+import yield_source  # noqa: E402  官方收益率（DefiLlama）
+
 OUT_PATH = os.path.normpath(os.path.join(HERE, "..", "public", "data", "pools.json"))
 
 UA = {
@@ -120,6 +123,10 @@ T0 = time.time()
 
 # 扫描阶段请求失败的 ticker。为空说明本轮扫描完整，非空则数据可能缺链。
 SCAN_FAILED = []
+
+# 官方收益率索引（DefiLlama），main() 启动时加载一次。
+# 结构见 yield_source.load_yields()。
+YIELDS = {}
 
 
 def budget_left():
@@ -381,14 +388,35 @@ def enrich(pool, want_hourly=True):
         v7 = v30 = vol24
 
     share = CAP / (tvl + CAP)
+
+    # ---- 自算的「手续费 APR」，只当参考 ----
+    # 这个值和 DApp 官方显示的对不上（实测差 0.02x ~ 11x，且没规律），
+    # 所以它**不再是主口径**，只保留在 legacy 字段里做对照。
     if fee_known:
-        day7 = v7 * fee / 100 * share
-        apr7 = day7 * 365 / CAP * 100
-        apr30 = v30 * fee / 100 * share * 365 / CAP * 100
+        day7_calc = v7 * fee / 100 * share
+        apr7_calc = day7_calc * 365 / CAP * 100
+        apr30_calc = v30 * fee / 100 * share * 365 / CAP * 100
     else:
-        # 费率未知：日收入与 APR 都无法给出，留 None 让前端显式显示「未知」，
-        # 不要用 0 假装算过。
-        day7 = apr7 = apr30 = None
+        day7_calc = apr7_calc = apr30_calc = None
+
+    # ---- 官方口径（DefiLlama），这才是页面上该显示的数字 ----
+    # apy      = DApp 上显示的 APR（手续费 + 激励）
+    # apyBase  = 其中手续费部分
+    # apyReward= 其中激励部分
+    y = yield_source.match_yield(YIELDS, pool["net"], tok_a, tok_b, tvl)
+    if y:
+        apy = y.get("apy")
+        apy_base = y.get("apyBase")
+        apy_reward = y.get("apyReward")
+        apr_src = "defillama"
+        apr_proj = y.get("project")
+    else:
+        apy = apy_base = apy_reward = None
+        apr_src = "missing"
+        apr_proj = None
+
+    # 日收入按官方 APR 折算：本金 × APR / 365
+    day7 = (CAP * apy / 100 / 365) if apy is not None else None
 
     # ---- 标的本身的价格走势 ----
     # 手续费再高，标的在跌也是白搭。存下收盘价序列和几个关键涨跌幅。
@@ -429,9 +457,22 @@ def enrich(pool, want_hourly=True):
         "v30": v30,
         "ndays": len(vols),
         "share_pct": share * 100,
+
+        # ---- 收益：以官方口径为准 ----
+        # apr_src = "defillama" 表示拿到了 DApp 口径的官方收益率；
+        #           "missing"  表示 DefiLlama 没收录这个池，不能编一个数字。
+        "apr": apy,                    # 官方总 APR（手续费 + 激励）
+        "apr_base": apy_base,          # 其中手续费
+        "apr_reward": apy_reward,      # 其中激励
+        "apr_src": apr_src,
+        "apr_proj": apr_proj,          # DefiLlama 里的项目名（aerodrome-slipstream 等）
         "day7": day7,
-        "apr7": apr7,
-        "apr30": apr30,
+
+        # ---- 自算的手续费 APR：只作对照，不再作为主口径 ----
+        # 和官方差 0.02x ~ 11x 且没规律，别拿它当收益。
+        "apr_calc": apr30_calc,
+        "apr_calc7": apr7_calc,
+
         "spark": vols[-30:],
         "px": px,
         "tok_a": tok_a,
@@ -441,10 +482,17 @@ def enrich(pool, want_hourly=True):
 
 
 def main():
+    global YIELDS
     print(f"开始抓取  {datetime.now(timezone.utc).isoformat(timespec='seconds')}", flush=True)
     print(
         f"预算 {BUDGET_S}s（扫描阶段预留 {SCAN_RESERVE_S}s 给补全）", flush=True
     )
+
+    # 先拉官方收益率。这一步只花几秒，但决定了整份数据的可信度：
+    # 拿不到就应该让整轮失败，而不是退回自算的错数字。
+    print("  正在拉取 DefiLlama 官方收益率…", flush=True)
+    YIELDS = yield_source.load_yields()
+    print(f"  官方收益率索引：{len(YIELDS)} 个代币对", flush=True)
 
     # 只要 24h 量过 MIN_VOL 就保留。这里不再按链做取舍——
     # 同一个股票在不同链上的池子都要露出来，小链的池子可能正是最好的一块。
@@ -534,8 +582,15 @@ def main():
         if r:
             rows.append(r)
             mark = "" if i < HOURLY_TOP_N else "  (无小时线)"
-            apr = f"{r['apr30']:7.0f}%" if r["apr30"] is not None else "   费率未知"
-            print(f"  ok {r['name']:<34} APR30 {apr}{mark}", flush=True)
+            if r["apr"] is not None:
+                apr = f"{r['apr']:8.1f}%"
+                # 激励占大头时标出来——那是代币奖励，随时可能停
+                rw = r.get("apr_reward")
+                if rw and r["apr"] and rw / r["apr"] > 0.5:
+                    apr += "  ←激励为主"
+            else:
+                apr = "   官方未收录"
+            print(f"  ok {r['name']:<32} APY {apr}{mark}", flush=True)
 
     if len(rows) < MIN_POOLS:
         print(
@@ -544,13 +599,21 @@ def main():
         )
         return 1
 
-    rows.sort(key=lambda r: -(r["apr30"] if r["apr30"] is not None else -1))
+    # 按官方 APY 排序；官方未收录的排最后（它们没有可比的收益数据）
+    rows.sort(key=lambda r: -(r["apr"] if r["apr"] is not None else -1))
+    n_off = sum(1 for r in rows if r["apr"] is not None)
+    print(
+        f"  官方收益率覆盖：{n_off}/{len(rows)} 个池 "
+        f"（其余 DefiLlama 未收录，页面会明确标注）",
+        flush=True,
+    )
     state = {
         "pools": rows,
         "updated": datetime.now(timezone.utc)
         .astimezone()
         .isoformat(timespec="seconds"),
         "n": len(rows),
+        "yield_source": "defillama",
     }
     os.makedirs(os.path.dirname(OUT_PATH), exist_ok=True)
     with open(OUT_PATH, "w", encoding="utf-8") as f:

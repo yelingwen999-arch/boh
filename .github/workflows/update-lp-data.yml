@@ -58,6 +58,14 @@ jobs:
           FETCH_BUDGET_S: '1500'
         run: python fetch_pools.py
 
+      # 收益率必须来自 DefiLlama 官方口径。如果这一轮基本都没匹配上，
+      # 说明数据源挂了或匹配逻辑坏了——宁可让这轮失败，也不要把
+      # 一堆「官方未收录」推上线上（那等于整个看板没有收益数据）。
+      - name: 校验官方收益率覆盖率
+        if: inputs.notify_test != true
+        working-directory: lp-site/scripts
+        run: python check_yield_coverage.py
+
       - name: 异动检测
         if: inputs.notify_test != true
         working-directory: lp-site/scripts

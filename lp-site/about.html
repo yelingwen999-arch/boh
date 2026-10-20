@@ -172,33 +172,60 @@ li::before{content:'—';position:absolute;left:0;color:var(--t3)}
     用固定的「成交量 × 费率 ÷ TVL」算出来会失真，请直接看它们的官方前端。
     股票对股票（如 NVDA/TSLA）的池子也不收，口径完全不同。
   </p>
-  <h3>Solana 的池为什么 APR 显示「费率未知」</h3>
+  <h3>为什么 APR 显示「官方未收录」</h3>
   <p>
-    GeckoTerminal 对 Solana 上的池（Raydium / Orca / Meteora 等）<strong>基本不返回费率</strong>，
-    池名里也不带费率档（不像 BSC 的「SKHYB / USDT 0.25%」）。
-    没有费率就算不出 APR，这里<strong>如实写「费率未知」，不用 0 或估算值凑数</strong>——
-    一个假的数字比没有数字更危险。
+    本站的收益率<strong>直接取 DefiLlama 收录的官方 APY</strong>，也就是你在
+    Aerodrome / PancakeSwap / Raydium 等 DApp 页面上看到的那个数字。
+    DefiLlama 没收录的池子拿不到这个数，页面会明确写<strong>「官方未收录」</strong>，
+    而不是自己推算一个填上去。
   </p>
   <p>
     这类池子仍然会出现在列表里（TVL、成交量、换手、标的走势都是真实的），
-    「去哪组」一列会显示具体 DEX 名称，点过去可以在官方界面看到真实费率档。
+    「去哪组」一列会显示具体 DEX 名称，点过去可以在官方界面看到真实收益率。
+  </p>
+
+  <h3>为什么不再自己算 APR</h3>
+  <p>
+    早期版本用 <code>成交量 × 池子费率 ÷ TVL</code> 自己推算 APR。实测下来，
+    这个值和 DApp 官方显示的数字<strong>差 0.02 倍到 11 倍，而且没有规律</strong>——
+    有的池子官方 2016% 我只算出 401%，有的官方 4132% 我只算出 79%。
+  </p>
+  <p>
+    原因不止一个：费率里有多少真正分给 LP、流动性集中在多窄的价格区间、
+    成交量归属到哪一档费率，这些都不在公开数据里。
+    <strong>与其给一个看起来精确但错得离谱的数字，不如老老实实用官方口径。</strong>
   </p>
 
   <h2>数据来源</h2>
   <dl>
     <dt>池子数据</dt>
-    <dd>GeckoTerminal 公开 API（TVL、24h 量、日线 OHLCV、池子费率、代币合约）。</dd>
+    <dd>GeckoTerminal 公开 API（TVL、24h 量、日线/小时线 OHLCV、代币合约、DEX 归属）。</dd>
+
+    <dt>收益率（APY）</dt>
+    <dd>
+      DefiLlama <code>yields.llama.fi/pools</code>，按<strong>链 + 两个代币的合约地址</strong>
+      匹配。接口同时给出 <code>apyBase</code>（手续费）和 <code>apyReward</code>（激励），
+      两者之和就是 DApp 上显示的 APY。
+    </dd>
 
     <dt>更新方式</dt>
-    <dd>由 GitHub Actions <strong>每日定时抓取一次</strong>，写入静态 JSON，随站点部署。页面顶部的「更新时间」是数据的抓取时间，不是页面加载时间。</dd>
+    <dd>由 GitHub Actions <strong>每小时抓取一次</strong>，写入静态 JSON，随站点部署。页面顶部的「更新时间」是数据的抓取时间，不是页面加载时间。</dd>
   </dl>
 
   <h2>计算口径</h2>
   <dl>
-    <dt>APR（手续费年化）</dt>
+    <dt>官方 APY</dt>
     <dd>
-      按 <code>(30 日均日成交量 × 池子费率) ÷ TVL</code> 年化。分母用的是<strong>当前 TVL</strong>，
-      分子用的是<strong>过去 30 天的成交</strong>——两者不是同一时点，市场剧烈变化时会放大或缩小这个数。
+      DApp 上显示的收益率，<strong>包含两部分</strong>：
+      <strong>手续费</strong>（交易真实产生）和<strong>激励</strong>（DEX 发的代币奖励）。
+      激励部分随时可能下调或停发——鼠标悬停在数字后面的「激励 N%」标签上可以看到占比。
+      激励超过 50% 时会标出来，因为那不完全是可持续收益。
+    </dd>
+
+    <dt>日收入</dt>
+    <dd>
+      按 <code>本金 × 官方 APY ÷ 365</code> 折算。同样是<strong>毛收益</strong>，
+      未扣无常损失、LVR、gas 和提现成本。
     </dd>
 
     <dt>占比（你的资金占池子比例）</dt>

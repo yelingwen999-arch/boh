@@ -138,12 +138,12 @@ def detect(cur, prev):
                 "type": "new_pool",
                 "level": "info",
                 "title": f"新池上线 · {label(p)}",
-                "detail": f"TVL {fmt_usd(tvl)} · APR30 {fmt_apr(p.get('apr30'))}",
+                "detail": f"TVL {fmt_usd(tvl)} · APY {fmt_apr(p.get('apr'))}",
                 "pool": key_of(p),
                 "prev": None,
                 "now": {
                     "tvl": tvl,
-                    "apr30": p.get("apr30"),
+                    "apr": p.get("apr"),
                 },
             }
         )
@@ -153,8 +153,8 @@ def detect(cur, prev):
         q = prev_pools.get(k)
         if not q:
             continue
-        a_now = p.get("apr30") or 0
-        a_prev = q.get("apr30") or 0
+        a_now = p.get("apr") or 0
+        a_prev = q.get("apr") or 0
         if a_now < APR_ABS_MIN or a_prev <= 0:
             continue
         chg = pct(a_now, a_prev)
@@ -171,22 +171,22 @@ def detect(cur, prev):
                         f" · TVL {fmt_usd(tvl)}"
                     ),
                     "pool": k,
-                    "prev": {"apr30": a_prev, "tvl": q.get("tvl")},
-                    "now": {"apr30": a_now, "tvl": tvl},
+                    "prev": {"apr": a_prev, "tvl": q.get("tvl")},
+                    "now": {"apr": a_now, "tvl": tvl},
                 }
             )
 
     # ---- 3. 新进 APR 前 N ----
     def top_ranks(pools, n):
-        # 费率未知（apr30 为 None）的池没法参与收益排名，排除掉。
+        # 官方未收录（apr 为 None）的池没法参与收益排名，排除掉。
         # 否则它们会被当成 0% 参与排序，把真实的高收益池挤出榜单。
         ranked = sorted(
             [
                 p
                 for p in pools
-                if (p.get("tvl") or 0) >= TVL_ABS_MIN and p.get("apr30") is not None
+                if (p.get("tvl") or 0) >= TVL_ABS_MIN and p.get("apr") is not None
             ],
-            key=lambda x: -x["apr30"],
+            key=lambda x: -x["apr"],
         )[:n]
         return {key_of(p): i + 1 for i, p in enumerate(ranked)}
 
@@ -199,9 +199,9 @@ def detect(cur, prev):
             [
                 p
                 for p in pools
-                if (p.get("tvl") or 0) >= TVL_ABS_MIN and p.get("apr30") is not None
+                if (p.get("tvl") or 0) >= TVL_ABS_MIN and p.get("apr") is not None
             ],
-            key=lambda x: -x["apr30"],
+            key=lambda x: -x["apr"],
         )
         return {key_of(p): i + 1 for i, p in enumerate(ranked)}
 
@@ -222,10 +222,10 @@ def detect(cur, prev):
                 "type": "top_rank",
                 "level": "info",
                 "title": f"新进 APR 前 {APR_TOP_RANK} · {label(p)}",
-                "detail": f"{move}当前第 {rank} 名 · APR30 {fmt_apr(p.get('apr30'))}",
+                "detail": f"{move}当前第 {rank} 名 · APY {fmt_apr(p.get('apr'))}",
                 "pool": k,
                 "prev": {"rank": was},
-                "now": {"rank": rank, "apr30": p.get("apr30")},
+                "now": {"rank": rank, "apr": p.get("apr")},
             }
         )
 

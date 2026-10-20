@@ -570,7 +570,7 @@ tr.sparkrow:hover{background:var(--bg-raised)}
       <div class="st"><div class="l">监控池</div><div class="v" id="k-n">–</div></div>
       <div class="st"><div class="l">合计 TVL</div><div class="v" id="k-tvl">–</div></div>
       <div class="st"><div class="l">24h 交易量</div><div class="v" id="k-vol">–</div></div>
-      <div class="st"><div class="l">最佳收益池 · APR 7d</div><div class="v accent" id="k-best">–</div></div>
+      <div class="st"><div class="l">最佳收益池 · 官方 APY</div><div class="v accent" id="k-best">–</div></div>
       <div class="st"><div class="l">净收益提示</div><div class="v" style="font-size:13px">≈ 表值 ÷ 2–3<small>LVR/IL 折扣</small></div></div>
     </div>
   </div>
@@ -679,8 +679,7 @@ tr.sparkrow:hover{background:var(--bg-raised)}
           <th data-k="turn">日换手</th>
           <th data-k="share">占比</th>
           <th data-k="day7">日收入</th>
-          <th data-k="apr7">APR 7d</th>
-          <th data-k="apr30">APR 30d</th>
+          <th data-k="apr">官方 APY</th>
           <th data-k="trendKey" style="width:74px">量能</th>
           <th style="width:168px">状态</th>
         </tr>
@@ -698,15 +697,15 @@ tr.sparkrow:hover{background:var(--bg-raised)}
   <section class="method">
     <div class="mc">
       <h3>口径</h3>
-      <p>APR = 手续费年化,按 <b>日均成交量 × 费率 ÷ TVL</b>,未扣 LVR / 无常损失。表里同时给 <b>7d</b> 和 <b>30d</b> 两个口径——量能变化大时两者会差很远,<b>7d 更接近现在能拿到的</b>。按 Blockworks 实测,股票/稳定币池费收约 <b>2.9–3.3 倍</b>覆盖套利成本,净收益预期 ≈ 表值 ÷ 2–3。</p>
+      <p>APY 取自 <b>DefiLlama 官方口径</b>,与你在 Aerodrome / PancakeSwap / Raydium 页面上看到的是同一个数,含 <b>手续费 + 激励</b> 两部分。激励占大头的会标出占比——那部分随时可能停发。未扣 LVR / 无常损失,按 Blockworks 实测费收约 <b>2.9–3.3 倍</b> 覆盖套利成本,净收益预期 ≈ 表值 ÷ 2–3。<b>DefiLlama 未收录的池写「官方未收录」,不自己推算。</b></p>
     </div>
     <div class="mc">
       <h3>预警含义</h3>
-      <p><b>占比 &gt; 5%</b> —— 你即市场,慎入。<br><b>量能萎缩</b> —— 7d 日均量 &lt; 30d × 0.6,APR 30d 会偏高。<br><b>APR &lt; 50%</b> —— 低于迁移阈值。<br><b>换手异常</b> —— 换手 &gt; 30×,可能是刷量或 TVL 抓错,APR 不可信。</p>
+      <p><b>占比 &gt; 5%</b> —— 你即市场,慎入。<br><b>量能萎缩</b> —— 7d 日均量 &lt; 30d × 0.6,收益可能在下降。<br><b>APY 偏低</b> —— 低于 50%,机会成本高。<br><b>换手异常</b> —— 换手 &gt; 30×,可能是刷量或 TVL 抓错。<br><b>激励 N%</b> —— 收益里激励占大头,随时可能停发。<br><b>官方未收录</b> —— DefiLlama 没有这个池,拿不到官方收益率。</p>
     </div>
     <div class="mc">
       <h3>数据来源</h3>
-      <p>GeckoTerminal API,每小时抓取、静态托管。<br><b>Fables / Metric</b> 动态费率池不在收录范围,数据看官方前端。</p>
+      <p>池子数据来自 <b>GeckoTerminal API</b>，收益率（APY）来自 <b>DefiLlama</b> 官方口径，每小时抓取、静态托管。<br><b>Fables / Metric</b> 动态费率池不在收录范围，数据看官方前端。</p>
     </div>
   </section>
 
@@ -881,18 +880,6 @@ function trend(p){
   return {dir:'flat', ratio:r, label:'平稳'};
 }
 
-/* APR 可信度：30d 口径在量能萎缩时严重高估，用 7d 做参照。
-   返回 {score, gap}  score 越小越可信。 */
-function aprGap(p){
-  const a30=p.apr30||0;
-  if(!a30) return {gap:0, est:0};
-  // v7 口径的 APR（与 apr30 同一套本金占比公式）
-  const share=CAP/(p.tvl+CAP);
-  const day7=(p.v7||0)*(p.fee||0)/100*share;
-  const est=day7*365/CAP*100;
-  return {gap:(a30-est)/a30, est};
-}
-
 /* theme — set on <html> so html{background} also follows (body-scoped vars
    leave :root at dark defaults and the black html bg bleeds through) */
 const tbtn=$('#theme');
@@ -987,34 +974,34 @@ function initCap(){
    否则像 AAPLB 那种 TVL 一千刀、换手 2221× 的池子会用虚高的 APR
    霸占这个位置，而它根本不是能放钱的地方。
 
-   选池用综合分（scoreP）：收益侧按趋势加权，再扣掉标的 7 日跌幅——
-   否则一个「30 天平均 270% 但现在量能只剩 18%」或者「APR 147% 但标的
-   7 日跌 12%」的池会误导人。显示仍用它的 APR 7d，说明收益水平。 */
+   选池用综合分（scoreP）：官方 APY 打底，再扣掉标的 7 日跌幅——
+   否则一个「APY 400% 但标的 7 日跌 12%」的池会误导人。
+   显示用官方 APY，和点进 DApp 看到的数字一致。 */
 function updateBest(){
   const capNow=CAP;
   const solid=POOLS.filter(p=>{
     const sh=capNow/(p.tvl+capNow)*100;
     // 还要求有标的价格数据——没有价格的池子无法判断本金风险，不能当「最佳」
     const hasPx=p.px&&(p.px.chg7d!=null||p.px.chg1d!=null);
-    // 费率未知的池算不出收益，不能当选「最佳」
-    return sh<=5 && p.tvl>=50000 && p.fee!=null && isTrusted(p) && hasPx;
+    // 官方没收录的池拿不到可信收益，不能当选「最佳」
+    return sh<=5 && p.tvl>=50000 && p.apr!=null && isTrusted(p) && hasPx;
   });
   if(!solid.length){ $('#k-best').textContent='–'; return; }
-  // 复用 view() 的收益口径
   const save=CAP; CAP=capNow;
   const scored=solid.map(p=>{
     const share=capNow/(p.tvl+capNow);
-    const day7=p.v7*p.fee/100*share;
-    return {...p, apr7:day7*365/capNow*100, share_pct:share*100};
+    return {...p, apr:p.apr, apr7:p.apr, apr30:p.apr, share_pct:share*100};
   });
   CAP=save;
   const best=scored.reduce((a,b)=>scoreP(a)>scoreP(b)?a:b);
   const sp=scoreParts(best);
   const px=(best.px&&best.px.chg7d!=null)?best.px.chg7d:null;
-  $('#k-best').textContent=fmtPct(best.apr7);
-  $('#k-best').title=`${best.stock}/${best.stable} · ${NETNAME[best.net]}\n`+
-    `APR 7d ${fmtPct(best.apr7)} · 综合分 ${sp.total.toFixed(0)}\n`+
-    `标的 7 日 ${px==null?'–':(px>0?'+':'')+px.toFixed(1)+'%'}`;
+  const rw=best.apr_reward, bs=best.apr_base;
+  $('#k-best').textContent=fmtPct(best.apr);
+  $('#k-best').title=`${best.stock}/${best.stable} · ${NETNAME[best.net]} · ${best.name}\n`+
+    `官方 APY ${fmtPct(best.apr)}`+
+      (bs!=null?`（手续费 ${fmtPct(bs)}`+(rw!=null?` + 激励 ${fmtPct(rw)}`:'')+`）`:'')+`\n`+
+    `综合分 ${sp.total.toFixed(0)} · 标的 7 日 ${px==null?'–':(px>0?'+':'')+px.toFixed(1)+'%'}`;
 }
 
 async function load(){
@@ -1053,15 +1040,17 @@ function view(){
   let rows=POOLS.filter(p=>(!net||p.net===net)&&(!stock||p.stock===stock));
   rows=rows.map(p=>{
     const share=CAP/(p.tvl+CAP);
-    // 费率可能为 null（Solana 的池常缺这个字段）。null*number 在 JS 里是 0，
-    // 直接算会显示成「0% 收益」，比显示「未知」更误导，所以显式区分。
-    const feeKnown=p.fee!=null;
-    const day7=feeKnown?p.v7*p.fee/100*share:null;
+    // 收益口径改为官方 APR（DefiLlama = DApp 上显示的那个数）。
+    // 注意日收入也是按官方 APR 折算的：本金 × APR / 365。
+    // 之前那个「成交量 × 费率 ÷ TVL」的自算值保留在 apr_calc，只作对照。
+    const apr=p.apr!=null?p.apr:null;
+    const day7=apr!=null?CAP*apr/100/365:null;
     const h=health(p);
     const t=trend(p);
     return {...p,share_pct:share*100,day7,
-            apr7:feeKnown?day7*365/CAP*100:null,
-            apr30:feeKnown?p.v30*p.fee/100*share*365/CAP*100:null,
+            apr,
+            apr7:apr,          // 旧字段名指向同一个数，避免其他函数取不到
+            apr30:apr,
             turn:p.vol24/p.tvl,
             _health:h.level,_flags:h.flags,_trend:t,
             px7:(p.px&&p.px.chg7d!=null)?p.px.chg7d:(p.px&&p.px.chg1d!=null?p.px.chg1d:null),
@@ -1072,7 +1061,7 @@ function view(){
   // 否则「按 APR 降序」一开，那个换手 2221× 的池子就霸屏了。
   // 费率未知的池没法比收益，单独排一档（在存疑之后、薄池之前），
   // 否则它的综合分会被当成 0 分挤到最后，反而看不出是「缺数据」而非「收益差」
-  const rank = p => p.apr30==null ? 3
+  const rank = p => p.apr==null ? 3
                  : p._health==='suspicious' ? 2
                  : p._health==='thin' ? 1 : 0;
   rows.sort((a,b)=>{
@@ -1116,22 +1105,34 @@ function view(){
 const PRICE_W_7D = 2.0;
 const PRICE_W_30D = 0.5;
 
+/* 分开给 UI 用：收益侧 / 价格侧，方便展示「为什么它排这里」
+
+   收益侧的算法改了：不再按 7d/30d 加权（官方只给一个 APY），
+   改为「手续费全额 + 激励打折」。理由：
+     手续费是交易真实产生的，可持续；
+     激励是 DEX 发的代币奖励，随时可以下调或停发。
+   一个 400% 里 380% 是激励的池子，真实可持续部分只有 20%，
+   不该和「400% 里 390% 是手续费」的池子排在一起。 */
+const REWARD_WEIGHT = 0.35;   // 激励部分的折算系数
+
 function scoreP(p){
   return scoreParts(p).total;
 }
-/* 分开给 UI 用：收益侧 / 价格侧，方便展示「为什么它排这里」 */
 function scoreParts(p){
   const t=trend(p);
-  const apr7=p.apr7||0, apr30=p.apr30||0;
-  let base=apr7*0.7 + apr30*0.3;
-  if(t.dir==='up')   base*=1.15;
-  if(t.dir==='down') base*=0.7;
+  const apy=p.apr||0;
+  const base=(p.apr_base!=null)?p.apr_base:apy;
+  const reward=(p.apr_reward!=null)?p.apr_reward:0;
+  // 激励打三折计入：停发风险高，不能当成稳定收益
+  let y=base + reward*REWARD_WEIGHT;
+  if(t.dir==='up')   y*=1.15;
+  if(t.dir==='down') y*=0.7;
 
   const px=p.px||{};
   const c7 = (px.chg7d!=null)?px.chg7d:(px.chg1d!=null?px.chg1d:0);
   const c30 = (px.chg30d!=null)?px.chg30d:0;
   const pen = c7*PRICE_W_7D + c30*PRICE_W_30D;
-  return {yield:base, price:pen, total:base+pen, hasPx:(px.chg7d!=null||px.chg1d!=null)};
+  return {yield:y, price:pen, total:y+pen, hasPx:(px.chg7d!=null||px.chg1d!=null)};
 }
 
 /* 表格内联的迷你走势：只有线，没有填充，尺寸固定小 */
@@ -1193,12 +1194,11 @@ function statusPills(p){
   if(drop!=null && drop<=PX_WARN){
     pills.push(`<span class="pill p-down" title="标的 7 日 ${drop.toFixed(1)}%，手续费收入很可能盖不住本金缩水">标的跌${Math.abs(drop).toFixed(0)}%</span>`);
   }
-  // APR 偏低只是提示，不再是筛选门槛。给个中性措辞，别像警告。
-  // 费率未知时 APR 是 null，既不能说偏低也不能说健康，单独标出来。
-  if(p.apr30==null){
-    pills.push('<span class="pill p-mut" title="数据源没有提供这个池的费率，算不出 APR">费率未知</span>');
-  }else if(p.apr30<50){
-    pills.push('<span class="pill p-mut" title="APR 30d 低于 50%，手续费收入相对有限">APR 偏低</span>');
+  // 官方没收录的池拿不到可信收益，单独标出来
+  if(p.apr==null){
+    pills.push('<span class="pill p-mut" title="DefiLlama 没收录这个池，拿不到官方收益率">官方未收录</span>');
+  }else if(p.apr<50){
+    pills.push('<span class="pill p-mut" title="官方 APY 低于 50%">APY 偏低</span>');
   }
   if(!pills.length)pills.push('<span class="pill p-ok">健康</span>');
   return pills;
@@ -1215,12 +1215,14 @@ function quoteTag(p){
 }
 
 function aprText(p){
-  // 费率未知时数据源没给，明确写出来，别用破折号假装是 0
-  if(p.apr30==null){
-    return '<span class="apr-na" title="数据源没有提供这个池的费率，算不出 APR">费率未知</span>';
+  // 官方（DefiLlama）没收录这个池时，不能编数字。
+  // 明确写「官方未收录」，而不是显示 0 或者一个自算的猜测值。
+  if(p.apr==null){
+    return '<span class="apr-na" title="DefiLlama 没有收录这个池，拿不到官方收益率。自算的手续费 APY 和 DApp 显示的对不上（差 0.02×~11×），所以不显示。">官方未收录</span>';
   }
   const h=p._health||health(p).level;
-  return fmtPct(p.apr30)+(h==='suspicious'?'?':'');
+  // 数据存疑（换手异常等）时加问号——连官方数也不一定靠得住
+  return fmtPct(p.apr)+(h==='suspicious'?'?':'');
 }
 /* 量能趋势单元格：箭头 + 倍数，斜率越大越刺眼 */
 function trendCell(p){
@@ -1229,12 +1231,16 @@ function trendCell(p){
   const arrow=t.dir==='up'?'↑':t.dir==='down'?'↓':'→';
   return `<span class="tv ${cls}" title="7 日均量 / 30 日均量 = ${t.ratio.toFixed(2)}×">${arrow}${t.ratio.toFixed(2)}×</span>`;
  }
-/* APR 30d 与 7d 差得太多时提示：说明 30d 口径已经不代表现在 */
+/* 激励占比过高时提示。
+   这不是「数据有问题」，而是「收益性质有问题」：
+   激励部分是 DEX 发的代币奖励，随时可能下调或停止；只有手续费是交易真实产生的。
+   一个 400% 的池子里如果 380% 是激励，实际可持续的部分只有 20%。 */
 function aprWarn(p){
-  if(!p.apr7||!p.apr30) return '';
-  const gap=(p.apr30-p.apr7)/p.apr30;
-  if(gap<0.3) return '';
-  return ` <span class="apr-note" title="30d 口径比 7d 高出 ${Math.round(gap*100)}%，成交量已明显下降">虚高</span>`;
+  const total=p.apr, base=p.apr_base, reward=p.apr_reward;
+  if(total==null || !total || reward==null || !reward) return '';
+  const share=reward/total;
+  if(share<0.5) return '';
+  return ` <span class="apr-note" title="激励占 ${(share*100).toFixed(0)}%（手续费只有 ${(base!=null?base.toFixed(1):'–')}%）。代币奖励随时可能下调或停发">激励${(share*100).toFixed(0)}%</span>`;
 }
 
 /* ============ 标的价格走势 ============
@@ -1325,7 +1331,7 @@ function renderPairView(rows,tb){
     const head=document.createElement('tr');
     head.className='pairhead';
     head.dataset.pair=k;
-    head.innerHTML=`<td colspan="14"><div class="ptitle">
+    head.innerHTML=`<td colspan="13"><div class="ptitle">
       ${stkChip(stock)}
       <span class="pn">${esc(stock)} / ${esc(stable)}${quoteTag(best)}</span>
       <span class="chainb"><span class="cdot ${net}"></span>${NETNAME[net]}</span>
@@ -1341,8 +1347,8 @@ function renderPairView(rows,tb){
     if(open){
       const pr=document.createElement('tr');
       pr.className='poolsrow'+(open?'':' hidden');
-      pr.innerHTML=`<td colspan="14"><table class="subtbl">
-        <tr><td style="width:190px">池子(费率档+地址)</td><td style="width:150px">去哪组</td><td style="width:96px">标的走势</td><td>TVL</td><td>24h 量</td><td>日换手</td><td>日收入</td><td>APR 30d</td><td>量能</td><td>状态</td></tr>
+      pr.innerHTML=`<td colspan="13"><table class="subtbl">
+        <tr><td style="width:190px">池子(费率档+地址)</td><td style="width:150px">去哪组</td><td style="width:96px">标的走势</td><td>TVL</td><td>24h 量</td><td>日换手</td><td>日收入</td><td>官方 APY</td><td>量能</td><td>状态</td></tr>
         ${g.map((p,i)=>pairRowsHTML(p,i,i===0)).join('')}
       </table></td>`;
       tb.appendChild(pr);
@@ -1385,7 +1391,7 @@ function render(){
     const sig=rows.filter(p=>
       p.share_pct<=5 &&            // you're not the market
       p.tvl>=50000 &&              // not a micro-trap
-      p.apr30!=null &&             // 费率已知，否则没法比收益
+      p.apr!=null &&               // 有官方收益率才参与筛选
       p._health==='ok'             // 数据可信度过关
     );
     const flagged=rows.filter(p=>!sig.includes(p));
@@ -1396,7 +1402,6 @@ function render(){
     const dt=counts[key2]>1&&p._dupTotal?' <span class="pooltag">池'+('ABCDEF'[p._dupTotal-1]||p._dupTotal)+'</span>':'';
     const dex=dexOf(p);
     const pills=statusPills(p);
-    const a7=p.apr7>=100?'hot':p.apr7>=50?'mid':'low';
     const a30=p.apr30==null?'':p.apr30>=100?'hot':p.apr30>=50?'mid':'low';
     tr.className=p._health==='suspicious'?'sus':'';
     tr.innerHTML=`
@@ -1413,7 +1418,6 @@ function render(){
       <td class="mono mut">${p.turn.toFixed(1)}×</td>
       <td class="shareN ${p.share_pct>5?'risk':''}">${p.share_pct.toFixed(2)}%</td>
       <td class="mono">$${p.day7!=null?p.day7.toFixed(2):"–"}</td>
-      <td class="apr7">${fmtPct(p.apr7)}</td>
       <td class="apr ${a30}">${aprText(p)}${aprWarn(p)}</td>
       <td>${trendCell(p)}</td>
       <td><div class="pills">${pills.join('')}</div></td>`;
@@ -1427,11 +1431,11 @@ function render(){
     if(sig.length){
       sig.forEach((p,i)=>renderRow(p,i+1));
     }else{
-      tb.insertAdjacentHTML('beforeend',`<tr><td colspan="14" style="padding:36px;text-align:center;color:var(--t3)">
+      tb.insertAdjacentHTML('beforeend',`<tr><td colspan="13" style="padding:36px;text-align:center;color:var(--t3)">
         当前没有同时满足三项筛选条件的池(占比≤5% · TVL≥$50K · 数据可信)</td></tr>`);
     }
     if(flagged.length){
-      tb.insertAdjacentHTML('beforeend',`<tr><td colspan="14" style="padding:8px 10px;background:var(--bg-raised)">
+      tb.insertAdjacentHTML('beforeend',`<tr><td colspan="13" style="padding:8px 10px;background:var(--bg-raised)">
         <span class="fl" style="color:var(--t3)">以下 ${flagged.length} 个池被筛选条件排除(占比过高 / 池子过小 / 数据存疑),已折叠展示——切到「全部池」看完整清单</span></td></tr>`);
       flagged.forEach((p,i)=>renderRow(p,i+1));
     }
@@ -1445,7 +1449,6 @@ function render(){
     const dt=counts[key2]>1&&p._dupTotal?' <span class="pooltag">池'+('ABCDEF'[p._dupTotal-1]||p._dupTotal)+'</span>':'';
     const dex=dexOf(p);
     const pills=statusPills(p);
-    const a7=p.apr7>=100?'hot':p.apr7>=50?'mid':'low';
     const a30=p.apr30==null?'':p.apr30>=100?'hot':p.apr30>=50?'mid':'low';
     tr.className=p._health==='suspicious'?'sus':'';
     tr.innerHTML=`
@@ -1462,7 +1465,6 @@ function render(){
       <td class="mono mut">${p.turn.toFixed(1)}×</td>
       <td class="shareN ${p.share_pct>5?'risk':''}">${p.share_pct.toFixed(2)}%</td>
       <td class="mono">$${p.day7!=null?p.day7.toFixed(2):"–"}</td>
-      <td class="apr7">${fmtPct(p.apr7)}</td>
       <td class="apr ${a30}">${aprText(p)}${aprWarn(p)}</td>
       <td>${trendCell(p)}</td>
       <td><div class="pills">${pills.join('')}</div></td>`;
@@ -1485,7 +1487,7 @@ function toggleExpand(p,tr){
 function appendSpark(tr,p){
   const row=document.createElement('tr');row.className='sparkrow';
   const up=p.spark&&p.spark.length>1?p.spark[p.spark.length-1]>=p.spark[0]:null;
-  row.innerHTML=`<td colspan="14"><div class="sbox">
+  row.innerHTML=`<td colspan="13"><div class="sbox">
     <div><div class="stitle">${esc(p.stock)} / ${esc(p.stable)} — 近 30 天日成交量 · ${p.ndays} 根日线</div>${sparkSVG(p.spark)}</div>
     <div class="smeta">7 天日均 <b>$${fmtUSD(p.v7)}</b><br>30 天日均 <b>$${fmtUSD(p.v30)}</b><br>
     ${up!=null?(up?'<b style="color:var(--up)">近期量能 ↑</b>':'<b style="color:var(--down)">近期量能 ↓</b>'):'数据不足'}</div>
