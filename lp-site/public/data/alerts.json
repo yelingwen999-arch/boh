@@ -1,104 +1,76 @@
 {
- "generatedAt": "2026-10-19T21:23:35+00:00",
+ "generatedAt": "2026-10-20T00:38:32+00:00",
  "baseline": true,
  "prevUpdated": "2026-10-19T19:30:44+08:00",
- "nowUpdated": "2026-10-19T21:23:35+00:00",
- "n": 7,
+ "nowUpdated": "2026-10-20T00:38:32+00:00",
+ "n": 5,
  "alerts": [
   {
    "type": "share_risk",
    "level": "warn",
    "title": "占比过高 · AAPL/USDT · BNB Chain · 0.01%",
-   "detail": "按本金 $10,000 算，占池子 14.9%（TVL $57.0K）— 你即市场",
+   "detail": "按本金 $10,000 算，占池子 14.9%（TVL $57.1K）— 你即市场",
    "pool": "bsc|0x0905edec2928b701fb6c6354e4eee4960895a82f",
    "prev": {
     "share": 13.49
    },
    "now": {
-    "share": 14.92
-   }
-  },
-  {
-   "type": "tvl_swing",
-   "level": "warn",
-   "title": "TVL 骤降 · MSTR/USDC · Base · 0.05%",
-   "detail": "$1.79M → $1.12M（-38%）",
-   "pool": "base|0x8b27f626ab668197000bc722a1012022caed10e2",
-   "prev": {
-    "tvl": 1792174.7289
-   },
-   "now": {
-    "tvl": 1117267.3868
-   }
-  },
-  {
-   "type": "apr_jump",
-   "level": "info",
-   "title": "APR 飙升 · MSTR/USDC · Base · 0.05%",
-   "detail": "79% → 129%（+63%） · TVL $1.12M",
-   "pool": "base|0x8b27f626ab668197000bc722a1012022caed10e2",
-   "prev": {
-    "apr30": 78.73916457608624,
-    "tvl": 1792174.7289
-   },
-   "now": {
-    "apr30": 128.5383264939202,
-    "tvl": 1117267.3868
+    "share": 14.91
    }
   },
   {
    "type": "top_rank",
    "level": "info",
-   "title": "新进 APR 前 5 · HIMS/USDG · Robinhood · 0.3%",
-   "detail": "上次第 6 名 → 当前第 2 名 · APR30 400%",
-   "pool": "robinhood|0xc8c90d3a1c1a24967e773ac2ad0d456ba3e31f64",
+   "title": "新进 APR 前 5 · TSLA/USDC · Base · 0.13%",
+   "detail": "上次第 8 名 → 当前第 3 名 · APR30 250%",
+   "pool": "base|0x469337fdcc5e8f38e2e4b670b04f57865d13a7bb",
    "prev": {
-    "rank": 6
+    "rank": 8
    },
    "now": {
-    "rank": 2,
-    "apr30": 399.9055482742629
-   }
-  },
-  {
-   "type": "top_rank",
-   "level": "info",
-   "title": "新进 APR 前 5 · AMC/USDG · Robinhood · 0.1%",
-   "detail": "上次第 7 名 → 当前第 4 名 · APR30 285%",
-   "pool": "robinhood|0x7499938c352d5b5b8f0c648722aca5ee964ef9b85c3a3041f1ec379726291d9d",
-   "prev": {
-    "rank": 7
-   },
-   "now": {
-    "rank": 4,
-    "apr30": 285.26939666319925
+    "rank": 3,
+    "apr30": 250.058207929797
    }
   },
   {
    "type": "top_rank",
    "level": "info",
    "title": "新进 APR 前 5 · AAPL/USDT · BNB Chain · 0.01%",
-   "detail": "上次第 9 名 → 当前第 5 名 · APR30 257%",
+   "detail": "上次第 9 名 → 当前第 4 名 · APR30 220%",
    "pool": "bsc|0x0905edec2928b701fb6c6354e4eee4960895a82f",
    "prev": {
     "rank": 9
    },
    "now": {
+    "rank": 4,
+    "apr30": 220.11785965370368
+   }
+  },
+  {
+   "type": "top_rank",
+   "level": "info",
+   "title": "新进 APR 前 5 · SPCX/WBNB · BNB Chain · 0.25%",
+   "detail": "上次第 10 名 → 当前第 5 名 · APR30 190%",
+   "pool": "bsc|0x66faad27cf481f82d0089ec8156b3aa3636010c7",
+   "prev": {
+    "rank": 10
+   },
+   "now": {
     "rank": 5,
-    "apr30": 256.8329298583897
+    "apr30": 189.52690507931754
    }
   },
   {
    "type": "tvl_swing",
    "level": "info",
    "title": "TVL 暴涨 · SPCX/USDC · Base · ?",
-   "detail": "$512.5K → $787.1K（+54%）",
+   "detail": "$512.5K → $776.9K（+52%）",
    "pool": "base|0x0bf58fe0fac935ac69595c19b12ba0d75e3f8c0e",
    "prev": {
     "tvl": 512540.4352
    },
    "now": {
-    "tvl": 787114.6488
+    "tvl": 776895.236
    }
   }
  ]
