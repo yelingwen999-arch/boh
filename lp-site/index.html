@@ -2080,9 +2080,18 @@ function wireKline(chart){
       const hh=g.h||1;
       KP_STATE.view={...KP_STATE.view, yPan:dragStartYPan+dy/hh};
     }else{
-      // 水平拖动：鼠标往左拖 = 内容跟着往左走 = 看到更早的数据（start 减小）。
-      // 之前写成了 -dx，方向反了：一开始就停在最右端（start = total-count），
-      // 再往左拖反而让 start 变大、被 kRange 钳回原值，表现就是「拖不动」。
+      // 水平拖动：往左拖 → 蜡烛右移 → 左边露出更早的数据（start 减小）。
+      // 也就是画面「反着」跟手走，和滚动条一致。
+      //
+      // 别照「抓住纸面」的直觉把它改成 -dx。改过两次，两个后果都踩到了：
+      //   1) 往左拖时 start 变大，而初始视窗就在最右端（total-count），
+      //      被 kRange 钳回原值 → 表现为「左右拖不动」；
+      //   2) 方向变成蜡烛跟着鼠标同向，反馈是「鼠标跟 K 线方向一致，很怪」。
+      // 方向错和拖不动是同一个符号造成的，改符号会同时破坏这两点。
+      //
+      // 参照：start 是最左边那根 bar 的序号，cx = pad.l + colW*(k-start+0.5)，
+      // start 减小 → 每根 bar 的 x 变大 → 视觉上向右移。往左拖 dx<0，
+      // 要 start 减小就取 +dx。
       const dx=e.clientX-dragStartX;
       const shift=Math.round(dx/g.colW);
       KP_STATE.view={...KP_STATE.view,
