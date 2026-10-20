@@ -1,77 +1,8 @@
 {
- "generatedAt": "2026-10-20T00:38:32+00:00",
+ "generatedAt": "2026-10-20T02:49:25+00:00",
  "baseline": true,
- "prevUpdated": "2026-10-19T19:30:44+08:00",
- "nowUpdated": "2026-10-20T00:38:32+00:00",
- "n": 5,
- "alerts": [
-  {
-   "type": "share_risk",
-   "level": "warn",
-   "title": "占比过高 · AAPL/USDT · BNB Chain · 0.01%",
-   "detail": "按本金 $10,000 算，占池子 14.9%（TVL $57.1K）— 你即市场",
-   "pool": "bsc|0x0905edec2928b701fb6c6354e4eee4960895a82f",
-   "prev": {
-    "share": 13.49
-   },
-   "now": {
-    "share": 14.91
-   }
-  },
-  {
-   "type": "top_rank",
-   "level": "info",
-   "title": "新进 APR 前 5 · TSLA/USDC · Base · 0.13%",
-   "detail": "上次第 8 名 → 当前第 3 名 · APR30 250%",
-   "pool": "base|0x469337fdcc5e8f38e2e4b670b04f57865d13a7bb",
-   "prev": {
-    "rank": 8
-   },
-   "now": {
-    "rank": 3,
-    "apr30": 250.058207929797
-   }
-  },
-  {
-   "type": "top_rank",
-   "level": "info",
-   "title": "新进 APR 前 5 · AAPL/USDT · BNB Chain · 0.01%",
-   "detail": "上次第 9 名 → 当前第 4 名 · APR30 220%",
-   "pool": "bsc|0x0905edec2928b701fb6c6354e4eee4960895a82f",
-   "prev": {
-    "rank": 9
-   },
-   "now": {
-    "rank": 4,
-    "apr30": 220.11785965370368
-   }
-  },
-  {
-   "type": "top_rank",
-   "level": "info",
-   "title": "新进 APR 前 5 · SPCX/WBNB · BNB Chain · 0.25%",
-   "detail": "上次第 10 名 → 当前第 5 名 · APR30 190%",
-   "pool": "bsc|0x66faad27cf481f82d0089ec8156b3aa3636010c7",
-   "prev": {
-    "rank": 10
-   },
-   "now": {
-    "rank": 5,
-    "apr30": 189.52690507931754
-   }
-  },
-  {
-   "type": "tvl_swing",
-   "level": "info",
-   "title": "TVL 暴涨 · SPCX/USDC · Base · ?",
-   "detail": "$512.5K → $776.9K（+52%）",
-   "pool": "base|0x0bf58fe0fac935ac69595c19b12ba0d75e3f8c0e",
-   "prev": {
-    "tvl": 512540.4352
-   },
-   "now": {
-    "tvl": 776895.236
-   }
-  }
- ]
+ "prevUpdated": "2026-10-20T10:13:00+08:00",
+ "nowUpdated": "2026-10-20T10:49:22+08:00",
+ "n": 0,
+ "alerts": []
 }
