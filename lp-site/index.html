@@ -1870,6 +1870,8 @@ function openKline(g, tf){
   // 换标的后旧的 OHLC 读数要清掉，否则会短暂显示上一只票的数字
   const ohlc=$('#kp-ohlc');
   if(ohlc) ohlc.textContent='';
+  // 绑定一次交互（内部有去重，重复调用无副作用），再画
+  ensureKlineWired();
   drawKline();
 }
 
@@ -1879,6 +1881,12 @@ function closeKline(){
   if(panel) panel.hidden=true;
 }
 
+/* 画（或重画）K 线。
+
+   重要：这个函数**只替换 SVG 和光标层，不碰事件监听**。
+   监听由 wireKline() 在面板打开时绑定一次，挂在 #kp-chart 上。
+   早期版本在这里重绑监听，结果拖动时第一个 mousemove 触发重绘，
+   重绘又 abort 掉监听，第二次以后的 mousemove 全收不到——表现为「拖不动」。 */
 function drawKline(){
   const chart=$('#kp-chart');
   if(!chart) return;
@@ -1899,6 +1907,7 @@ function drawKline(){
   const res=klineSVG(bars, W, H, KP_STATE.view, {timeframe:KP_STATE.tf, ma:true});
   if(!res){ chart.innerHTML=''; return; }
 
+  // 只换内部结构。外层 #kp-chart 保持不变，绑在它上面的监听器才不会被冲掉。
   chart.innerHTML=res.svg
     +'<div class="kp-cursor" id="kp-cursor"><div class="v"></div><div class="h-line"></div></div>'
     // 价格刻度区的透明覆盖层，给纵轴操作一个明确的可点击区域
@@ -1909,47 +1918,56 @@ function drawKline(){
   const r=kRange(bars.length, KP_STATE.view);
   const period=KP_STATE.tf==='h'?'小时':'日';
   $('#kp-info').textContent=`${bars.length} 根${period}线 · 显示 ${r.start+1}–${r.start+r.count}`;
-
-  wireKline(chart);
 }
 
 /* 悬停十字线 + OHLC 读数、滚轮缩放、拖动平移
 
-   注意：drawKline() 每次都会调这里，而缩放/平移又会触发 drawKline，
-   所以监听器必须能干净地解绑——否则一次拖动就叠出几十个监听，
-   每个都再触发一次 drawKline，页面直接卡死。
-   统一用 AbortController：重绘前 abort 上一次的全部监听。 */
-let KP_AC=null;
-
+   监听器只在面板打开时绑定一次（wireKlinePanel），挂在 #kp-chart 上。
+   它们读的是 KP_STATE 里的**实时**几何量（每次重绘后更新），
+   所以重绘不需要重绑监听。 */
 function wireKline(chart){
-  // 先清掉上一次绑的（含挂在 window 上的）
-  if(KP_AC) KP_AC.abort();
-  KP_AC=new AbortController();
-  const signal=KP_AC.signal;
+  // 一次性绑定：已经有绑定就直接返回，避免重复叠加
+  if(chart.dataset.wired==='1') return;
+  chart.dataset.wired='1';
 
-  const svg=chart.querySelector('svg.kline');
-  if(!svg) return;
-  const cursor=chart.querySelector('#kp-cursor');
-  const g=KP_STATE.geom;
-  const bars=KP_STATE.bars;
+  // 拖动状态
+  let dragging=false, dragStartX=0, dragStartY=0, dragStartView=null;
+  let dragStartYPan=0, dragAxis=null;
+
+  const svgNow=()=>chart.querySelector('svg.kline');
+  const geom=()=>KP_STATE.geom||{pad:{l:8},colW:10,w:100,h:200};
 
   const fmtT=t=>{
     const d=new Date(t*1000);
     const p=n=>String(n).padStart(2,'0');
-    return KP_STATE.tf==='hour'
+    return KP_STATE.tf==='h'
       ? `${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:00`
       : `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
   };
   const fmtP=v=>v>=1000?v.toFixed(2):v>=1?v.toFixed(3):v.toFixed(5);
 
-  // 拖动状态要提前声明：下面的悬停监听里会读它（TDZ 会直接抛错）
-  // dragAxis: 'x' 拖横轴 / 'y' 拖纵轴
-  let dragging=false, dragStartX=0, dragStartY=0, dragStartView=null;
-  let dragStartYPan=0, dragAxis=null;
+  /* 判断鼠标在哪个区：价格刻度区（右侧 56px）= 纵轴，其余 = 横轴 */
+  const inPriceAxis=e=>{
+    const svg=svgNow();
+    if(!svg) return false;
+    const g=geom();
+    const rect=svg.getBoundingClientRect();
+    return (e.clientX-rect.left) > g.pad.l+g.w;
+  };
 
+  // 重绘节流：合并到每帧一次
+  let rafId=null;
+  function scheduleDraw(){
+    if(rafId!=null) return;
+    rafId=requestAnimationFrame(()=>{ rafId=null; drawKline(); });
+  }
+
+  /* ---------- 悬停：十字线 + OHLC 读数 ---------- */
   function showAt(idx){
     const m=KP_STATE.meta[idx];
     if(!m) return;
+    const svg=svgNow(); if(!svg) return;
+    const g=geom();
     const b=m.b;
     const up=b.c>=b.o;
     const cls=up?'up':'down';
@@ -1963,134 +1981,117 @@ function wireKline(chart){
       `<span>量<b>$${fmtUSD(b.v)}</b></span>`+
       `<span>涨跌<b class="${cls}">${chg>=0?'+':''}${chg.toFixed(2)}%</b></span>`;
 
+    const cursor=chart.querySelector('#kp-cursor');
+    if(!cursor) return;
     const rect=svg.getBoundingClientRect();
     const chartRect=chart.getBoundingClientRect();
-    const x=m.cx, y=()=>{
-      // 用收盘价位置画横线
-      const r=kRange(bars.length,KP_STATE.view);
-      const slice=bars.slice(r.start,r.start+r.count);
-      let hi=-Infinity, lo=Infinity;
-      for(const q of slice){ if(q.h>hi)hi=q.h; if(q.l<lo)lo=q.l; }
-      const padY=(hi-lo||hi*0.01)*0.06; hi+=padY; lo-=padY;
-      const h=g.H-g.pad.t-g.pad.b;
-      return g.pad.t+h-(b.c-lo)/(hi-lo||1)*h;
-    };
-    if(cursor){
-      cursor.classList.add('on');
-      const vx=x+(rect.left-chartRect.left), vy=y()+(rect.top-chartRect.top);
-      cursor.querySelector('.v').style.left=vx+'px';
-      cursor.querySelector('.v').style.top=(rect.top-chartRect.top)+'px';
-      cursor.querySelector('.v').style.bottom='';
-      cursor.querySelector('.v').style.height=(g.H-g.pad.b)+'px';
-      cursor.querySelector('.h-line').style.left=0;
-      cursor.querySelector('.h-line').style.right=0;
-      cursor.querySelector('.h-line').style.top=vy+'px';
+    const h=g.H-g.pad.t-g.pad.b;
+    const y=g.pad.t+h-(b.c-g.lo)/((g.hi-g.lo)||1)*h;
+    cursor.classList.add('on');
+    const v=cursor.querySelector('.v');
+    const hl=cursor.querySelector('.h-line');
+    if(v){
+      v.style.left=(m.cx+rect.left-chartRect.left)+'px';
+      v.style.top=(g.pad.t+rect.top-chartRect.top)+'px';
+      v.style.height=h+'px';
+    }
+    if(hl){
+      hl.style.left='0'; hl.style.right='0';
+      hl.style.top=(y+rect.top-chartRect.top)+'px';
     }
   }
-
   function hideCursor(){
-    if(cursor) cursor.classList.remove('on');
+    const c=chart.querySelector('#kp-cursor');
+    if(c) c.classList.remove('on');
   }
 
-  // 悬停：定位到最近的一根
   chart.addEventListener('mousemove',e=>{
-    if(dragging) return;              // 拖动时不做悬停，避免和拖拽抢
+    if(dragging) return;
+    const svg=svgNow(); if(!svg) return;
+    const g=geom();
     const rect=svg.getBoundingClientRect();
     const x=e.clientX-rect.left-g.pad.l;
     const idx=Math.floor(x/g.colW);
     if(idx<0||idx>=KP_STATE.meta.length){ hideCursor(); return; }
     showAt(idx);
-  },{signal});
-  chart.addEventListener('mouseleave',hideCursor,{signal});
+  });
+  chart.addEventListener('mouseleave',hideCursor);
 
-  // 重绘节流：滚轮和拖动都会连续触发，直接用 rAF 合并到每帧一次。
-  // 不节流的话一次拖动会重绘几十次，每次都重建整个 SVG 并重绑监听。
-  let rafId=null;
-  function scheduleDraw(){
-    if(rafId!=null) return;
-    rafId=requestAnimationFrame(()=>{
-      rafId=null;
-      drawKline();
-    });
-  }
-
-  /* 判断鼠标在哪个区：
-       价格刻度区（右侧 56px）= 纵轴操作
-       图表主体 = 横轴操作
-     这是交易软件的习惯，不用额外按钮。
-     覆盖层也在 svg 范围内，所以统一按 svg 坐标算，不区分事件源。 */
-  const inPriceAxis = e=>{
-    const rect=svg.getBoundingClientRect();
-    return (e.clientX-rect.left) > g.pad.l+g.w;
-  };
-
-  // 滚轮：在图表上缩放横轴，在价格刻度上缩放纵轴
+  /* ---------- 滚轮：主体缩横轴，价格区缩纵轴 ---------- */
   chart.addEventListener('wheel',e=>{
     e.preventDefault();
+    const bars=KP_STATE.bars;
+    if(!bars.length) return;
+    const g=geom();
 
     if(inPriceAxis(e)){
-      // ---- 纵轴缩放 ----
       const cur=KP_STATE.view.yZoom||1;
       const next=Math.max(0.15, Math.min(8, cur*(e.deltaY>0?0.88:1.14)));
-      KP_STATE.view={...KP_STATE.view, yZoom:next};
-      if(Math.abs(next-1)<0.02) delete KP_STATE.view.yZoom;
+      const v={...KP_STATE.view, yZoom:next};
+      if(Math.abs(next-1)<0.02) delete v.yZoom;
+      KP_STATE.view=v;
       scheduleDraw();
       return;
     }
 
-    // ---- 横轴缩放：以鼠标位置为锚点 ----
+    const svg=svgNow(); if(!svg) return;
     const total=bars.length;
     const cur=kRange(total,KP_STATE.view);
     const rect=svg.getBoundingClientRect();
     const x=e.clientX-rect.left-g.pad.l;
     const frac=Math.max(0,Math.min(1,x/g.w));
     const anchor=cur.start+frac*cur.count;
-
     const factor=e.deltaY>0?1.25:0.8;
     let count=Math.round(cur.count*factor);
     count=Math.max(12, Math.min(total, count));
-    let start=Math.round(anchor-frac*count);
+    const start=Math.round(anchor-frac*count);
     KP_STATE.view={...KP_STATE.view, start, count};
     scheduleDraw();
-  },{passive:false,signal});
+  },{passive:false});
 
-  // 拖动：主体拖横轴，价格刻度区拖纵轴
+  /* ---------- 拖动：主体拖横轴，价格区拖纵轴 ---------- */
   chart.addEventListener('mousedown',e=>{
     if(e.button!==0) return;
+    e.preventDefault();               // 防止选中文本打断拖动
     dragging=true;
     dragStartX=e.clientX;
     dragStartY=e.clientY;
-    dragStartView=kRange(bars.length,KP_STATE.view);
+    dragStartView=kRange(KP_STATE.bars.length,KP_STATE.view);
     dragStartYPan=KP_STATE.view.yPan||0;
     dragAxis=inPriceAxis(e)?'y':'x';
     chart.style.cursor=dragAxis==='y'?'ns-resize':'grabbing';
     hideCursor();
-  },{signal});
-  // 挂在 window 上是为了鼠标拖出图表外再松手也能正确结束；
-  // signal 保证每次重绘时被清掉，不会累积。
+  });
+
+  // 挂在 window 上：鼠标拖出图表外再松手也能正确结束
   window.addEventListener('mouseup',()=>{
-    if(dragging){
-      dragging=false;
-      dragAxis=null;
-      chart.style.cursor='crosshair';
-    }
-  },{signal});
-  chart.addEventListener('mousemove',e=>{
     if(!dragging) return;
+    dragging=false;
+    dragAxis=null;
+    chart.style.cursor='crosshair';
+  });
+
+  // 拖动时也监听 window 的 mousemove——鼠标划出图表边界拖动才不会断
+  window.addEventListener('mousemove',e=>{
+    if(!dragging) return;
+    const g=geom();
     if(dragAxis==='y'){
-      // 纵轴平移：往上拖 = 看更低的价格区间
       const dy=e.clientY-dragStartY;
       const hh=g.h||1;
       KP_STATE.view={...KP_STATE.view, yPan:dragStartYPan+dy/hh};
     }else{
+      // 水平拖动：鼠标往左拖 = 内容跟着往左走 = 看到更早的数据（start 减小）。
+      // 之前写成了 -dx，方向反了：一开始就停在最右端（start = total-count），
+      // 再往左拖反而让 start 变大、被 kRange 钳回原值，表现就是「拖不动」。
       const dx=e.clientX-dragStartX;
-      const shift=Math.round(-dx/g.colW);
-      KP_STATE.view={...KP_STATE.view, start:dragStartView.start+shift, count:dragStartView.count};
+      const shift=Math.round(dx/g.colW);
+      KP_STATE.view={...KP_STATE.view,
+        start:dragStartView.start+shift, count:dragStartView.count};
     }
     scheduleDraw();
-  },{signal});
+  });
 
-  // 双击价格刻度 = 重置纵轴（回到自动适配）
+  // 双击价格刻度 = 重置纵轴
   chart.addEventListener('dblclick',e=>{
     if(!inPriceAxis(e)) return;
     e.preventDefault();
@@ -2098,13 +2099,19 @@ function wireKline(chart){
     delete v.yZoom; delete v.yPan;
     KP_STATE.view=v;
     drawKline();
-  },{signal});
+  });
 
-  // 悬停时给出光标提示，让人知道这儿能操作纵轴
+  // 光标提示
   chart.addEventListener('mousemove',e=>{
     if(dragging) return;
     chart.style.cursor=inPriceAxis(e)?'ns-resize':'crosshair';
-  },{signal});
+  });
+}
+
+/* 兼容旧调用：drawKline 后确保监听已绑定 */
+function ensureKlineWired(){
+  const chart=$('#kp-chart');
+  if(chart) wireKline(chart);
 }
 
 /* 卡片交互：点击筛选 / 悬停看图 */
