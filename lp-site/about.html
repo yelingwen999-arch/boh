@@ -209,7 +209,7 @@ li::before{content:'—';position:absolute;left:0;color:var(--t3)}
     </dd>
 
     <dt>更新方式</dt>
-    <dd>由 GitHub Actions <strong>每小时抓取一次</strong>，写入静态 JSON，随站点部署。页面顶部的「更新时间」是数据的抓取时间，不是页面加载时间。</dd>
+    <dd>由 GitHub Actions <strong>每 6 小时抓取一次</strong>，写入静态 JSON，随站点部署。页面顶部的「更新时间」是数据的抓取时间，不是页面加载时间。若某一轮抓取不完整（池子数比上一版少三成以上），这一轮会失败并被丢弃，页面继续显示上一版的完整数据。</dd>
   </dl>
 
   <h2>计算口径</h2>

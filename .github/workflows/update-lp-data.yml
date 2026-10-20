@@ -5,9 +5,12 @@ name: LP 看板监控
 
 on:
   schedule:
-    # 每小时一次（UTC 整点后 5 分，避开整点的 Actions 高峰）
-    # 注：公开仓库的 Actions 免费不限量
-    - cron: '5 * * * *'
+    # 每 6 小时一次（UTC 每 6 小时的 :05）。
+    # 原来每小时一次：完整抓取要 40 分钟，一小时一轮意味着几乎连轴转，
+    # 而且一旦某轮被打断（限流/预算），下一轮还会用新的残缺结果继续覆盖，
+    # 好数据没有喘息和回滚的机会。放宽到 6 小时，配合防退化校验，
+    # 数据新鲜度对 LP 看板完全够用。
+    - cron: '5 */6 * * *'
   workflow_dispatch:
     inputs:
       notify_test:
@@ -25,7 +28,10 @@ concurrency:
 jobs:
   monitor:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    # 完整抓取本地实测要 40 分钟以上（72 个池、4 条链、每池还要补小时线）。
+    # 原来给 35 分钟不够，配合下面的 FETCH_BUDGET_S=1500 会稳定停在半路，
+    # 把抓了一半的数据当成完整结果提交，线上池子数从 72 掉到过 21。
+    timeout-minutes: 55
 
     steps:
       - name: 检出仓库
@@ -50,13 +56,24 @@ jobs:
           MAIL_TO: ${{ secrets.MAIL_TO }}
         run: python notify.py --test
 
-      # ---- 正常流程：抓取 → 检测 → 推送 ----
+      # ---- 正常流程：抓取 → 校验 → 检测 → 推送 ----
       - name: 抓取 LP 池数据
         if: inputs.notify_test != true
         working-directory: lp-site/scripts
         env:
-          FETCH_BUDGET_S: '1500'
+          # 2400s（40 分钟）是本地实测完整抓取所需。给少了脚本会按设计
+          # 在预算耗尽时停下并写出「扫到的那部分」，看起来是一次成功的
+          # 抓取，实际是残缺数据。宁可跑久一点，也不要半份数据。
+          FETCH_BUDGET_S: '2400'
         run: python fetch_pools.py
+
+      # 池子数防退化：这一版比上一版少太多，说明抓取没跑完（预算/限流），
+      # 直接让这轮失败，保留上一版。必须先于覆盖率检查跑——
+      # 覆盖率看的是比例，21 个池里 14 个有 APY 依然能通过。
+      - name: 校验池子数没有异常缩水
+        if: inputs.notify_test != true
+        working-directory: lp-site/scripts
+        run: python check_pool_regression.py
 
       # 收益率必须来自 DefiLlama 官方口径。如果这一轮基本都没匹配上，
       # 说明数据源挂了或匹配逻辑坏了——宁可让这轮失败，也不要把

@@ -1,66 +1,8 @@
 {
- "generatedAt": "2026-10-20T06:19:21+00:00",
+ "generatedAt": "2026-10-20T02:49:25+00:00",
  "baseline": true,
- "prevUpdated": "2026-10-20T10:49:22+08:00",
- "nowUpdated": "2026-10-20T06:19:20+00:00",
- "n": 4,
- "alerts": [
-  {
-   "type": "apr_jump",
-   "level": "info",
-   "title": "APR 飙升 · SNDK/USDC · Base · 0.2%",
-   "detail": "2017% → 4565%（+126%） · TVL $945.9K",
-   "pool": "base|0x5a8236f575471e7bfca2c8462a200c28f737246e",
-   "prev": {
-    "apr": 2016.89606,
-    "tvl": 947898.8762
-   },
-   "now": {
-    "apr": 4564.71862,
-    "tvl": 945858.3176
-   }
-  },
-  {
-   "type": "apr_jump",
-   "level": "info",
-   "title": "APR 飙升 · AMZN/USDC · Base · 0.034%",
-   "detail": "194% → 549%（+182%） · TVL $2.05M",
-   "pool": "base|0xd03bc8c7f2faedce2aac81bf0444aea08ea06e9b",
-   "prev": {
-    "apr": 194.39294,
-    "tvl": 2047279.5141
-   },
-   "now": {
-    "apr": 548.99755,
-    "tvl": 2048029.4355
-   }
-  },
-  {
-   "type": "top_rank",
-   "level": "info",
-   "title": "新进 APR 前 5 · AMZN/USDC · Base · 0.034%",
-   "detail": "上次第 16 名 → 当前第 5 名 · APY 549%",
-   "pool": "base|0xd03bc8c7f2faedce2aac81bf0444aea08ea06e9b",
-   "prev": {
-    "rank": 16
-   },
-   "now": {
-    "rank": 5,
-    "apr": 548.99755
-   }
-  },
-  {
-   "type": "tvl_swing",
-   "level": "info",
-   "title": "TVL 暴涨 · MSTR/USDC · Base · 0.05%",
-   "detail": "$1.09M → $1.49M（+37%）",
-   "pool": "base|0x8b27f626ab668197000bc722a1012022caed10e2",
-   "prev": {
-    "tvl": 1088918.9357
-   },
-   "now": {
-    "tvl": 1491583.9007
-   }
-  }
- ]
+ "prevUpdated": "2026-10-20T10:13:00+08:00",
+ "nowUpdated": "2026-10-20T10:49:22+08:00",
+ "n": 0,
+ "alerts": []
 }
