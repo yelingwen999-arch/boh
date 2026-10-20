@@ -40,22 +40,39 @@ function build() {
 
 let lastBuild = 0;
 
-/** dist 缺失或比源文件旧时重建，最多每 2 秒一次 */
+/**
+ * dist 缺失或比源文件旧时重建，最多每 2 秒一次。
+ *
+ * 注意：必须拿「同名产物」比，不能拿 dist/index.html 的时间去比所有源文件。
+ * 早先的写法把所有源文件的 mtime 和 dist/index.html 比，只要 about.html 比
+ * dist/index.html 新（很常见：改完 index 再改 about），条件就永远成立，
+ * 于是每个请求都触发一次重建，日志里刷满「about.html 比 dist 新」。
+ * 重建又会刷新 dist 的 mtime，看起来像在自愈，实际是死循环。
+ */
 async function ensureFresh() {
-  const idx = join(dist, 'index.html');
-  if (!existsSync(idx)) {
+  if (!existsSync(join(dist, 'index.html'))) {
     if (Date.now() - lastBuild > 2000) { lastBuild = Date.now(); build(); }
     return;
   }
-  const distTime = (await stat(idx)).mtimeMs;
   for (const s of SOURCES) {
     const src = join(root, s);
+    const out = join(dist, s);
     if (!existsSync(src)) continue;
-    const srcTime = (await stat(src)).mtimeMs;
-    if (srcTime > distTime) {
+    // 产物不存在，或源比它对应的产物新 → 需要重建
+    if (!existsSync(out)) {
       if (Date.now() - lastBuild > 2000) {
         lastBuild = Date.now();
-        console.log(`[serve] ${s} 比 dist 新，自动重建`);
+        console.log(`[serve] dist/${s} 缺失，自动重建`);
+        build();
+      }
+      return;
+    }
+    const srcTime = (await stat(src)).mtimeMs;
+    const outTime = (await stat(out)).mtimeMs;
+    if (srcTime > outTime) {
+      if (Date.now() - lastBuild > 2000) {
+        lastBuild = Date.now();
+        console.log(`[serve] ${s} 比 dist/${s} 新，自动重建`);
         build();
       }
       return;
