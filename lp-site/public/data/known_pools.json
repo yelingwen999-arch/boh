@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-20T21:58:47+00:00",
+ "updated": "2026-10-21T04:15:02+00:00",
  "pools": [
   "base|0x0bf58fe0fac935ac69595c19b12ba0d75e3f8c0e",
   "base|0x21ecda9a537f831361d1c336eadd7f3f9a82ea43",
@@ -76,6 +76,7 @@
   "solana|3l7kbpvaaqa4utecagqysm6ucq5f3szm9zaykxqyt63j",
   "solana|49imatqtoyabsyaqc8gafvq6aebfvdxsrh44oiatyyw6",
   "solana|4pczcveiyyt4efndxudl2tjf8vgmgimxrzwq6finxhrw",
+  "solana|4vrc6qne8hpun98mjr88vrkrd9n4cadyrgtpwvu3cv86",
   "solana|5tgludhm9phtqbtfymvdarbd59aymyyimxxwbffzetv9",
   "solana|6m5axave4uh6kt4ytkyclwnmjd8pyp5vujwnctycruid",
   "solana|7gkb2d1sqhuygkrspdu5cma4tk9efijhouyituabdjcg",

@@ -1,52 +1,143 @@
 {
- "generatedAt": "2026-10-20T21:58:48+00:00",
+ "generatedAt": "2026-10-21T04:15:03+00:00",
  "baseline": true,
- "prevUpdated": "2026-10-20T17:06:19+00:00",
- "nowUpdated": "2026-10-20T21:58:47+00:00",
- "n": 3,
+ "prevUpdated": "2026-10-20T21:58:47+00:00",
+ "nowUpdated": "2026-10-21T04:15:02+00:00",
+ "n": 10,
  "alerts": [
   {
-   "type": "apr_jump",
-   "level": "info",
-   "title": "APR 飙升 · MSFT/USDC · Base · 0.055%",
-   "detail": "405% → 1674%（+313%） · TVL $374.1K",
-   "pool": "base|0x7103eb3c9590d1281f7dc03b2a9ee27c39df5d54",
+   "type": "share_risk",
+   "level": "warn",
+   "title": "占比过高 · SNDK/USDC · Solana · ?",
+   "detail": "按本金 $10,000 算，占池子 7.5%（TVL $124.0K）— 你即市场",
+   "pool": "solana|4vrc6qne8hpun98mjr88vrkrd9n4cadyrgtpwvu3cv86",
    "prev": {
-    "apr": 405.12002,
-    "tvl": 402295.2245
+    "share": 0
    },
    "now": {
-    "apr": 1673.86407,
-    "tvl": 374143.8354
+    "share": 7.46
+   }
+  },
+  {
+   "type": "tvl_swing",
+   "level": "warn",
+   "title": "TVL 骤降 · MSTR/USDC · Base · 0.05%",
+   "detail": "$1.62M → $1.02M（-37%）",
+   "pool": "base|0x8b27f626ab668197000bc722a1012022caed10e2",
+   "prev": {
+    "tvl": 1618684.9887
+   },
+   "now": {
+    "tvl": 1024564.4843
+   }
+  },
+  {
+   "type": "tvl_swing",
+   "level": "warn",
+   "title": "TVL 骤降 · SPCX/USDC · Solana · ?",
+   "detail": "$2.66M → $1.57M（-41%）",
+   "pool": "solana|fjuby7jjf9dxj9d3r7chpvcnofw2iqxf7f7p3vqx4jza",
+   "prev": {
+    "tvl": 2662743.9947
+   },
+   "now": {
+    "tvl": 1570982.627
+   }
+  },
+  {
+   "type": "volume_dry",
+   "level": "warn",
+   "title": "量能萎缩 · HIMS/USDG · Robinhood · 0.3%",
+   "detail": "7 日均量 / 30 日均量 = 33%（$637.5K / $1.91M）",
+   "pool": "robinhood|0xc8c90d3a1c1a24967e773ac2ad0d456ba3e31f64",
+   "prev": {
+    "ratio": 40.6
+   },
+   "now": {
+    "ratio": 33.4
    }
   },
   {
    "type": "apr_jump",
    "level": "info",
-   "title": "APR 飙升 · AAPL/USDC · Base · 0.08%",
-   "detail": "230% → 994%（+332%） · TVL $875.1K",
-   "pool": "base|0xa3b1e3f9747065e2073722ff4c9027d3ea4994f0",
+   "title": "APR 飙升 · NVDA/USDC · Base · 0.286%",
+   "detail": "269% → 766%（+185%） · TVL $1.47M",
+   "pool": "base|0x853f5f1b92b16714fe6cda67caad0856b83c7ab9",
    "prev": {
-    "apr": 230.17867,
-    "tvl": 968859.287
+    "apr": 268.76237,
+    "tvl": 1275223.4282
    },
    "now": {
-    "apr": 994.03696,
-    "tvl": 875123.8638
+    "apr": 766.07651,
+    "tvl": 1468407.8478
+   }
+  },
+  {
+   "type": "apr_jump",
+   "level": "info",
+   "title": "APR 飙升 · SPCX/USDC · Solana · ?",
+   "detail": "192% → 638%（+232%） · TVL $1.57M",
+   "pool": "solana|fjuby7jjf9dxj9d3r7chpvcnofw2iqxf7f7p3vqx4jza",
+   "prev": {
+    "apr": 192.15,
+    "tvl": 2662743.9947
+   },
+   "now": {
+    "apr": 637.7,
+    "tvl": 1570982.627
+   }
+  },
+  {
+   "type": "new_pool",
+   "level": "info",
+   "title": "新池上线 · SNDK/USDC · Solana · ?",
+   "detail": "TVL $124.0K · APY 89%",
+   "pool": "solana|4vrc6qne8hpun98mjr88vrkrd9n4cadyrgtpwvu3cv86",
+   "prev": null,
+   "now": {
+    "tvl": 123961.3176,
+    "apr": 89.29
    }
   },
   {
    "type": "top_rank",
    "level": "info",
-   "title": "新进 APR 前 5 · MSFT/USDC · Base · 0.055%",
-   "detail": "上次第 11 名 → 当前第 5 名 · APY 1674%",
-   "pool": "base|0x7103eb3c9590d1281f7dc03b2a9ee27c39df5d54",
+   "title": "新进 APR 前 5 · NVDA/USDC · Base · 0.286%",
+   "detail": "上次第 13 名 → 当前第 4 名 · APY 766%",
+   "pool": "base|0x853f5f1b92b16714fe6cda67caad0856b83c7ab9",
    "prev": {
-    "rank": 11
+    "rank": 13
+   },
+   "now": {
+    "rank": 4,
+    "apr": 766.07651
+   }
+  },
+  {
+   "type": "top_rank",
+   "level": "info",
+   "title": "新进 APR 前 5 · DJT/USDC · Solana · ?",
+   "detail": "上次第 10 名 → 当前第 5 名 · APY 690%",
+   "pool": "solana|7gkb2d1sqhuygkrspdu5cma4tk9efijhouyituabdjcg",
+   "prev": {
+    "rank": 10
    },
    "now": {
     "rank": 5,
-    "apr": 1673.86407
+    "apr": 689.94657
+   }
+  },
+  {
+   "type": "tvl_swing",
+   "level": "info",
+   "title": "TVL 暴涨 · CRCL/USDC · Solana · ?",
+   "detail": "$3.44M → $4.98M（+45%）",
+   "pool": "solana|gyqhjudztiw7i52xv1qohde6ejr6eszpsrbvikgzyafv",
+   "prev": {
+    "tvl": 3436765.9736
+   },
+   "now": {
+    "tvl": 4975892.5135
    }
   }
  ]
