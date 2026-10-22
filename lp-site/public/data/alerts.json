@@ -1,95 +1,315 @@
 {
- "generatedAt": "2026-10-21T21:59:13+00:00",
+ "generatedAt": "2026-10-22T04:11:00+00:00",
  "baseline": true,
- "prevUpdated": "2026-10-21T17:23:18+00:00",
- "nowUpdated": "2026-10-21T21:59:12+00:00",
- "n": 6,
+ "prevUpdated": "2026-10-21T21:59:12+00:00",
+ "nowUpdated": "2026-10-22T04:10:59+00:00",
+ "n": 23,
  "alerts": [
   {
-   "type": "apr_jump",
-   "level": "info",
-   "title": "APR 飙升 · META/USDC · Base · 0.143%",
-   "detail": "318% → 3014%（+847%） · TVL $1.09M",
-   "pool": "base|0xeaf57753bc382e0324a1d43f72e7027705a2273e",
+   "type": "share_risk",
+   "level": "warn",
+   "title": "占比过高 · NFLX/USDC · Solana · ?",
+   "detail": "按本金 $10,000 算，占池子 5.4%（TVL $176.0K）— 你即市场",
+   "pool": "solana|e3mugzpimhkgrdcfcz5ojo7hjbbya6umajvszbabplam",
    "prev": {
-    "apr": 318.44321,
-    "tvl": 1034003.8552
+    "share": 0
    },
    "now": {
-    "apr": 3014.23451,
-    "tvl": 1090582.2496
+    "share": 5.38
    }
   },
   {
-   "type": "apr_jump",
-   "level": "info",
-   "title": "APR 飙升 · MSFT/USDC · Base · 0.185%",
-   "detail": "447% → 2245%（+402%） · TVL $440.7K",
+   "type": "share_risk",
+   "level": "warn",
+   "title": "占比过高 · SNDK/USDC · Solana · ?",
+   "detail": "按本金 $10,000 算，占池子 7.8%（TVL $118.9K）— 你即市场",
+   "pool": "solana|4vrc6qne8hpun98mjr88vrkrd9n4cadyrgtpwvu3cv86",
+   "prev": {
+    "share": 7.52
+   },
+   "now": {
+    "share": 7.76
+   }
+  },
+  {
+   "type": "share_risk",
+   "level": "warn",
+   "title": "占比过高 · MSFT/USDC · Base · 0.185%",
+   "detail": "按本金 $10,000 算，占池子 5.6%（TVL $168.6K）— 你即市场",
    "pool": "base|0x7103eb3c9590d1281f7dc03b2a9ee27c39df5d54",
    "prev": {
-    "apr": 447.13727,
-    "tvl": 349201.8023
+    "share": 2.22
    },
    "now": {
-    "apr": 2244.51903,
-    "tvl": 440700.121
+    "share": 5.6
    }
   },
   {
-   "type": "apr_jump",
-   "level": "info",
-   "title": "APR 飙升 · AAPL/USDC · Base · 0.056%",
-   "detail": "190% → 1787%（+839%） · TVL $1.03M",
-   "pool": "base|0xa3b1e3f9747065e2073722ff4c9027d3ea4994f0",
+   "type": "share_risk",
+   "level": "warn",
+   "title": "占比过高 · SKHY/USDC · Base · ?",
+   "detail": "按本金 $10,000 算，占池子 12.4%（TVL $70.7K）— 你即市场",
+   "pool": "base|0x6678992e0a166f4e78bf6cad5dd7e61ca041711c",
    "prev": {
-    "apr": 190.37838,
-    "tvl": 878419.3306
+    "share": 0
    },
    "now": {
-    "apr": 1787.46914,
-    "tvl": 1032968.127
+    "share": 12.38
    }
   },
   {
-   "type": "apr_jump",
-   "level": "info",
-   "title": "APR 飙升 · NVDA/USDC · Base · 0.638%",
-   "detail": "343% → 1631%（+376%） · TVL $1.49M",
-   "pool": "base|0x853f5f1b92b16714fe6cda67caad0856b83c7ab9",
+   "type": "share_risk",
+   "level": "warn",
+   "title": "占比过高 · NFLX/USDC · Base · ?",
+   "detail": "按本金 $10,000 算，占池子 26.7%（TVL $27.4K）— 你即市场",
+   "pool": "base|0x40e8d293ca4e0cce3221eb13a78bff1d0d2b70a7",
    "prev": {
-    "apr": 342.86909,
-    "tvl": 1398025.8271
+    "share": 0
    },
    "now": {
-    "apr": 1630.90798,
-    "tvl": 1485201.7026
+    "share": 26.71
    }
   },
   {
-   "type": "apr_jump",
-   "level": "info",
-   "title": "APR 飙升 · AMZN/USDC · Base · 0.051%",
-   "detail": "260% → 1334%（+413%） · TVL $1.83M",
+   "type": "share_risk",
+   "level": "warn",
+   "title": "占比过高 · AMD/USDC · Base · ?",
+   "detail": "按本金 $10,000 算，占池子 24.9%（TVL $30.1K）— 你即市场",
+   "pool": "base|0x0f9392c6c3fde1066f2e1c32b5536fb63897b64d",
+   "prev": {
+    "share": 0
+   },
+   "now": {
+    "share": 24.93
+   }
+  },
+  {
+   "type": "share_risk",
+   "level": "warn",
+   "title": "占比过高 · MUB/USDT · BNB Chain · 0.25%",
+   "detail": "按本金 $10,000 算，占池子 7.5%（TVL $123.6K）— 你即市场",
+   "pool": "bsc|0x9e75ced0a01590890917c5180c3e3ed6a86a071e",
+   "prev": {
+    "share": 0
+   },
+   "now": {
+    "share": 7.49
+   }
+  },
+  {
+   "type": "share_risk",
+   "level": "warn",
+   "title": "占比过高 · SOXL/USDT · BNB Chain · 0.25%",
+   "detail": "按本金 $10,000 算，占池子 8.9%（TVL $102.5K）— 你即市场",
+   "pool": "bsc|0x3d7d950377eca7b4af7233716ff17def00ab2045",
+   "prev": {
+    "share": 0
+   },
+   "now": {
+    "share": 8.89
+   }
+  },
+  {
+   "type": "share_risk",
+   "level": "warn",
+   "title": "占比过高 · GME/USDT · BNB Chain · 0.25%",
+   "detail": "按本金 $10,000 算，占池子 5.5%（TVL $173.0K）— 你即市场",
+   "pool": "bsc|0x908d49048eb3a7bedfd238972403842805eaf2be",
+   "prev": {
+    "share": 0
+   },
+   "now": {
+    "share": 5.47
+   }
+  },
+  {
+   "type": "share_risk",
+   "level": "warn",
+   "title": "占比过高 · ARM/USDC · Base · ?",
+   "detail": "按本金 $10,000 算，占池子 19.4%（TVL $41.6K）— 你即市场",
+   "pool": "base|0x9a0f4fd0766ccdb792ba58fe631aa7720097623c",
+   "prev": {
+    "share": 0
+   },
+   "now": {
+    "share": 19.38
+   }
+  },
+  {
+   "type": "share_risk",
+   "level": "warn",
+   "title": "占比过高 · DJT/USDT · BNB Chain · 0.25%",
+   "detail": "按本金 $10,000 算，占池子 12.2%（TVL $71.7K）— 你即市场",
+   "pool": "bsc|0x9aadbd51515432dbb77c0a7f69c2b2c211f0c837",
+   "prev": {
+    "share": 0
+   },
+   "now": {
+    "share": 12.23
+   }
+  },
+  {
+   "type": "share_risk",
+   "level": "warn",
+   "title": "占比过高 · NFLX/USDT · BNB Chain · 0.25%",
+   "detail": "按本金 $10,000 算，占池子 5.7%（TVL $165.6K）— 你即市场",
+   "pool": "bsc|0xafab4441d8b354bba790229c0e235e7e6187b3d0",
+   "prev": {
+    "share": 0
+   },
+   "now": {
+    "share": 5.7
+   }
+  },
+  {
+   "type": "tvl_swing",
+   "level": "warn",
+   "title": "TVL 骤降 · META/USDC · Base · 0.143%",
+   "detail": "$1.09M → $662.5K（-39%）",
+   "pool": "base|0xeaf57753bc382e0324a1d43f72e7027705a2273e",
+   "prev": {
+    "tvl": 1090582.2496
+   },
+   "now": {
+    "tvl": 662482.041
+   }
+  },
+  {
+   "type": "tvl_swing",
+   "level": "warn",
+   "title": "TVL 骤降 · MSTR/USDC · Base · 0.05%",
+   "detail": "$1.98M → $587.5K（-70%）",
+   "pool": "base|0x8b27f626ab668197000bc722a1012022caed10e2",
+   "prev": {
+    "tvl": 1979030.948
+   },
+   "now": {
+    "tvl": 587468.457
+   }
+  },
+  {
+   "type": "tvl_swing",
+   "level": "warn",
+   "title": "TVL 骤降 · AMZN/USDC · Base · 0.051%",
+   "detail": "$1.83M → $859.7K（-53%）",
    "pool": "base|0xd03bc8c7f2faedce2aac81bf0444aea08ea06e9b",
    "prev": {
-    "apr": 260.02601,
-    "tvl": 1764921.647
+    "tvl": 1827766.3711
    },
    "now": {
-    "apr": 1333.65974,
-    "tvl": 1827766.3711
+    "tvl": 859685.4325
    }
   },
   {
-   "type": "new_pool",
-   "level": "info",
-   "title": "新池上线 · SPCX/USDC · Solana · ?",
-   "detail": "TVL $784.8K · APY 未知",
-   "pool": "solana|csiojdbzethdndy6m6hv5eceowf8zm7bfvtbcb7fzect",
-   "prev": null,
+   "type": "tvl_swing",
+   "level": "warn",
+   "title": "TVL 骤降 · TSLA/USDC · Base · 0.107%",
+   "detail": "$314.3K → $201.4K（-36%）",
+   "pool": "base|0x469337fdcc5e8f38e2e4b670b04f57865d13a7bb",
+   "prev": {
+    "tvl": 314316.4985
+   },
    "now": {
-    "tvl": 784836.0059,
-    "apr": null
+    "tvl": 201389.7175
+   }
+  },
+  {
+   "type": "tvl_swing",
+   "level": "warn",
+   "title": "TVL 骤降 · AAPL/USDC · Base · 0.056%",
+   "detail": "$1.03M → $503.5K（-51%）",
+   "pool": "base|0xa3b1e3f9747065e2073722ff4c9027d3ea4994f0",
+   "prev": {
+    "tvl": 1032968.127
+   },
+   "now": {
+    "tvl": 503499.3048
+   }
+  },
+  {
+   "type": "tvl_swing",
+   "level": "warn",
+   "title": "TVL 骤降 · MSFT/USDC · Base · 0.185%",
+   "detail": "$440.7K → $168.6K（-62%）",
+   "pool": "base|0x7103eb3c9590d1281f7dc03b2a9ee27c39df5d54",
+   "prev": {
+    "tvl": 440700.121
+   },
+   "now": {
+    "tvl": 168579.9756
+   }
+  },
+  {
+   "type": "apr_jump",
+   "level": "info",
+   "title": "APR 飙升 · HIMS/USDC · Solana · ?",
+   "detail": "235% → 484%（+106%） · TVL $201.7K",
+   "pool": "solana|7iqwwnjubstjmwxk9eyjvidlzjbn2kjryt5z9j8n8exq",
+   "prev": {
+    "apr": 235.21306,
+    "tvl": 202637.9565
+   },
+   "now": {
+    "apr": 484.34088,
+    "tvl": 201687.5148
+   }
+  },
+  {
+   "type": "apr_jump",
+   "level": "info",
+   "title": "APR 飙升 · META/USDT · BNB Chain · 0.25%",
+   "detail": "144% → 384%（+167%） · TVL $190.5K",
+   "pool": "bsc|0xc2151a561e928d16576d75ea88544543ac63d80b",
+   "prev": {
+    "apr": 143.64876,
+    "tvl": 191487.5844
+   },
+   "now": {
+    "apr": 384.13359,
+    "tvl": 190488.4465
+   }
+  },
+  {
+   "type": "apr_jump",
+   "level": "info",
+   "title": "APR 飙升 · META/USDC · Solana · ?",
+   "detail": "72% → 171%（+137%） · TVL $838.9K",
+   "pool": "solana|3l7kbpvaaqa4utecagqysm6ucq5f3szm9zaykxqyt63j",
+   "prev": {
+    "apr": 71.97,
+    "tvl": 847193.6562
+   },
+   "now": {
+    "apr": 170.65,
+    "tvl": 838910.033
+   }
+  },
+  {
+   "type": "apr_jump",
+   "level": "info",
+   "title": "APR 飙升 · TSLA/USDC · Solana · ?",
+   "detail": "31% → 53%（+74%） · TVL $2.40M",
+   "pool": "solana|8adabqktrs6hvmjyc6ezebgdiaxhlygridwkwwp1npff",
+   "prev": {
+    "apr": 30.65,
+    "tvl": 2437183.9363
+   },
+   "now": {
+    "apr": 53.24,
+    "tvl": 2395023.1527
+   }
+  },
+  {
+   "type": "scope_change",
+   "level": "info",
+   "title": "监控范围扩大",
+   "detail": "上一轮 55 个池 → 本轮 72 个（+17）。本轮不报「新池上线」，避免把口径变化当成市场变化",
+   "pool": null,
+   "prev": {
+    "n": 55
+   },
+   "now": {
+    "n": 72
    }
   }
  ]
