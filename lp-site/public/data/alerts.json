@@ -1,115 +1,89 @@
 {
- "generatedAt": "2026-10-24T04:13:34+00:00",
+ "generatedAt": "2026-10-24T11:04:24+00:00",
  "baseline": true,
- "prevUpdated": "2026-10-23T21:43:47+00:00",
- "nowUpdated": "2026-10-24T04:13:34+00:00",
- "n": 8,
+ "prevUpdated": "2026-10-24T04:13:34+00:00",
+ "nowUpdated": "2026-10-24T11:04:23+00:00",
+ "n": 6,
  "alerts": [
   {
    "type": "share_risk",
    "level": "warn",
-   "title": "占比过高 · GLD/USDC · Solana · ?",
-   "detail": "按本金 $10,000 算，占池子 7.5%（TVL $123.2K）— 你即市场",
-   "pool": "solana|5tgludhm9phtqbtfymvdarbd59aymyyimxxwbffzetv9",
+   "title": "占比过高 · AMD/USDC · Solana · ?",
+   "detail": "按本金 $10,000 算，占池子 7.7%（TVL $119.3K）— 你即市场",
+   "pool": "solana|asvfi45yphkhx6ej9gjedvtedxcxjhkjkhm3hreruu2",
    "prev": {
-    "share": 5.5
+    "share": 0
    },
    "now": {
-    "share": 7.51
+    "share": 7.73
    }
   },
   {
    "type": "share_risk",
    "level": "warn",
    "title": "占比过高 · DJT/USDT · BNB Chain · 0.25%",
-   "detail": "按本金 $10,000 算，占池子 10.7%（TVL $83.1K）— 你即市场",
+   "detail": "按本金 $10,000 算，占池子 11.1%（TVL $80.3K）— 你即市场",
    "pool": "bsc|0x9aadbd51515432dbb77c0a7f69c2b2c211f0c837",
    "prev": {
-    "share": 0
+    "share": 10.74
    },
    "now": {
-    "share": 10.74
+    "share": 11.07
+   }
+  },
+  {
+   "type": "share_risk",
+   "level": "warn",
+   "title": "占比过高 · GME/USDG · Robinhood · 0.05%",
+   "detail": "按本金 $10,000 算，占池子 8.9%（TVL $102.2K）— 你即市场",
+   "pool": "robinhood|0xe2b46c905e12ab8e2f864e4821a4325884c1b126",
+   "prev": {
+    "share": 8.55
+   },
+   "now": {
+    "share": 8.92
    }
   },
   {
    "type": "tvl_swing",
    "level": "warn",
-   "title": "TVL 骤降 · MSTR/USDC · Base · 0.012%",
-   "detail": "$1.72M → $842.1K（-51%）",
-   "pool": "base|0x66dcd42e6314b287110922ae36cb2a8bdeecc153",
+   "title": "TVL 骤降 · COIN/WETH · Robinhood · 0.3%",
+   "detail": "$807.2K → $524.2K（-35%）",
+   "pool": "robinhood|0x6707aeac7d0e519b083219d27bb427364363183a",
    "prev": {
-    "tvl": 1724838.1606
+    "tvl": 807170.279
    },
    "now": {
-    "tvl": 842108.1764
+    "tvl": 524180.9889
    }
   },
   {
    "type": "apr_jump",
    "level": "info",
-   "title": "APR 飙升 · DJT/USDC · Solana · ?",
-   "detail": "770% → 1428%（+86%） · TVL $745.1K",
-   "pool": "solana|7gkb2d1sqhuygkrspdu5cma4tk9efijhouyituabdjcg",
+   "title": "APR 飙升 · AAPL/USDC · Solana · ?",
+   "detail": "41% → 246%（+496%） · TVL $266.7K",
+   "pool": "solana|ckwjzwm7oj3nu4653n1epdrqxbxayxopfipeenlouf8y",
    "prev": {
-    "apr": 769.57849,
-    "tvl": 1136907.2255
+    "apr": 41.27,
+    "tvl": 264181.4183
    },
    "now": {
-    "apr": 1428.36088,
-    "tvl": 745052.946
-   }
-  },
-  {
-   "type": "new_pool",
-   "level": "info",
-   "title": "新池上线 · META/USDC · Solana · ?",
-   "detail": "TVL $2.40M · APY 未知",
-   "pool": "solana|cupoiqkk4hxycijclc4ye9atjp1mov1vfv2vx3jqwwes",
-   "prev": null,
-   "now": {
-    "tvl": 2398333.3909,
-    "apr": null
+    "apr": 245.98,
+    "tvl": 266712.6223
    }
   },
   {
    "type": "top_rank",
    "level": "info",
-   "title": "新进 APR 前 5 · MSTR/USDC · Base · 0.012%",
-   "detail": "上次第 7 名 → 当前第 4 名 · APY 124%",
-   "pool": "base|0x66dcd42e6314b287110922ae36cb2a8bdeecc153",
+   "title": "新进 APR 前 5 · AAPL/USDC · Solana · ?",
+   "detail": "上次第 13 名 → 当前第 2 名 · APY 246%",
+   "pool": "solana|ckwjzwm7oj3nu4653n1epdrqxbxayxopfipeenlouf8y",
    "prev": {
-    "rank": 7
+    "rank": 13
    },
    "now": {
-    "rank": 4,
-    "apr": 124.47763
-   }
-  },
-  {
-   "type": "top_rank",
-   "level": "info",
-   "title": "新进 APR 前 5 · SPCX/USDC · Solana · ?",
-   "detail": "上次第 6 名 → 当前第 5 名 · APY 114%",
-   "pool": "solana|fjuby7jjf9dxj9d3r7chpvcnofw2iqxf7f7p3vqx4jza",
-   "prev": {
-    "rank": 6
-   },
-   "now": {
-    "rank": 5,
-    "apr": 113.57
-   }
-  },
-  {
-   "type": "tvl_swing",
-   "level": "info",
-   "title": "TVL 暴涨 · PLTR/USDC · Base · 0.08%",
-   "detail": "$353.6K → $526.8K（+49%）",
-   "pool": "base|0xa0473ced0cd1bfb857e3e04b5fa4b6af18c5e44d",
-   "prev": {
-    "tvl": 353620.3066
-   },
-   "now": {
-    "tvl": 526825.487
+    "rank": 2,
+    "apr": 245.98
    }
   }
  ]
