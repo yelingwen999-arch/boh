@@ -1,144 +1,116 @@
 {
- "generatedAt": "2026-10-28T05:02:31+00:00",
+ "generatedAt": "2026-10-28T12:53:59+00:00",
  "baseline": true,
- "prevUpdated": "2026-10-27T22:32:05+00:00",
- "nowUpdated": "2026-10-28T05:02:30+00:00",
- "n": 10,
+ "prevUpdated": "2026-10-28T05:02:30+00:00",
+ "nowUpdated": "2026-10-28T12:53:58+00:00",
+ "n": 8,
  "alerts": [
   {
    "type": "share_risk",
    "level": "warn",
-   "title": "占比过高 · BABA/USDC · Solana · ?",
-   "detail": "按本金 $10,000 算，占池子 5.4%（TVL $173.6K）— 你即市场",
-   "pool": "solana|6evguuruvprazvdpd717e9uqruhcqrpbhrkdm5czdidu",
+   "title": "占比过高 · TSLA/USDC · Solana · ?",
+   "detail": "按本金 $10,000 算，占池子 7.7%（TVL $120.1K）— 你即市场",
+   "pool": "solana|9p7abufv31ycgu9kckvnoqmmvby67dqtdm2m6hp9xokn",
    "prev": {
     "share": 0
    },
    "now": {
-    "share": 5.45
+    "share": 7.69
    }
   },
   {
    "type": "share_risk",
    "level": "warn",
-   "title": "占比过高 · HOOD/WETH · Robinhood · ?",
-   "detail": "按本金 $10,000 算，占池子 22.5%（TVL $34.5K）— 你即市场",
-   "pool": "robinhood|0xd6a5bc05379b098c59fcc643bb17ce5bb1d8f3e2d417f5d00aa1bd98f88d4521",
+   "title": "占比过高 · SNDK/USDC · Solana · ?",
+   "detail": "按本金 $10,000 算，占池子 8.1%（TVL $113.2K）— 你即市场",
+   "pool": "solana|4vrc6qne8hpun98mjr88vrkrd9n4cadyrgtpwvu3cv86",
    "prev": {
     "share": 0
    },
    "now": {
-    "share": 22.49
+    "share": 8.11
    }
   },
   {
-   "type": "volume_dry",
+   "type": "tvl_swing",
    "level": "warn",
-   "title": "量能萎缩 · SPCX/WBNB · BNB Chain · 0.25%",
-   "detail": "7 日均量 / 30 日均量 = 36%（$1.24M / $3.42M）",
-   "pool": "bsc|0x66faad27cf481f82d0089ec8156b3aa3636010c7",
+   "title": "TVL 骤降 · DJT/USDC · Solana · ?",
+   "detail": "$557.4K → $319.0K（-43%）",
+   "pool": "solana|7gkb2d1sqhuygkrspdu5cma4tk9efijhouyituabdjcg",
    "prev": {
-    "ratio": 51.6
+    "tvl": 557406.1003
    },
    "now": {
-    "ratio": 36.1
+    "tvl": 318971.6147
    }
   },
   {
-   "type": "volume_dry",
+   "type": "tvl_swing",
    "level": "warn",
-   "title": "量能萎缩 · BABA/USDT · BNB Chain · 0.25%",
-   "detail": "7 日均量 / 30 日均量 = 36%（$372.4K / $1.04M）",
-   "pool": "bsc|0xfd95cb1391999006eb91797a7c62acfe88b20292",
+   "title": "TVL 骤降 · TSLA/USDT · BNB Chain · 0.25%",
+   "detail": "$1.73M → $328.8K（-81%）",
+   "pool": "bsc|0xb0f5e5400e8f0f7c242f2b7740c004f020579c41",
    "prev": {
-    "ratio": 42.2
+    "tvl": 1729951.0775
    },
    "now": {
-    "ratio": 35.6
+    "tvl": 328827.2844
    }
   },
   {
    "type": "apr_jump",
    "level": "info",
    "title": "APR 飙升 · DJT/USDC · Solana · ?",
-   "detail": "341% → 833%（+144%） · TVL $557.4K",
+   "detail": "833% → 1412%（+69%） · TVL $319.0K",
    "pool": "solana|7gkb2d1sqhuygkrspdu5cma4tk9efijhouyituabdjcg",
    "prev": {
-    "apr": 341.47793,
-    "tvl": 496932.9529
-   },
-   "now": {
     "apr": 833.17854,
     "tvl": 557406.1003
+   },
+   "now": {
+    "apr": 1411.68409,
+    "tvl": 318971.6147
    }
   },
   {
    "type": "apr_jump",
    "level": "info",
-   "title": "APR 飙升 · SKHY/USDC · Solana · ?",
-   "detail": "27% → 43%（+63%） · TVL $2.53M",
-   "pool": "solana|dpau7wdymxdgnafzqymfynqmtjzcorsspa2legh71hgi",
+   "title": "APR 飙升 · BABA/USDC · Solana · ?",
+   "detail": "58% → 159%（+176%） · TVL $174.0K",
+   "pool": "solana|6evguuruvprazvdpd717e9uqruhcqrpbhrkdm5czdidu",
    "prev": {
-    "apr": 26.54,
-    "tvl": 2439766.2129
+    "apr": 57.70679,
+    "tvl": 173635.7054
    },
    "now": {
-    "apr": 43.3,
-    "tvl": 2533422.5575
-   }
-  },
-  {
-   "type": "apr_jump",
-   "level": "info",
-   "title": "APR 飙升 · TSLA/USDC · Solana · ?",
-   "detail": "22% → 39%（+79%） · TVL $2.43M",
-   "pool": "solana|8adabqktrs6hvmjyc6ezebgdiaxhlygridwkwwp1npff",
-   "prev": {
-    "apr": 21.77,
-    "tvl": 2384165.8024
-   },
-   "now": {
-    "apr": 38.91,
-    "tvl": 2430122.7153
-   }
-  },
-  {
-   "type": "apr_jump",
-   "level": "info",
-   "title": "APR 飙升 · SNDK/USDC · Base · 0.089%",
-   "detail": "9% → 33%（+259%） · TVL $683.6K",
-   "pool": "base|0x2836e062a3fe75943a7f4a552e2365b98e414e75",
-   "prev": {
-    "apr": 9.19477,
-    "tvl": 644805.6394
-   },
-   "now": {
-    "apr": 32.96752,
-    "tvl": 683590.3913
+    "apr": 159.25616,
+    "tvl": 173993.5356
    }
   },
   {
    "type": "new_pool",
    "level": "info",
-   "title": "新池上线 · HOOD/USDC · Solana · ?",
-   "detail": "TVL $235.7K · APY 58%",
-   "pool": "solana|97r9nlqyoygfbqespduwuthq4fjjbk8phvugaweqfnva",
+   "title": "新池上线 · TSLA/USDC · Solana · ?",
+   "detail": "TVL $120.1K · APY 253%",
+   "pool": "solana|9p7abufv31ycgu9kckvnoqmmvby67dqtdm2m6hp9xokn",
    "prev": null,
    "now": {
-    "tvl": 235695.3345,
-    "apr": 58.16
+    "tvl": 120089.2337,
+    "apr": 252.95037
    }
   },
   {
-   "type": "new_pool",
+   "type": "top_rank",
    "level": "info",
-   "title": "新池上线 · HOOD/WETH · Robinhood · ?",
-   "detail": "TVL $34.5K · APY 未知",
-   "pool": "robinhood|0xd6a5bc05379b098c59fcc643bb17ce5bb1d8f3e2d417f5d00aa1bd98f88d4521",
-   "prev": null,
+   "title": "新进 APR 前 5 · META/USDC · Base · ?",
+   "detail": "上次第 6 名 → 当前第 5 名 · APY 57%",
+   "pool": "base|0xd072410fa13d242e1d53721bcf7af02e3455dc96",
+   "prev": {
+    "rank": 6
+   },
    "now": {
-    "tvl": 34456.5648,
-    "apr": null
+    "rank": 5,
+    "apr": 57.06828
    }
   }
  ]

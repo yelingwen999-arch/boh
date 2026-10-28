@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-28T05:02:30+00:00",
+ "updated": "2026-10-28T12:53:58+00:00",
  "pools": [
   "base|0x0bf58fe0fac935ac69595c19b12ba0d75e3f8c0e",
   "base|0x0f9392c6c3fde1066f2e1c32b5536fb63897b64d",
@@ -129,10 +129,12 @@
   "solana|8adabqktrs6hvmjyc6ezebgdiaxhlygridwkwwp1npff",
   "solana|97r9nlqyoygfbqespduwuthq4fjjbk8phvugaweqfnva",
   "solana|9jsdnmzonykbmrybuyazuyxr4dcbzzqtdyqzdfxtdr5f",
+  "solana|9p7abufv31ycgu9kckvnoqmmvby67dqtdm2m6hp9xokn",
   "solana|9xvkrt2d53ledya5jyhblmev23kw91inrxbzvghudft9",
   "solana|asaxmeatt1hfe3mvc3zbkde4tub28w7732xqrembm5w2",
   "solana|asvfi45yphkhx6ej9gjedvtedxcxjhkjkhm3hreruu2",
   "solana|b8yawjgyk6qidwzgbxmaxp7nyfg8g74ez3y4gfssobrw",
+  "solana|caje1kewm5a3pbrxrrghcdv3gdu9vqprfw7gpk4it26f",
   "solana|ckwjzwm7oj3nu4653n1epdrqxbxayxopfipeenlouf8y",
   "solana|clu4kfm4nb67xrdn7vjnmxxxir8z5ha4hjuzpfccxjsl",
   "solana|cnakwtw7mdzbhkucduwrbykpe8efgwlncrfuhinok9m6",
