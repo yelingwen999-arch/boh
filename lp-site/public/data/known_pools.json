@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-31T12:26:58+00:00",
+ "updated": "2026-10-31T17:33:43+00:00",
  "pools": [
   "base|0x086a1447d0851f0aea9d09d6c547fec8e97be413",
   "base|0x0bf58fe0fac935ac69595c19b12ba0d75e3f8c0e",
@@ -38,6 +38,7 @@
   "base|0xf668e21993f0acd7ab00bb1cfbaed0df28a3c8ec",
   "bsc|0x07d726370d28b3d38f2285ef70f5e24731b481ee36affa53b00dee467fe7b16c",
   "bsc|0x0905edec2928b701fb6c6354e4eee4960895a82f",
+  "bsc|0x162d64349c57ff06ad69551870f0414f694e6491",
   "bsc|0x23fc3a1a2a535ff5bf2962e0ae06dedd29074e2ff38ab9faf8abccc63d5cc569",
   "bsc|0x29967c54c5bf12e8158c8894376064b30ebab297",
   "bsc|0x36c0fc3159eb8662a2e1b84a4df518d916bce0e1",
@@ -70,6 +71,7 @@
   "bsc|0xe4b5403f5103b02d1e8193b0d7d76d49f3f8ad77",
   "bsc|0xe531fcb1f5a195de7608b9f4f9518544c2cdb693",
   "bsc|0xe9b9998b2ec5430d2246c7f1f8d9f298c97d7365",
+  "bsc|0xee90641e7c3b4d6338ab7f1c23dfb979fab5f096",
   "bsc|0xf6a5f768f583a695b6cdd772fb138921c5bae4e9",
   "bsc|0xfd95cb1391999006eb91797a7c62acfe88b20292",
   "bsc|0xfeef70ff6f58f0a900e28a77e5a8945afb343923",
@@ -85,6 +87,7 @@
   "robinhood|0x34d0dc122cf9a8eb296fc5e0d3a233625d7d19b7",
   "robinhood|0x38453c115607463ac284820ce959831042f3df4e",
   "robinhood|0x43343e5881c9382bbdc7b8fb44e837d7a6c254ad",
+  "robinhood|0x4538681130d33cb1e3f7495f733caea3a678a299",
   "robinhood|0x48d284a2a4d3dc1b3da08231fe44317e7e7aa51f",
   "robinhood|0x5875d407a42965b0e768c8925cea290e06fa50603ef34fc99eb92a1050e6ae36",
   "robinhood|0x5f2a5025feb93a4c44da4e3b37e4fd3fb0ab5171",
@@ -146,6 +149,7 @@
   "solana|7gkb2d1sqhuygkrspdu5cma4tk9efijhouyituabdjcg",
   "solana|7iqwwnjubstjmwxk9eyjvidlzjbn2kjryt5z9j8n8exq",
   "solana|8adabqktrs6hvmjyc6ezebgdiaxhlygridwkwwp1npff",
+  "solana|8cdmw3egziaxzqqggjx46xnzaxquvg5acthqxclijmre",
   "solana|97r9nlqyoygfbqespduwuthq4fjjbk8phvugaweqfnva",
   "solana|9jsdnmzonykbmrybuyazuyxr4dcbzzqtdyqzdfxtdr5f",
   "solana|9p7abufv31ycgu9kckvnoqmmvby67dqtdm2m6hp9xokn",
