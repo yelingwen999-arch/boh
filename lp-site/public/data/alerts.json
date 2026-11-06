@@ -1,190 +1,207 @@
 {
- "generatedAt": "2026-11-06T14:29:41+00:00",
+ "generatedAt": "2026-11-06T23:26:05+00:00",
  "baseline": true,
- "prevUpdated": "2026-11-06T06:06:48+00:00",
- "nowUpdated": "2026-11-06T14:29:41+00:00",
- "n": 14,
+ "prevUpdated": "2026-11-06T14:29:41+00:00",
+ "nowUpdated": "2026-11-06T23:26:04+00:00",
+ "n": 15,
  "alerts": [
   {
    "type": "share_risk",
    "level": "warn",
-   "title": "占比过高 · PLTR/USDC · Base · 0.036%",
-   "detail": "按本金 $10,000 算，占池子 6.6%（TVL $140.8K）— 你即市场",
-   "pool": "base|0xa0473ced0cd1bfb857e3e04b5fa4b6af18c5e44d",
-   "prev": {
-    "share": 5.83
-   },
-   "now": {
-    "share": 6.63
-   }
-  },
-  {
-   "type": "share_risk",
-   "level": "warn",
-   "title": "占比过高 · AMD/USDC · Base · 0.05%",
-   "detail": "按本金 $10,000 算，占池子 18.5%（TVL $44.1K）— 你即市场",
-   "pool": "base|0x138cb591c4a7d854d796e1906af8228d84cb7642",
-   "prev": {
-    "share": 9.36
-   },
-   "now": {
-    "share": 18.49
-   }
-  },
-  {
-   "type": "share_risk",
-   "level": "warn",
-   "title": "占比过高 · ORCL/USDC · Base · 0.01%",
-   "detail": "按本金 $10,000 算，占池子 14.9%（TVL $57.3K）— 你即市场",
-   "pool": "base|0x62b5452e80e50b047dcf6dd3fb6a1d266c678eb5",
-   "prev": {
-    "share": 8.46
-   },
-   "now": {
-    "share": 14.86
-   }
-  },
-  {
-   "type": "share_risk",
-   "level": "warn",
-   "title": "占比过高 · NFLX/USDC · Base · 0.091%",
-   "detail": "按本金 $10,000 算，占池子 15.4%（TVL $55.0K）— 你即市场",
-   "pool": "base|0x67ba8dbedc6d7f93f0f5967aa2420715f1edc756",
-   "prev": {
-    "share": 2.48
-   },
-   "now": {
-    "share": 15.37
-   }
-  },
-  {
-   "type": "share_risk",
-   "level": "warn",
-   "title": "占比过高 · SOXL/USDT · BNB Chain · 0.25%",
-   "detail": "按本金 $10,000 算，占池子 11.1%（TVL $80.0K）— 你即市场",
-   "pool": "bsc|0x3d7d950377eca7b4af7233716ff17def00ab2045",
+   "title": "占比过高 · AAPL/USDC · Solana · ?",
+   "detail": "按本金 $10,000 算，占池子 47.9%（TVL $10.9K）— 你即市场",
+   "pool": "solana|djdm88bgu5nlhvmewczqsblgd28vl8kes2mxejtnpzow",
    "prev": {
     "share": 0
    },
    "now": {
-    "share": 11.11
+    "share": 47.89
+   }
+  },
+  {
+   "type": "share_risk",
+   "level": "warn",
+   "title": "占比过高 · AAPL/USDG · Robinhood · 0.05%",
+   "detail": "按本金 $10,000 算，占池子 7.0%（TVL $132.0K）— 你即市场",
+   "pool": "robinhood|0xaae0d815ee56e4092a5e5c2911e676fea50b2d6d",
+   "prev": {
+    "share": 0
+   },
+   "now": {
+    "share": 7.04
    }
   },
   {
    "type": "tvl_swing",
    "level": "warn",
-   "title": "TVL 骤降 · AMC/SOL · Solana · ?",
-   "detail": "$37.9K → $3.7K（-90%）",
-   "pool": "solana|8wcdjcafdx9mqk2vp9szlzmvkbtfafurtpvbeaesovdw",
+   "title": "TVL 骤降 · MSTR/USDC · Base · 0.109%",
+   "detail": "$1.52M → $969.9K（-36%）",
+   "pool": "base|0x66dcd42e6314b287110922ae36cb2a8bdeecc153",
    "prev": {
-    "tvl": 37926.1218
+    "tvl": 1517774.7444
    },
    "now": {
-    "tvl": 3698.321
+    "tvl": 969852.2093
    }
   },
   {
-   "type": "tvl_swing",
-   "level": "warn",
-   "title": "TVL 骤降 · AMD/USDC · Base · 0.05%",
-   "detail": "$96.8K → $44.1K（-54%）",
-   "pool": "base|0x138cb591c4a7d854d796e1906af8228d84cb7642",
+   "type": "apr_jump",
+   "level": "info",
+   "title": "APR 飙升 · MU/USDC · Solana · ?",
+   "detail": "56% → 113%（+101%） · TVL $227.5K",
+   "pool": "solana|9xvkrt2d53ledya5jyhblmev23kw91inrxbzvghudft9",
    "prev": {
-    "tvl": 96829.292
+    "apr": 56.03,
+    "tvl": 258717.7653
    },
    "now": {
-    "tvl": 44080.1473
-   }
-  },
-  {
-   "type": "tvl_swing",
-   "level": "warn",
-   "title": "TVL 骤降 · ORCL/USDC · Base · 0.01%",
-   "detail": "$108.2K → $57.3K（-47%）",
-   "pool": "base|0x62b5452e80e50b047dcf6dd3fb6a1d266c678eb5",
-   "prev": {
-    "tvl": 108163.4349
-   },
-   "now": {
-    "tvl": 57292.0159
-   }
-  },
-  {
-   "type": "tvl_swing",
-   "level": "warn",
-   "title": "TVL 骤降 · NFLX/USDC · Base · 0.091%",
-   "detail": "$393.6K → $55.0K（-86%）",
-   "pool": "base|0x67ba8dbedc6d7f93f0f5967aa2420715f1edc756",
-   "prev": {
-    "tvl": 393629.2183
-   },
-   "now": {
-    "tvl": 55048.2867
+    "apr": 112.89,
+    "tvl": 227502.1697
    }
   },
   {
    "type": "new_pool",
    "level": "info",
-   "title": "新池上线 · TSLA/WETH · Robinhood · 0.3%",
-   "detail": "TVL $759.6K · APY 未知",
-   "pool": "robinhood|0xa953ca88ff430e9487c60ca34d757414f4efda07",
+   "title": "新池上线 · NVDA/USDT · BNB Chain · 0.05%",
+   "detail": "TVL $835.4K · APY 未知",
+   "pool": "bsc|0xcc2bffaec373a6004bb6ccc8a62cdd66061f7c6a",
    "prev": null,
    "now": {
-    "tvl": 759608.28,
+    "tvl": 835414.0578,
     "apr": null
    }
   },
   {
    "type": "top_rank",
    "level": "info",
-   "title": "新进 APR 前 5 · GLD/USDC · Solana · ?",
-   "detail": "上次第 6 名 → 当前第 5 名 · APY 116%",
-   "pool": "solana|5tgludhm9phtqbtfymvdarbd59aymyyimxxwbffzetv9",
+   "title": "新进 APR 前 5 · MSTR/USDC · Solana · ?",
+   "detail": "上次第 7 名 → 当前第 3 名 · APY 133%",
+   "pool": "solana|ryhf4cksvzy7vcqjpoythcxcgnkrp27peghsneppbgv",
+   "prev": {
+    "rank": 7
+   },
+   "now": {
+    "rank": 3,
+    "apr": 132.82
+   }
+  },
+  {
+   "type": "top_rank",
+   "level": "info",
+   "title": "新进 APR 前 5 · SKHY/USDC · Solana · ?",
+   "detail": "上次第 6 名 → 当前第 4 名 · APY 114%",
+   "pool": "solana|dpau7wdymxdgnafzqymfynqmtjzcorsspa2legh71hgi",
    "prev": {
     "rank": 6
    },
    "now": {
-    "rank": 5,
-    "apr": 115.52926
+    "rank": 4,
+    "apr": 113.76
    }
   },
   {
-   "type": "tvl_swing",
+   "type": "top_rank",
    "level": "info",
-   "title": "TVL 暴涨 · DJT/USDC · Solana · ?",
-   "detail": "$96.8K → $203.6K（+110%）",
-   "pool": "solana|7gkb2d1sqhuygkrspdu5cma4tk9efijhouyituabdjcg",
+   "title": "新进 APR 前 5 · MU/USDC · Solana · ?",
+   "detail": "上次第 13 名 → 当前第 5 名 · APY 113%",
+   "pool": "solana|9xvkrt2d53ledya5jyhblmev23kw91inrxbzvghudft9",
    "prev": {
-    "tvl": 96846.0648
+    "rank": 13
    },
    "now": {
-    "tvl": 203626.4464
+    "rank": 5,
+    "apr": 112.89
    }
   },
   {
    "type": "tvl_swing",
    "level": "info",
    "title": "TVL 暴涨 · SPCX/USDC · Base · 0.034%",
-   "detail": "$438.0K → $622.8K（+42%）",
+   "detail": "$622.8K → $879.3K（+41%）",
    "pool": "base|0x880db7dda4407d99508574e680d067d1164b3cfe",
    "prev": {
-    "tvl": 438007.6641
+    "tvl": 622800.969
    },
    "now": {
-    "tvl": 622800.969
+    "tvl": 879276.3153
    }
   },
   {
    "type": "tvl_swing",
    "level": "info",
-   "title": "TVL 暴涨 · MSTR/USDC · Base · 0.109%",
-   "detail": "$852.3K → $1.52M（+78%）",
-   "pool": "base|0x66dcd42e6314b287110922ae36cb2a8bdeecc153",
+   "title": "TVL 暴涨 · MSFT/USDC · Base · 0.095%",
+   "detail": "$250.1K → $587.8K（+135%）",
+   "pool": "base|0x2740c0faab738f6e346e545fde02aef9b1a01ee7",
    "prev": {
-    "tvl": 852321.4982
+    "tvl": 250123.8926
    },
    "now": {
-    "tvl": 1517774.7444
+    "tvl": 587802.7915
+   }
+  },
+  {
+   "type": "tvl_swing",
+   "level": "info",
+   "title": "TVL 暴涨 · TSLA/USDC · Base · 0.027%",
+   "detail": "$240.4K → $504.0K（+110%）",
+   "pool": "base|0x7a33000372f3f028f074182ccb9d16cbeefbf920",
+   "prev": {
+    "tvl": 240384.5851
+   },
+   "now": {
+    "tvl": 503950.6987
+   }
+  },
+  {
+   "type": "tvl_swing",
+   "level": "info",
+   "title": "TVL 暴涨 · PLTR/USDC · Base · 0.036%",
+   "detail": "$140.8K → $430.6K（+206%）",
+   "pool": "base|0xa0473ced0cd1bfb857e3e04b5fa4b6af18c5e44d",
+   "prev": {
+    "tvl": 140774.5668
+   },
+   "now": {
+    "tvl": 430639.931
+   }
+  },
+  {
+   "type": "tvl_swing",
+   "level": "info",
+   "title": "TVL 暴涨 · AMD/USDC · Base · 0.05%",
+   "detail": "$44.1K → $298.9K（+578%）",
+   "pool": "base|0x138cb591c4a7d854d796e1906af8228d84cb7642",
+   "prev": {
+    "tvl": 44080.1473
+   },
+   "now": {
+    "tvl": 298900.8004
+   }
+  },
+  {
+   "type": "tvl_swing",
+   "level": "info",
+   "title": "TVL 暴涨 · ORCL/USDC · Base · 0.01%",
+   "detail": "$57.3K → $278.0K（+385%）",
+   "pool": "base|0x62b5452e80e50b047dcf6dd3fb6a1d266c678eb5",
+   "prev": {
+    "tvl": 57292.0159
+   },
+   "now": {
+    "tvl": 277967.0108
+   }
+  },
+  {
+   "type": "tvl_swing",
+   "level": "info",
+   "title": "TVL 暴涨 · NFLX/USDC · Base · 0.091%",
+   "detail": "$55.0K → $384.4K（+598%）",
+   "pool": "base|0x67ba8dbedc6d7f93f0f5967aa2420715f1edc756",
+   "prev": {
+    "tvl": 55048.2867
+   },
+   "now": {
+    "tvl": 384376.6029
    }
   }
  ]
