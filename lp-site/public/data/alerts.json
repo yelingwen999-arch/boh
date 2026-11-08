@@ -1,73 +1,72 @@
 {
- "generatedAt": "2026-11-08T05:27:29+00:00",
+ "generatedAt": "2026-11-08T13:31:03+00:00",
  "baseline": true,
- "prevUpdated": "2026-11-07T22:09:19+00:00",
- "nowUpdated": "2026-11-08T05:27:29+00:00",
+ "prevUpdated": "2026-11-08T05:27:29+00:00",
+ "nowUpdated": "2026-11-08T13:31:03+00:00",
  "n": 5,
  "alerts": [
   {
    "type": "share_risk",
    "level": "warn",
-   "title": "占比过高 · HIMS/SOL · Solana · ?",
-   "detail": "按本金 $10,000 算，占池子 17.9%（TVL $46.0K）— 你即市场",
-   "pool": "solana|4rtiwuzd5e9aysfqxqxlpjzs68ncibhjvpd7q4nztrpk",
+   "title": "占比过高 · NFLX/USDC · Solana · ?",
+   "detail": "按本金 $10,000 算，占池子 8.0%（TVL $114.9K）— 你即市场",
+   "pool": "solana|e3mugzpimhkgrdcfcz5ojo7hjbbya6umajvszbabplam",
    "prev": {
-    "share": 15.12
+    "share": 0
    },
    "now": {
-    "share": 17.87
+    "share": 8.0
    }
   },
   {
    "type": "share_risk",
    "level": "warn",
-   "title": "占比过高 · SNDK/USDC · Solana · ?",
-   "detail": "按本金 $10,000 算，占池子 8.8%（TVL $103.7K）— 你即市场",
-   "pool": "solana|hse6afxkjqgwmdk1z23u1xgzhstxxjmvnm5gvagj2j7",
+   "title": "占比过高 · SKHY/USDC · Base · 0.062%",
+   "detail": "按本金 $10,000 算，占池子 12.2%（TVL $71.7K）— 你即市场",
+   "pool": "base|0xebc746a47ebb274de1dbdc9a465e6c5c2301c5da",
+   "prev": {
+    "share": 11.93
+   },
+   "now": {
+    "share": 12.23
+   }
+  },
+  {
+   "type": "share_risk",
+   "level": "warn",
+   "title": "占比过高 · AVGO/SOL · Solana · ?",
+   "detail": "按本金 $10,000 算，占池子 14.5%（TVL $58.9K）— 你即市场",
+   "pool": "solana|4sraagrader3vqgbdqklwkdryz5ys8bucxvsxx3wx828",
    "prev": {
     "share": 0
    },
    "now": {
-    "share": 8.8
+    "share": 14.5
+   }
+  },
+  {
+   "type": "tvl_swing",
+   "level": "warn",
+   "title": "TVL 骤降 · MSTR/USDC · Base · 0.066%",
+   "detail": "$1.57M → $866.5K（-45%）",
+   "pool": "base|0x66dcd42e6314b287110922ae36cb2a8bdeecc153",
+   "prev": {
+    "tvl": 1571570.6754
+   },
+   "now": {
+    "tvl": 866508.5079
    }
   },
   {
    "type": "new_pool",
    "level": "info",
-   "title": "新池上线 · TSLA/USDT · BNB Chain · 0.007%",
-   "detail": "TVL $46.25M · APY 未知",
-   "pool": "bsc|0x4e7d1ea68ed94be7fa18ea463c2816445c33b265208ff6f0954500067b0ea7b6",
+   "title": "新池上线 · AVGO/SOL · Solana · ?",
+   "detail": "TVL $58.9K · APY 未知",
+   "pool": "solana|4sraagrader3vqgbdqklwkdryz5ys8bucxvsxx3wx828",
    "prev": null,
    "now": {
-    "tvl": 46253471.2828,
+    "tvl": 58942.5544,
     "apr": null
-   }
-  },
-  {
-   "type": "top_rank",
-   "level": "info",
-   "title": "新进 APR 前 5 · SPCX/SOL · Solana · ?",
-   "detail": "上次第 6 名 → 当前第 5 名 · APY 45%",
-   "pool": "solana|3h9ghsuzozu2erq9mclcehwyshywm4mqbzptz2h1zgmf",
-   "prev": {
-    "rank": 6
-   },
-   "now": {
-    "rank": 5,
-    "apr": 45.44687
-   }
-  },
-  {
-   "type": "tvl_swing",
-   "level": "info",
-   "title": "TVL 暴涨 · MSTR/USDC · Base · 0.091%",
-   "detail": "$949.1K → $1.57M（+66%）",
-   "pool": "base|0x66dcd42e6314b287110922ae36cb2a8bdeecc153",
-   "prev": {
-    "tvl": 949081.7009
-   },
-   "now": {
-    "tvl": 1571570.6754
    }
   }
  ]
