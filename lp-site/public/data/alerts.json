@@ -1,127 +1,114 @@
 {
- "generatedAt": "2026-11-11T14:19:48+00:00",
+ "generatedAt": "2026-11-12T00:47:36+00:00",
  "baseline": true,
- "prevUpdated": "2026-11-11T05:37:56+00:00",
- "nowUpdated": "2026-11-11T14:19:48+00:00",
- "n": 9,
+ "prevUpdated": "2026-11-11T14:19:48+00:00",
+ "nowUpdated": "2026-11-12T00:47:36+00:00",
+ "n": 8,
  "alerts": [
   {
    "type": "share_risk",
    "level": "warn",
-   "title": "占比过高 · AMC/USDC · Solana · ?",
-   "detail": "按本金 $10,000 算，占池子 34.4%（TVL $19.0K）— 你即市场",
-   "pool": "solana|crq38vjwre7tb4iabufaatth6qukaidqtmdueijkgox4",
-   "prev": {
-    "share": 30.1
-   },
-   "now": {
-    "share": 34.45
-   }
-  },
-  {
-   "type": "share_risk",
-   "level": "warn",
    "title": "占比过高 · AMD/USDC · Solana · ?",
-   "detail": "按本金 $10,000 算，占池子 10.6%（TVL $84.8K）— 你即市场",
-   "pool": "solana|asvfi45yphkhx6ej9gjedvtedxcxjhkjkhm3hreruu2",
+   "detail": "按本金 $10,000 算，占池子 25.1%（TVL $29.8K）— 你即市场",
+   "pool": "solana|ddynroknkfy2e7b5kfevcszfarofsudsez1k9xr6tbap",
    "prev": {
     "share": 0
    },
    "now": {
-    "share": 10.55
+    "share": 25.15
    }
   },
   {
    "type": "share_risk",
    "level": "warn",
-   "title": "占比过高 · INTC/USDC · Solana · ?",
-   "detail": "按本金 $10,000 算，占池子 5.5%（TVL $173.3K）— 你即市场",
-   "pool": "solana|7eopbx8uyo2yun5sk1dakncwf2onp1japhbkrpqasymo",
+   "title": "占比过高 · DJT/USDC · Solana · ?",
+   "detail": "按本金 $10,000 算，占池子 6.1%（TVL $152.7K）— 你即市场",
+   "pool": "solana|7gkb2d1sqhuygkrspdu5cma4tk9efijhouyituabdjcg",
    "prev": {
-    "share": 0
+    "share": 5.63
    },
    "now": {
-    "share": 5.45
+    "share": 6.15
    }
   },
   {
    "type": "share_risk",
    "level": "warn",
-   "title": "占比过高 · HIMS/USDC · Base · 0.05%",
-   "detail": "按本金 $10,000 算，占池子 19.4%（TVL $41.6K）— 你即市场",
-   "pool": "base|0x41d7793faa4ca181b6f021423ff3f9015c00b2ff",
+   "title": "占比过高 · SNDK/USDC · Solana · ?",
+   "detail": "按本金 $10,000 算，占池子 8.4%（TVL $109.2K）— 你即市场",
+   "pool": "solana|hse6afxkjqgwmdk1z23u1xgzhstxxjmvnm5gvagj2j7",
    "prev": {
-    "share": 18.89
+    "share": 0
    },
    "now": {
-    "share": 19.38
+    "share": 8.39
+   }
+  },
+  {
+   "type": "share_risk",
+   "level": "warn",
+   "title": "占比过高 · GLD/WETH · Robinhood · 0.05%",
+   "detail": "按本金 $10,000 算，占池子 6.4%（TVL $146.4K）— 你即市场",
+   "pool": "robinhood|0x26250ba84465454bc731f710e46f1f32b167d66b",
+   "prev": {
+    "share": 0
+   },
+   "now": {
+    "share": 6.39
    }
   },
   {
    "type": "share_risk",
    "level": "warn",
    "title": "占比过高 · SKHY/USDC · Base · 0.039%",
-   "detail": "按本金 $10,000 算，占池子 13.6%（TVL $63.7K）— 你即市场",
+   "detail": "按本金 $10,000 算，占池子 14.1%（TVL $61.0K）— 你即市场",
    "pool": "base|0xebc746a47ebb274de1dbdc9a465e6c5c2301c5da",
    "prev": {
-    "share": 12.03
-   },
-   "now": {
     "share": 13.57
-   }
-  },
-  {
-   "type": "tvl_swing",
-   "level": "warn",
-   "title": "TVL 骤降 · NFLX/USDC · Base · 0.075%",
-   "detail": "$409.5K → $259.3K（-37%）",
-   "pool": "base|0x67ba8dbedc6d7f93f0f5967aa2420715f1edc756",
-   "prev": {
-    "tvl": 409505.4582
    },
    "now": {
-    "tvl": 259318.8821
+    "share": 14.09
    }
   },
   {
    "type": "top_rank",
    "level": "info",
-   "title": "新进 APR 前 5 · MSFT/USDC · Base · 0.009%",
-   "detail": "当前第 4 名 · APY 110%",
-   "pool": "base|0x2740c0faab738f6e346e545fde02aef9b1a01ee7",
+   "title": "新进 APR 前 5 · AMC/USDC · Solana · ?",
+   "detail": "当前第 1 名 · APY 1294%",
+   "pool": "solana|crq38vjwre7tb4iabufaatth6qukaidqtmdueijkgox4",
    "prev": {
     "rank": null
    },
    "now": {
-    "rank": 4,
-    "apr": 109.95666
+    "rank": 1,
+    "apr": 1293.62
    }
   },
   {
    "type": "top_rank",
    "level": "info",
-   "title": "新进 APR 前 5 · MSTR/USDC · Solana · ?",
-   "detail": "上次第 7 名 → 当前第 5 名 · APY 88%",
-   "pool": "solana|ryhf4cksvzy7vcqjpoythcxcgnkrp27peghsneppbgv",
+   "title": "新进 APR 前 5 · META/USDC · Base · 0.149%",
+   "detail": "当前第 5 名 · APY 98%",
+   "pool": "base|0xd072410fa13d242e1d53721bcf7af02e3455dc96",
    "prev": {
-    "rank": 7
+    "rank": null
    },
    "now": {
     "rank": 5,
-    "apr": 88.33
+    "apr": 98.19052
    }
   },
   {
    "type": "tvl_swing",
    "level": "info",
-   "title": "TVL 暴涨 · GLD/USDG · Robinhood · 0.05%",
-   "detail": "$831.9K → $1.13M（+36%）",
-   "pool": "robinhood|0xba2f1ed4ceb2169d538d1e614d847e83c5a55913",
+   "title": "TVL 暴涨 · HIMS/USDC · Base · 0.05%",
+   "detail": "$41.6K → $255.1K（+513%）",
+   "pool": "base|0x41d7793faa4ca181b6f021423ff3f9015c00b2ff",
    "prev": {
-    "tvl": 831902.3114
+    "tvl": 41608.4868
    },
    "now": {
-    "tvl": 1134253.8627
+    "tvl": 255080.5225
    }
   }
  ]
