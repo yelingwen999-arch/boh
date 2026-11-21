@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-21T14:58:42+00:00",
+ "updated": "2026-11-21T23:29:25+00:00",
  "pools": [
   "base|0x086a1447d0851f0aea9d09d6c547fec8e97be413",
   "base|0x0bf58fe0fac935ac69595c19b12ba0d75e3f8c0e",
@@ -124,6 +124,7 @@
   "robinhood|0x8517f8071ae5b831b738052f12125e8e3d6c158b78728aa44ce3b25e5104d32e",
   "robinhood|0x8ac92da74ab5f3b1d024dc1943ad7e15dc4179ef",
   "robinhood|0x8bb3514e2204e1cdf3ac149efee7ff04d91b719f",
+  "robinhood|0x8bf780a819c86f0162b842568b6cb1c40f578146",
   "robinhood|0x90cabda18279bbb3d935989af807b08b0e8cec61",
   "robinhood|0x961888ccca612ee3f1d68508456bf893e1887014",
   "robinhood|0x99932c7660dd58cf19f0e82e97f288d88d033480",
@@ -152,6 +153,7 @@
   "robinhood|0xeb60bcd1d920ad6e102690ccfc6fb488899e1510",
   "robinhood|0xee430ee1003e1985e1828a01b9a20dad67ad4302994fe2abb4a173de4ac54623",
   "robinhood|0xf4acdaeeb7022862a763c9b1b885e11191c889e3",
+  "robinhood|0xfb383f2470120c2eac6092c229064272eae91d6f",
   "robinhood|0xfe709115a71c7f9c007f2ac9cb932071ff3b3117865122134e2c1bd96719734c",
   "solana|13mex6gjradjnudmtoagszgewhlh7fzscuqs9mc5nyf5",
   "solana|29ih2lobujozc8zi7wiwwhqybwz5er4fmppfyykpizjl",
