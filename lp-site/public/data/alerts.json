@@ -1,44 +1,44 @@
 {
- "generatedAt": "2026-11-24T09:23:11+00:00",
+ "generatedAt": "2026-11-24T22:37:50+00:00",
  "baseline": true,
- "prevUpdated": "2026-11-24T00:08:02+00:00",
- "nowUpdated": "2026-11-24T09:23:10+00:00",
- "n": 6,
+ "prevUpdated": "2026-11-24T09:23:10+00:00",
+ "nowUpdated": "2026-11-24T22:37:49+00:00",
+ "n": 10,
  "alerts": [
   {
    "type": "share_risk",
    "level": "warn",
-   "title": "占比过高 · AMD/USDC · Solana · ?",
-   "detail": "按本金 $10,000 算，占池子 30.1%（TVL $23.2K）— 你即市场",
-   "pool": "solana|ddynroknkfy2e7b5kfevcszfarofsudsez1k9xr6tbap",
+   "title": "占比过高 · GLD/USDC · Solana · ?",
+   "detail": "按本金 $10,000 算，占池子 8.8%（TVL $103.0K）— 你即市场",
+   "pool": "solana|5tgludhm9phtqbtfymvdarbd59aymyyimxxwbffzetv9",
    "prev": {
-    "share": 0
+    "share": 8.15
    },
    "now": {
-    "share": 30.09
+    "share": 8.85
    }
   },
   {
    "type": "share_risk",
    "level": "warn",
-   "title": "占比过高 · GOOGL/USDG · Robinhood · 0.014%",
-   "detail": "按本金 $10,000 算，占池子 26.5%（TVL $27.8K）— 你即市场",
-   "pool": "robinhood|0x845c8384db587aec362e276d705cc333ba525ee3",
+   "title": "占比过高 · SPY/USDT · BNB Chain · 0.01%",
+   "detail": "按本金 $10,000 算，占池子 6.0%（TVL $157.1K）— 你即市场",
+   "pool": "bsc|0x7aa6d92fc369a8c1edc631a3aac44efb0808ddbf",
    "prev": {
     "share": 0
    },
    "now": {
-    "share": 26.45
+    "share": 5.99
    }
   },
   {
    "type": "share_risk",
    "level": "warn",
-   "title": "占比过高 · NFLX/USDC · Base · 0.023%",
-   "detail": "按本金 $10,000 算，占池子 6.1%（TVL $153.5K）— 你即市场",
-   "pool": "base|0x67ba8dbedc6d7f93f0f5967aa2420715f1edc756",
+   "title": "占比过高 · AMC/USDG · Robinhood · 0.1%",
+   "detail": "按本金 $10,000 算，占池子 6.1%（TVL $153.4K）— 你即市场",
+   "pool": "robinhood|0x7499938c352d5b5b8f0c648722aca5ee964ef9b85c3a3041f1ec379726291d9d",
    "prev": {
-    "share": 3.23
+    "share": 4.32
    },
    "now": {
     "share": 6.12
@@ -47,42 +47,92 @@
   {
    "type": "share_risk",
    "level": "warn",
-   "title": "占比过高 · AMD/USDG · Robinhood · 0.3%",
-   "detail": "按本金 $10,000 算，占池子 6.8%（TVL $137.5K）— 你即市场",
-   "pool": "robinhood|0x48d284a2a4d3dc1b3da08231fe44317e7e7aa51f",
+   "title": "占比过高 · SOXL/USDT · BNB Chain · 0.25%",
+   "detail": "按本金 $10,000 算，占池子 11.3%（TVL $78.8K）— 你即市场",
+   "pool": "bsc|0x3d7d950377eca7b4af7233716ff17def00ab2045",
    "prev": {
-    "share": 6.64
+    "share": 0
    },
    "now": {
-    "share": 6.78
+    "share": 11.26
+   }
+  },
+  {
+   "type": "share_risk",
+   "level": "warn",
+   "title": "占比过高 · AAPL/USDG · Robinhood · ?",
+   "detail": "按本金 $10,000 算，占池子 8.5%（TVL $107.6K）— 你即市场",
+   "pool": "robinhood|0x6a4fc50b14f6d390340bd0bd2fcdb1752852a099",
+   "prev": {
+    "share": 8.33
+   },
+   "now": {
+    "share": 8.5
+   }
+  },
+  {
+   "type": "share_risk",
+   "level": "warn",
+   "title": "占比过高 · MSTR/USDG · Robinhood · 0.015%",
+   "detail": "按本金 $10,000 算，占池子 15.4%（TVL $54.8K）— 你即市场",
+   "pool": "robinhood|0x961888ccca612ee3f1d68508456bf893e1887014",
+   "prev": {
+    "share": 0
+   },
+   "now": {
+    "share": 15.44
+   }
+  },
+  {
+   "type": "share_risk",
+   "level": "warn",
+   "title": "占比过高 · SKHY/USDC · Base · 0.035%",
+   "detail": "按本金 $10,000 算，占池子 14.7%（TVL $58.2K）— 你即市场",
+   "pool": "base|0xebc746a47ebb274de1dbdc9a465e6c5c2301c5da",
+   "prev": {
+    "share": 0
+   },
+   "now": {
+    "share": 14.65
+   }
+  },
+  {
+   "type": "share_risk",
+   "level": "warn",
+   "title": "占比过高 · AVGO/SOL · Solana · ?",
+   "detail": "按本金 $10,000 算，占池子 60.1%（TVL $6.6K）— 你即市场",
+   "pool": "solana|7i9rb1v9ck6bwjeaqrbahowshyufzev6qpcz3arcremd",
+   "prev": {
+    "share": 0
+   },
+   "now": {
+    "share": 60.08
    }
   },
   {
    "type": "tvl_swing",
-   "level": "warn",
-   "title": "TVL 骤降 · NFLX/USDC · Base · 0.023%",
-   "detail": "$299.2K → $153.5K（-49%）",
-   "pool": "base|0x67ba8dbedc6d7f93f0f5967aa2420715f1edc756",
+   "level": "info",
+   "title": "TVL 暴涨 · DJT/SOL · Solana · ?",
+   "detail": "$33.9K → $51.4K（+51%）",
+   "pool": "solana|8aw7uadspzcshkaxvn2ugvlixzhzy9dhgkc43rvhncpt",
    "prev": {
-    "tvl": 299197.4431
+    "tvl": 33932.1539
    },
    "now": {
-    "tvl": 153472.2783
+    "tvl": 51396.3307
    }
   },
   {
-   "type": "apr_jump",
+   "type": "tvl_swing",
    "level": "info",
-   "title": "APR 飙升 · SPY/USDG · Robinhood · 0.05%",
-   "detail": "33% → 76%（+133%） · TVL $771.4K",
-   "pool": "robinhood|0xe5923c8a8be481ec89a2ca784a2bbfa4235de6d88f92260fd66b660c4babf907",
+   "title": "TVL 暴涨 · NFLX/USDC · Base · 0.023%",
+   "detail": "$153.5K → $295.3K（+92%）",
+   "pool": "base|0x67ba8dbedc6d7f93f0f5967aa2420715f1edc756",
    "prev": {
-    "apr": 32.78789,
-    "tvl": 765402.2815
+    "tvl": 153472.2783
    },
    "now": {
-    "apr": 76.43964,
-    "tvl": 771389.5321
+    "tvl": 295322.703
    }
   }
  ]
