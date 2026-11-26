@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-26T07:46:55+00:00",
+ "updated": "2026-11-26T21:38:51+00:00",
  "pools": [
   "base|0x086a1447d0851f0aea9d09d6c547fec8e97be413",
   "base|0x0bf58fe0fac935ac69595c19b12ba0d75e3f8c0e",
@@ -10,6 +10,7 @@
   "base|0x25b45ff27bd03dafa0c0bf458762ffd0911fa9de",
   "base|0x2740c0faab738f6e346e545fde02aef9b1a01ee7",
   "base|0x2836e062a3fe75943a7f4a552e2365b98e414e75",
+  "base|0x294666ad6a415e8c33af801225c04079bb4f1133",
   "base|0x40e8d293ca4e0cce3221eb13a78bff1d0d2b70a7",
   "base|0x41d7793faa4ca181b6f021423ff3f9015c00b2ff",
   "base|0x469337fdcc5e8f38e2e4b670b04f57865d13a7bb",
@@ -46,6 +47,7 @@
   "bsc|0x29967c54c5bf12e8158c8894376064b30ebab297",
   "bsc|0x33299e5499a33bb122a6d6fe5214cdad9dc19478",
   "bsc|0x36c0fc3159eb8662a2e1b84a4df518d916bce0e1",
+  "bsc|0x3a14eade4c91d88144b7768b756fab3e58ac6f2f",
   "bsc|0x3d7d950377eca7b4af7233716ff17def00ab2045",
   "bsc|0x47bc06722295ac316a569eef87ac32faa455f441",
   "bsc|0x49fcb68f78a4b75fc3e2464bfd21ebd5a3349b3a4cf811acaf2a9975a2110617",
@@ -95,6 +97,7 @@
   "robinhood|0x05e146f995aa70d0bf8481ee3d27368a537a8e0d",
   "robinhood|0x06b9732431bd134599dd112a93c708fe80cadd2fb7dc750fe632e1cbf49fd8c0",
   "robinhood|0x09b8de3ded768478376d98fbbe80d09ae8e6cd3c",
+  "robinhood|0x0d45911d6228811a7ec1f9228d26332af2dd48c4d3a0d9a7d2176b419c468316",
   "robinhood|0x1791fc651cc794a282e5dbcb56d0b2b38eff8754b677c8876e86901521ecc439",
   "robinhood|0x18a5af4e442f8be68968cc1f00d537f8af2d12cd",
   "robinhood|0x1dae69f15c48eef452c79360cc8df58f5d5c3c1e6324ff8777d58c1feb053cdc",
@@ -206,6 +209,7 @@
   "solana|ba5ezsmhtb5frecusvukd7vurwm1areu3bwiqiabkqyb",
   "solana|be9uivcxuovypga6ard68qrrzo3scneakhutsgy8ajvw",
   "solana|caje1kewm5a3pbrxrrghcdv3gdu9vqprfw7gpk4it26f",
+  "solana|cgpe85qvwx3ca4istetnwsircvtvrkwejq42yht2rjfv",
   "solana|ckwjzwm7oj3nu4653n1epdrqxbxayxopfipeenlouf8y",
   "solana|clu4kfm4nb67xrdn7vjnmxxxir8z5ha4hjuzpfccxjsl",
   "solana|cnakwtw7mdzbhkucduwrbykpe8efgwlncrfuhinok9m6",
